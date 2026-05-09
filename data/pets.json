@@ -1,0 +1,211 @@
+{
+  "typeChart": {
+    "fire":    { "strong": ["grass"], "weak": ["water"] },
+    "water":   { "strong": ["fire"],  "weak": ["grass", "electric"] },
+    "grass":   { "strong": ["water"], "weak": ["fire"] },
+    "electric":{ "strong": ["water"], "weak": [] },
+    "light":   { "strong": ["dark"],  "weak": ["dark"] },
+    "dark":    { "strong": ["light"], "weak": ["light"] }
+  },
+  "expTable": [0,0,10,30,60,100,150,210,280,360,450,550,660,780,910,1050,1200,1400,1620,1860,2120,2400,2700,3020,3360,3720,4100,4500,4920,5360,5820,6300,6800,7320,7860,8420,9000,9600,10220,10860,11520,12200,12900,13620,14360,15120,15900,16700,17520,18360,19220,20100,21000,21920,22860,23820,24800,25800,26820,27860,28920,30000,31100,32220,33360,34520,35700,36900,38120,39360,40620,41900,43200,44520,45860,47220,48600,50000,51420,52860,54320,55800,57300,58820,60360,61920,63500,65100,66720,68360,70020,71700,73400,75120,76860,78620,80400,82200,84020,85860],
+  "pets": [
+    {
+      "id": 1,
+      "name": "小火猴",
+      "type": "fire",
+      "description": "性格活泼的小火猴，尾巴上跳动着不灭的火焰。是新手训练师最受欢迎的伙伴之一。",
+      "baseStats": { "hp": 45, "attack": 52, "defense": 40, "speed": 65, "spAttack": 55, "spDefense": 42 },
+      "growthRate": { "hp": 3.2, "attack": 2.8, "defense": 2.0, "speed": 3.0, "spAttack": 2.6, "spDefense": 2.2 },
+      "evolution": { "to": 2, "level": 16 },
+      "learnset": [
+        { "level": 1, "skillId": 1 },
+        { "level": 1, "skillId": 7 },
+        { "level": 8, "skillId": 2 },
+        { "level": 15, "skillId": 8 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "烈焰猿",
+      "type": "fire",
+      "description": "进化后的烈焰猿拥有更强大的火焰力量，背部的火焰在战斗时会燃烧得更旺。",
+      "baseStats": { "hp": 65, "attack": 72, "defense": 55, "speed": 80, "spAttack": 75, "spDefense": 55 },
+      "growthRate": { "hp": 3.8, "attack": 3.4, "defense": 2.6, "speed": 3.5, "spAttack": 3.2, "spDefense": 2.6 },
+      "evolution": { "to": 3, "level": 36 },
+      "learnset": [
+        { "level": 1, "skillId": 1 },
+        { "level": 1, "skillId": 7 },
+        { "level": 1, "skillId": 2 },
+        { "level": 16, "skillId": 3 },
+        { "level": 24, "skillId": 9 },
+        { "level": 32, "skillId": 10 }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "炎帝猩",
+      "type": "fire",
+      "description": "传说中的炎帝猩，浑身笼罩着不灭的金色火焰，一拳可以熔化钢铁。是火系精灵中的王者。",
+      "baseStats": { "hp": 85, "attack": 95, "defense": 72, "speed": 95, "spAttack": 100, "spDefense": 72 },
+      "growthRate": { "hp": 4.2, "attack": 4.0, "defense": 3.2, "speed": 4.0, "spAttack": 4.2, "spDefense": 3.2 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 1 },
+        { "level": 1, "skillId": 2 },
+        { "level": 1, "skillId": 3 },
+        { "level": 36, "skillId": 4 },
+        { "level": 45, "skillId": 10 },
+        { "level": 55, "skillId": 11 }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "水灵蛙",
+      "type": "water",
+      "description": "温顺可爱的水灵蛙，身体能分泌出清澈的水珠。喜欢在雨天唱歌。",
+      "baseStats": { "hp": 50, "attack": 42, "defense": 48, "speed": 55, "spAttack": 58, "spDefense": 50 },
+      "growthRate": { "hp": 3.4, "attack": 2.2, "defense": 2.6, "speed": 2.6, "spAttack": 3.0, "spDefense": 2.8 },
+      "evolution": { "to": 5, "level": 16 },
+      "learnset": [
+        { "level": 1, "skillId": 5 },
+        { "level": 1, "skillId": 7 },
+        { "level": 8, "skillId": 6 },
+        { "level": 14, "skillId": 12 }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "碧波蛙",
+      "type": "water",
+      "description": "碧波蛙掌握了更强的水之力量，能操控周围的水形成漩涡。",
+      "baseStats": { "hp": 70, "attack": 58, "defense": 65, "speed": 70, "spAttack": 78, "spDefense": 68 },
+      "growthRate": { "hp": 3.8, "attack": 2.8, "defense": 3.0, "speed": 3.0, "spAttack": 3.6, "spDefense": 3.2 },
+      "evolution": { "to": 6, "level": 36 },
+      "learnset": [
+        { "level": 1, "skillId": 5 },
+        { "level": 1, "skillId": 6 },
+        { "level": 1, "skillId": 7 },
+        { "level": 16, "skillId": 13 },
+        { "level": 24, "skillId": 14 },
+        { "level": 30, "skillId": 12 }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "海皇蛙",
+      "type": "water",
+      "description": "海洋之王海皇蛙，手持三叉戟，能呼唤海啸。是水系最强精灵之一。",
+      "baseStats": { "hp": 90, "attack": 78, "defense": 85, "speed": 82, "spAttack": 105, "spDefense": 88 },
+      "growthRate": { "hp": 4.2, "attack": 3.2, "defense": 3.6, "speed": 3.4, "spAttack": 4.4, "spDefense": 3.8 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 5 },
+        { "level": 1, "skillId": 6 },
+        { "level": 1, "skillId": 13 },
+        { "level": 36, "skillId": 15 },
+        { "level": 45, "skillId": 14 },
+        { "level": 55, "skillId": 16 }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "叶小芽",
+      "type": "grass",
+      "description": "头顶嫩绿叶片的小精灵，通过光合作用获取能量。性格温和善良。",
+      "baseStats": { "hp": 48, "attack": 45, "defense": 55, "speed": 45, "spAttack": 52, "spDefense": 58 },
+      "growthRate": { "hp": 3.0, "attack": 2.4, "defense": 2.8, "speed": 2.2, "spAttack": 2.8, "spDefense": 3.0 },
+      "evolution": { "to": 8, "level": 16 },
+      "learnset": [
+        { "level": 1, "skillId": 17 },
+        { "level": 1, "skillId": 7 },
+        { "level": 8, "skillId": 18 },
+        { "level": 14, "skillId": 19 }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "翠叶龙",
+      "type": "grass",
+      "description": "翠叶龙背上长出了坚硬的叶片铠甲，能发射锋利的飞叶。",
+      "baseStats": { "hp": 68, "attack": 65, "defense": 72, "speed": 60, "spAttack": 72, "spDefense": 75 },
+      "growthRate": { "hp": 3.6, "attack": 3.0, "defense": 3.4, "speed": 2.8, "spAttack": 3.4, "spDefense": 3.4 },
+      "evolution": { "to": 9, "level": 36 },
+      "learnset": [
+        { "level": 1, "skillId": 17 },
+        { "level": 1, "skillId": 18 },
+        { "level": 1, "skillId": 7 },
+        { "level": 16, "skillId": 20 },
+        { "level": 24, "skillId": 19 },
+        { "level": 32, "skillId": 21 }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "森林守护",
+      "type": "grass",
+      "description": "古老森林的守护者，巨大的身躯与森林融为一体。拥有操控植物的强大力量。",
+      "baseStats": { "hp": 95, "attack": 82, "defense": 95, "speed": 70, "spAttack": 92, "spDefense": 100 },
+      "growthRate": { "hp": 4.4, "attack": 3.4, "defense": 4.0, "speed": 3.0, "spAttack": 3.8, "spDefense": 4.2 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 17 },
+        { "level": 1, "skillId": 18 },
+        { "level": 1, "skillId": 20 },
+        { "level": 36, "skillId": 22 },
+        { "level": 45, "skillId": 21 },
+        { "level": 55, "skillId": 23 }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "雷电鼠",
+      "type": "electric",
+      "description": "浑身带电的小精灵，颊部的电气囊能释放强烈的电击。在雷雨天特别活跃。",
+      "baseStats": { "hp": 55, "attack": 60, "defense": 45, "speed": 95, "spAttack": 85, "spDefense": 50 },
+      "growthRate": { "hp": 3.0, "attack": 2.8, "defense": 2.2, "speed": 4.0, "spAttack": 3.6, "spDefense": 2.6 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 24 },
+        { "level": 1, "skillId": 7 },
+        { "level": 10, "skillId": 25 },
+        { "level": 20, "skillId": 26 },
+        { "level": 35, "skillId": 27 },
+        { "level": 50, "skillId": 28 }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "光翼天使",
+      "type": "light",
+      "description": "来自光明星域的天使精灵，金色羽翼散发着神圣光辉。拥有治愈与光明之力。",
+      "baseStats": { "hp": 70, "attack": 55, "defense": 65, "speed": 80, "spAttack": 95, "spDefense": 90 },
+      "growthRate": { "hp": 3.4, "attack": 2.6, "defense": 3.0, "speed": 3.4, "spAttack": 4.0, "spDefense": 3.8 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 29 },
+        { "level": 1, "skillId": 7 },
+        { "level": 10, "skillId": 30 },
+        { "level": 20, "skillId": 31 },
+        { "level": 35, "skillId": 32 },
+        { "level": 50, "skillId": 33 }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "暗影刺客",
+      "type": "dark",
+      "description": "潜伏在暗影中的刺客精灵，速度极快，擅长暗杀和偷袭。传说从未有人见过它的真面目。",
+      "baseStats": { "hp": 60, "attack": 95, "defense": 55, "speed": 100, "spAttack": 70, "spDefense": 60 },
+      "growthRate": { "hp": 3.0, "attack": 4.0, "defense": 2.6, "speed": 4.2, "spAttack": 3.2, "spDefense": 2.8 },
+      "evolution": null,
+      "learnset": [
+        { "level": 1, "skillId": 34 },
+        { "level": 1, "skillId": 7 },
+        { "level": 10, "skillId": 35 },
+        { "level": 20, "skillId": 36 },
+        { "level": 35, "skillId": 37 },
+        { "level": 50, "skillId": 38 }
+      ]
+    }
+  ]
+}

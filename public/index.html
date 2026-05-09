@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛尔号 - 精灵养成对战</title>
+  <meta name="description" content="赛尔号精灵养成游戏，收集精灵、战斗进化、多人对战">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+  <!-- Stars background -->
+  <canvas id="stars-canvas"></canvas>
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <div id="screen-auth" class="screen active">
+    <div class="auth-container">
+      <div class="logo-wrapper">
+        <div class="logo-glow"></div>
+        <h1 class="game-logo">赛尔号</h1>
+        <p class="logo-subtitle">✦ 星际精灵养成对战 ✦</p>
+      </div>
+      <div class="auth-card glass-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login" id="tab-login">登录</button>
+          <button class="auth-tab" data-tab="register" id="tab-register">注册</button>
+        </div>
+        <form id="auth-form">
+          <div class="input-group">
+            <label for="auth-username">用户名</label>
+            <input type="text" id="auth-username" placeholder="输入用户名" required autocomplete="username">
+          </div>
+          <div class="input-group">
+            <label for="auth-password">密码</label>
+            <input type="password" id="auth-password" placeholder="输入密码" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" id="auth-submit">登录</button>
+          <p class="auth-error" id="auth-error"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STARTER SELECTION ===== -->
+  <div id="screen-starter" class="screen">
+    <div class="starter-container">
+      <h2 class="section-title glow-text">选择你的初始精灵</h2>
+      <p class="section-subtitle">每位训练师都从这里开始自己的冒险旅程</p>
+      <div class="starter-grid" id="starter-grid">
+        <!-- Filled by JS -->
+      </div>
+      <button class="btn btn-primary btn-lg" id="confirm-starter" disabled>确认选择</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN HUB ===== -->
+  <div id="screen-hub" class="screen">
+    <header class="hub-header">
+      <div class="hub-user-info">
+        <span class="hub-username" id="hub-username"></span>
+        <span class="hub-money" id="hub-money">💰 0</span>
+      </div>
+      <nav class="hub-nav">
+        <button class="hub-nav-btn active" data-section="planets" id="nav-planets">
+          <span class="nav-icon">🪐</span><span>星球探险</span>
+        </button>
+        <button class="hub-nav-btn" data-section="team" id="nav-team">
+          <span class="nav-icon">🎒</span><span>精灵背包</span>
+        </button>
+        <button class="hub-nav-btn" data-section="pvp" id="nav-pvp">
+          <span class="nav-icon">⚔️</span><span>对战大厅</span>
+        </button>
+        <button class="hub-nav-btn" data-section="heal" id="nav-heal">
+          <span class="nav-icon">💊</span><span>治疗中心</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Planets section -->
+    <section id="section-planets" class="hub-section active">
+      <h2 class="section-title">星球探险</h2>
+      <div class="planet-grid" id="planet-grid"></div>
+    </section>
+
+    <!-- Team section -->
+    <section id="section-team" class="hub-section">
+      <h2 class="section-title">精灵背包</h2>
+      <div class="team-subsection">
+        <h3>战斗队伍 <span id="team-count">0/6</span></h3>
+        <div class="pet-grid" id="team-grid"></div>
+      </div>
+      <div class="team-subsection">
+        <h3>仓库</h3>
+        <div class="pet-grid" id="storage-grid"></div>
+      </div>
+    </section>
+
+    <!-- PVP section -->
+    <section id="section-pvp" class="hub-section">
+      <h2 class="section-title">⚔️ 对战大厅</h2>
+      <div class="pvp-container">
+        <div class="online-players glass-card">
+          <h3>在线玩家</h3>
+          <div id="online-players-list" class="player-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Heal section -->
+    <section id="section-heal" class="hub-section">
+      <div class="heal-center glass-card">
+        <div class="heal-icon">🏥</div>
+        <h2>精灵治疗中心</h2>
+        <p>为你的精灵恢复全部HP</p>
+        <button class="btn btn-primary btn-lg" id="heal-btn">免费治疗</button>
+        <p class="heal-result" id="heal-result"></p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== BATTLE SCREEN ===== -->
+  <div id="screen-battle" class="screen">
+    <div class="battle-scene">
+      <!-- Enemy side -->
+      <div class="battle-side enemy-side">
+        <div class="battle-pet-info">
+          <span class="battle-pet-name" id="enemy-name"></span>
+          <span class="battle-pet-level" id="enemy-level"></span>
+          <span class="battle-pet-type" id="enemy-type"></span>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="enemy-hp-bar"></div>
+          <span class="hp-text" id="enemy-hp-text"></span>
+        </div>
+        <div class="battle-pet-sprite" id="enemy-sprite"></div>
+      </div>
+
+      <!-- Player side -->
+      <div class="battle-side player-side">
+        <div class="battle-pet-sprite" id="player-sprite"></div>
+        <div class="battle-pet-info">
+          <span class="battle-pet-name" id="player-name"></span>
+          <span class="battle-pet-level" id="player-level"></span>
+          <span class="battle-pet-type" id="player-type"></span>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="player-hp-bar"></div>
+          <span class="hp-text" id="player-hp-text"></span>
+        </div>
+        <div class="exp-bar-container">
+          <div class="exp-bar" id="player-exp-bar"></div>
+        </div>
+      </div>
+
+      <!-- Battle log -->
+      <div class="battle-log glass-card" id="battle-log">
+        <p>野生精灵出现了！</p>
+      </div>
+
+      <!-- Battle actions -->
+      <div class="battle-actions" id="battle-actions">
+        <div class="skill-grid" id="skill-grid"></div>
+        <div class="action-buttons">
+          <button class="btn btn-capture" id="btn-capture">🔮 捕捉</button>
+          <button class="btn btn-run" id="btn-run">🏃 逃跑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PVP BATTLE SCREEN ===== -->
+  <div id="screen-pvp-battle" class="screen">
+    <div class="battle-scene pvp-scene">
+      <div class="pvp-banner">⚔️ PVP 对战 ⚔️</div>
+      <div class="battle-side enemy-side">
+        <div class="battle-pet-info">
+          <span class="battle-pet-name" id="pvp-enemy-name"></span>
+          <span class="battle-pet-level" id="pvp-enemy-level"></span>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="pvp-enemy-hp-bar"></div>
+          <span class="hp-text" id="pvp-enemy-hp-text"></span>
+        </div>
+        <div class="battle-pet-sprite" id="pvp-enemy-sprite"></div>
+      </div>
+      <div class="battle-side player-side">
+        <div class="battle-pet-sprite" id="pvp-player-sprite"></div>
+        <div class="battle-pet-info">
+          <span class="battle-pet-name" id="pvp-player-name"></span>
+          <span class="battle-pet-level" id="pvp-player-level"></span>
+        </div>
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="pvp-player-hp-bar"></div>
+          <span class="hp-text" id="pvp-player-hp-text"></span>
+        </div>
+      </div>
+      <div class="battle-log glass-card" id="pvp-battle-log">
+        <p>PVP 对战开始！</p>
+      </div>
+      <div class="battle-actions" id="pvp-battle-actions">
+        <div class="skill-grid" id="pvp-skill-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PET DETAIL MODAL ===== -->
+  <div id="modal-pet-detail" class="modal">
+    <div class="modal-content glass-card">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div class="pet-detail-header" id="pet-detail-header"></div>
+      <div class="pet-detail-stats" id="pet-detail-stats"></div>
+      <div class="pet-detail-skills" id="pet-detail-skills"></div>
+      <div class="pet-detail-actions" id="pet-detail-actions"></div>
+    </div>
+  </div>
+
+  <!-- ===== NOTIFICATION TOAST ===== -->
+  <div id="toast-container"></div>
+
+  <!-- ===== PVP INVITATION MODAL ===== -->
+  <div id="modal-pvp-invite" class="modal">
+    <div class="modal-content glass-card pvp-invite-modal">
+      <h3>⚔️ 对战邀请</h3>
+      <p id="pvp-invite-text"></p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="pvp-accept">接受</button>
+        <button class="btn btn-danger" id="pvp-reject">拒绝</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EVOLUTION ANIMATION ===== -->
+  <div id="evolution-overlay" class="evolution-overlay">
+    <div class="evolution-content">
+      <h2 class="evolution-title glow-text">进化！</h2>
+      <div class="evolution-sprites">
+        <div class="evolution-old" id="evolution-old"></div>
+        <div class="evolution-arrow">→</div>
+        <div class="evolution-new" id="evolution-new"></div>
+      </div>
+      <p class="evolution-name" id="evolution-name"></p>
+      <button class="btn btn-primary" id="evolution-ok">太好了！</button>
+    </div>
+  </div>
+
+  <script src="js/pet-sprites.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/websocket.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

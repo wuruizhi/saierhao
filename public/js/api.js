@@ -1,0 +1,33 @@
+// API client with JWT auth
+const API = {
+  token: localStorage.getItem('saierhao_token'),
+  async request(method, url, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (this.token) opts.headers['Authorization'] = `Bearer ${this.token}`;
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`/api${url}`, opts);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '请求失败');
+    return data;
+  },
+  setToken(t) { this.token = t; localStorage.setItem('saierhao_token', t); },
+  clearToken() { this.token = null; localStorage.removeItem('saierhao_token'); },
+  // Auth
+  register(u, p) { return this.request('POST', '/auth/register', { username: u, password: p }); },
+  login(u, p) { return this.request('POST', '/auth/login', { username: u, password: p }); },
+  me() { return this.request('GET', '/auth/me'); },
+  // Player
+  profile() { return this.request('GET', '/player/profile'); },
+  chooseStarter(id) { return this.request('POST', '/player/choose-starter', { petId: id }); },
+  getTeam() { return this.request('GET', '/player/team'); },
+  swapPet(id, toTeam) { return this.request('POST', '/player/swap-pet', { petInstanceId: id, toTeam }); },
+  heal() { return this.request('POST', '/player/heal'); },
+  pokedex() { return this.request('GET', '/player/pokedex'); },
+  // Battle
+  explore(mapId) { return this.request('POST', '/battle/explore', { mapId }); },
+  battleAction(battleId, skillId) { return this.request('POST', '/battle/action', { battleId, skillId }); },
+  capture(battleId) { return this.request('POST', '/battle/capture', { battleId }); },
+  runAway(battleId) { return this.request('POST', '/battle/run', { battleId }); },
+  getMaps() { return this.request('GET', '/battle/maps'); },
+};
+window.API = API;
