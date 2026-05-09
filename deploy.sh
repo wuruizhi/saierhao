@@ -42,7 +42,7 @@ fi
 
 sudo tee /etc/nginx/sites-available/saierhao > /dev/null <<'NGINX'
 server {
-    listen 80 default_server;
+    listen 8924 default_server;
     server_name _;
 
     location / {
@@ -66,7 +66,7 @@ SERVER_IP=$(curl -s ifconfig.me 2>/dev/null || echo "你的服务器IP")
 echo ""
 echo "========================================="
 echo "🎉 部署完成！"
-echo "🌐 访问地址: http://$SERVER_IP"
+echo "🌐 访问地址: http://$SERVER_IP:8924"
 echo "========================================="
 echo ""
 echo "常用命令:"
