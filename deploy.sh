@@ -40,7 +40,7 @@ fi
 
 # 5. 启动/重启应用
 pm2 delete saierhao 2>/dev/null || true
-pm2 start server.js --name saierhao
+PORT=3001 pm2 start server.js --name saierhao --update-env
 pm2 save
 pm2 startup 2>/dev/null || true
 
