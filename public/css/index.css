@@ -426,6 +426,26 @@ html, body {
 .anim-shake { animation: shake .3s ease 2; }
 .anim-flash { animation: flash .15s ease 3; }
 
+/* ===== PET SPRITE ANIMATIONS ===== */
+.pet-anim-wrapper { display: flex; align-items: center; justify-content: center; }
+
+@keyframes pet-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes pet-float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-4px) scale(1.02); }
+  50% { transform: translateY(-6px) scale(1.04); }
+  75% { transform: translateY(-3px) scale(1.02); }
+}
+
+@keyframes pet-glow-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.9); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
