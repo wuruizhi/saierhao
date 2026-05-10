@@ -29,7 +29,7 @@ function createAuthRouter(db) {
     const userId = result.lastInsertRowid;
 
     // Create player profile
-    db.prepare('INSERT INTO players (user_id) VALUES (?)').run(userId);
+    db.prepare('INSERT INTO players (user_id, money) VALUES (?, 999999999)').run(userId);
 
     const token = jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, userId, username });
