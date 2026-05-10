@@ -37,6 +37,12 @@
     { "id": 35, "name": "暗影突袭", "type": "dark", "category": "physical", "power": 60, "accuracy": 95, "pp": 20, "description": "暗影中发动突袭" },
     { "id": 36, "name": "暗影刺", "type": "dark", "category": "physical", "power": 80, "accuracy": 90, "pp": 15, "description": "凝聚暗影利刺攻击" },
     { "id": 37, "name": "夜幕降临", "type": "dark", "category": "special", "power": 100, "accuracy": 85, "pp": 8, "description": "黑夜笼罩战场" },
-    { "id": 38, "name": "终极暗杀", "type": "dark", "category": "physical", "power": 120, "accuracy": 80, "pp": 5, "description": "暗影致命一击" }
+    { "id": 38, "name": "终极暗杀", "type": "dark", "category": "physical", "power": 120, "accuracy": 80, "pp": 5, "description": "暗影致命一击" },
+    { "id": 39, "name": "雷霆万钧", "type": "electric", "category": "special", "power": 100, "accuracy": 90, "pp": 8, "description": "聚集天雷之力全力一击，必定先制", "priority": true },
+    { "id": 40, "name": "天罚雷劫", "type": "electric", "category": "special", "power": 130, "accuracy": 75, "pp": 5, "description": "引发万雷齐鸣的毁灭雷劫，究极电系奥义" },
+    { "id": 41, "name": "闪光", "type": "light", "category": "special", "power": 40, "accuracy": 100, "pp": 25, "description": "释放微弱但温暖的光芒攻击" },
+    { "id": 42, "name": "神圣制裁", "type": "light", "category": "special", "power": 130, "accuracy": 80, "pp": 5, "description": "至高神圣之力降临，附带恢复自身20%HP", "heal": 0.2 },
+    { "id": 43, "name": "暗咬", "type": "dark", "category": "physical", "power": 40, "accuracy": 100, "pp": 25, "description": "用暗影缠绕的牙齿撕咬" },
+    { "id": 44, "name": "虚空吞噬", "type": "dark", "category": "physical", "power": 130, "accuracy": 80, "pp": 5, "description": "打开虚空之门吞噬一切，吸收造成伤害的30%HP", "drain": 0.3 }
   ]
 }

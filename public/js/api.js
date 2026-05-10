@@ -23,11 +23,20 @@ const API = {
   swapPet(id, toTeam) { return this.request('POST', '/player/swap-pet', { petInstanceId: id, toTeam }); },
   heal() { return this.request('POST', '/player/heal'); },
   pokedex() { return this.request('GET', '/player/pokedex'); },
+  useCandy(petInstanceId, candyId, quantity) { return this.request('POST', '/player/use-candy', { petInstanceId, candyId, quantity }); },
+  getEssences() { return this.request('GET', '/player/essences'); },
+  hatchStart(essenceDbId) { return this.request('POST', '/player/hatch-start', { essenceDbId }); },
+  hatchComplete(essenceDbId, speedUp) { return this.request('POST', '/player/hatch-complete', { essenceDbId, speedUp }); },
   // Battle
-  explore(mapId) { return this.request('POST', '/battle/explore', { mapId }); },
+  getScene(mapId, sceneIndex) { return this.request('GET', `/battle/scene/${mapId}/${sceneIndex}`); },
+  explore(mapId, sceneIndex, spawnId) { return this.request('POST', '/battle/explore', { mapId, sceneIndex, spawnId }); },
   battleAction(battleId, skillId) { return this.request('POST', '/battle/action', { battleId, skillId }); },
-  capture(battleId) { return this.request('POST', '/battle/capture', { battleId }); },
+  capture(battleId, capsuleId) { return this.request('POST', '/battle/capture', { battleId, capsuleId }); },
   runAway(battleId) { return this.request('POST', '/battle/run', { battleId }); },
   getMaps() { return this.request('GET', '/battle/maps'); },
+  // Shop
+  shopList() { return this.request('GET', '/shop/list'); },
+  shopBuy(itemId, quantity) { return this.request('POST', '/shop/buy', { itemId, quantity }); },
+  inventory() { return this.request('GET', '/shop/inventory'); },
 };
 window.API = API;

@@ -142,6 +142,22 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   if (critical) message += ' 暴击！';
   if (typeMultiplier > 1) message += ' 效果拔群！';
   if (typeMultiplier < 1) message += ' 效果不佳...';
+
+  // Drain effect (e.g., 虚空吞噬)
+  let drainHeal = 0;
+  if (skill.drain && damage > 0) {
+    drainHeal = Math.floor(damage * skill.drain);
+    attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + drainHeal);
+    message += ` 吸取了${drainHeal}点HP！`;
+  }
+
+  // Heal on attack (e.g., 神圣制裁)
+  if (skill.heal && damage > 0) {
+    const healAmt = Math.floor(attacker.max_hp * skill.heal);
+    attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + healAmt);
+    message += ` 恢复了${healAmt}点HP！`;
+  }
+
   if (defender.current_hp <= 0) message += ` ${!isPlayerAttacking ? '我方' : '对方'}的${defender.nickname}倒下了！`;
 
   return {
@@ -150,6 +166,7 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
     damage,
     critical,
     typeMultiplier,
+    drainHeal,
     message
   };
 }

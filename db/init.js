@@ -60,6 +60,26 @@ function initDB() {
       log TEXT DEFAULT '[]',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS player_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      item_id TEXT NOT NULL,
+      quantity INTEGER DEFAULT 0,
+      UNIQUE(player_id, item_id),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS player_essences (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      essence_id TEXT NOT NULL,
+      hatching INTEGER DEFAULT 0,
+      hatch_start DATETIME,
+      hatch_duration INTEGER DEFAULT 300,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
   `);
 
   return db;

@@ -7,13 +7,19 @@ const { initDB } = require('./db/init');
 const createAuthRouter = require('./routes/auth');
 const createPlayerRouter = require('./routes/player');
 const createBattleRouter = require('./routes/battle');
+const createShopRouter = require('./routes/shop');
 const PvpManager = require('./game/pvp-manager');
+const SceneManager = require('./game/scene-manager');
 
 const PORT = process.env.PORT || 3000;
 
 // Initialize database
 const db = initDB();
 console.log('✅ 数据库初始化完成');
+
+// Initialize scene manager
+const sceneManager = new SceneManager();
+console.log('✅ 场景管理器初始化完成');
 
 // Create Express app
 const app = express();
@@ -25,7 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.use('/api/auth', createAuthRouter(db));
 app.use('/api/player', createPlayerRouter(db));
-app.use('/api/battle', createBattleRouter(db));
+app.use('/api/battle', createBattleRouter(db, sceneManager));
+app.use('/api/shop', createShopRouter(db));
 
 // SPA fallback
 app.get('*', (req, res) => {

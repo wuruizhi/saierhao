@@ -4,23 +4,60 @@ const { executePveTurn, createWildPet } = require('../game/battle-engine');
 const { createPetInstance, addExp, healPet } = require('../game/pet-manager');
 const mapsData = require('../data/maps.json');
 const petsData = require('../data/pets.json');
+const itemsData = require('../data/items.json');
 
 // Store active battles in memory (per-session, cleared on server restart)
 const activeBattles = new Map();
 
-function createBattleRouter(db) {
+// Experience multipliers by scene depth
+const SCENE_EXP_MULTIPLIERS = [1.0, 1.3, 1.6];
+const BOSS_EXP_MULTIPLIER = 3.0;
+const BOSS_MONEY_REWARD = 500;
+
+function createBattleRouter(db, sceneManager) {
   const router = express.Router();
 
-  // Start exploring a map - encounter a wild pet
-  router.post('/explore', authMiddleware, (req, res) => {
-    const { mapId } = req.body;
+  // Get scene spawns
+  router.get('/scene/:mapId/:sceneIndex', authMiddleware, (req, res) => {
+    const mapId = parseInt(req.params.mapId);
+    const sceneIndex = parseInt(req.params.sceneIndex);
+
     const map = mapsData.maps.find(m => m.id === mapId);
     if (!map) return res.status(400).json({ error: '地图不存在' });
+    if (!map.scenes || !map.scenes[sceneIndex]) {
+      return res.status(400).json({ error: '场景不存在' });
+    }
+
+    const scene = map.scenes[sceneIndex];
+    const spawns = sceneManager.getSceneSpawns(mapId, sceneIndex);
+
+    // Enrich spawn data with pet definitions
+    const enrichedSpawns = spawns.map(s => {
+      const petDef = petsData.pets.find(p => p.id === s.petId);
+      return { ...s, petDef };
+    });
+
+    res.json({
+      scene,
+      spawns: enrichedSpawns,
+      mapName: map.name,
+      mapTheme: map.theme
+    });
+  });
+
+  // Start battle with a specific spawn in a scene
+  router.post('/explore', authMiddleware, (req, res) => {
+    const { mapId, sceneIndex = 0, spawnId } = req.body;
+    const map = mapsData.maps.find(m => m.id === mapId);
+    if (!map) return res.status(400).json({ error: '地图不存在' });
+
+    const scene = map.scenes && map.scenes[sceneIndex];
+    if (!scene) return res.status(400).json({ error: '场景不存在' });
 
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
-    // Get player's highest level team pet
+    // Get player's team
     const teamPets = db.prepare(
       'SELECT * FROM player_pets WHERE player_id = ? AND in_team = 1 ORDER BY team_order ASC'
     ).all(player.id);
@@ -30,25 +67,37 @@ function createBattleRouter(db) {
     }
 
     const maxLevel = Math.max(...teamPets.map(p => p.level));
-    if (maxLevel < map.requiredLevel) {
-      return res.status(400).json({ error: `需要精灵达到${map.requiredLevel}级才能探索此星球` });
+    if (maxLevel < scene.requiredLevel) {
+      return res.status(400).json({ error: `需要精灵达到${scene.requiredLevel}级才能探索此场景` });
     }
 
-    // Random encounter based on rates
-    const roll = Math.random() * 100;
-    let cumulative = 0;
-    let wildPetDef = null;
-    for (const wp of map.wildPets) {
-      cumulative += wp.rate;
-      if (roll < cumulative) {
-        wildPetDef = wp;
-        break;
+    // Get the specific spawn or create a random one
+    let wildPetData;
+    let isBoss = false;
+    let essenceId = null;
+
+    if (spawnId && sceneManager) {
+      const spawn = sceneManager.getSpawn(mapId, sceneIndex, spawnId);
+      if (!spawn) return res.status(400).json({ error: '该精灵已消失' });
+      sceneManager.removePet(mapId, sceneIndex, spawnId);
+      wildPetData = spawn;
+      isBoss = spawn.isBoss;
+      essenceId = spawn.essenceId;
+    } else {
+      // Fallback: random encounter
+      const roll = Math.random() * 100;
+      let cumulative = 0;
+      let wildPetDef = null;
+      for (const wp of scene.wildPets) {
+        cumulative += wp.rate;
+        if (roll < cumulative) { wildPetDef = wp; break; }
       }
+      if (!wildPetDef) wildPetDef = scene.wildPets[0];
+      const level = wildPetDef.minLevel + Math.floor(Math.random() * (wildPetDef.maxLevel - wildPetDef.minLevel + 1));
+      wildPetData = { petId: wildPetDef.petId, level, isBoss: false };
     }
-    if (!wildPetDef) wildPetDef = map.wildPets[0];
 
-    const level = wildPetDef.minLevel + Math.floor(Math.random() * (wildPetDef.maxLevel - wildPetDef.minLevel + 1));
-    const wildPet = createWildPet(wildPetDef.petId, level);
+    const wildPet = createWildPet(wildPetData.petId, wildPetData.level);
 
     // Store active battle
     const battleId = `pve_${req.userId}_${Date.now()}`;
@@ -58,17 +107,26 @@ function createBattleRouter(db) {
       playerId: player.id,
       userId: req.userId,
       mapId,
+      sceneIndex,
       playerTeam: teamPets,
       activeTeamIndex: 0,
       activePet: { ...firstTeamPet, skills: JSON.parse(firstTeamPet.skills) },
       wildPet,
-      wildPetOriginal: { ...wildPet }
+      wildPetOriginal: { ...wildPet },
+      isBoss,
+      essenceId,
+      bossName: wildPetData.bossName || null
     });
 
     const petDef = petsData.pets.find(p => p.id === wildPet.pet_id);
     res.json({
       battleId,
-      wildPet: { ...wildPet, petDef },
+      wildPet: {
+        ...wildPet,
+        petDef,
+        isBoss,
+        bossName: wildPetData.bossName || null
+      },
       playerPet: {
         ...firstTeamPet,
         skills: JSON.parse(firstTeamPet.skills),
@@ -89,13 +147,41 @@ function createBattleRouter(db) {
 
     if (result.battleEnd) {
       if (result.playerWin) {
-        // Grant exp
-        const expGain = Math.floor(battle.wildPet.level * 15 + 20);
+        // Calculate exp with scene bonuses
+        const sceneMultiplier = SCENE_EXP_MULTIPLIERS[battle.sceneIndex] || 1.0;
+        const bossMultiplier = battle.isBoss ? BOSS_EXP_MULTIPLIER : 1.0;
+        const baseExp = Math.floor(battle.wildPet.level * 15 + 20);
+        const expGain = Math.floor(baseExp * sceneMultiplier * bossMultiplier);
+
         const levelResult = addExp(db, battle.activePet.id, expGain);
 
         // Update HP in DB
         db.prepare('UPDATE player_pets SET current_hp = ? WHERE id = ?')
           .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
+
+        // Boss rewards
+        let bossReward = null;
+        if (battle.isBoss && battle.essenceId) {
+          // Grant money
+          db.prepare('UPDATE players SET money = money + ? WHERE id = ?')
+            .run(BOSS_MONEY_REWARD, battle.playerId);
+
+          // Grant essence
+          db.prepare('INSERT INTO player_essences (player_id, essence_id) VALUES (?, ?)')
+            .run(battle.playerId, battle.essenceId);
+
+          const essenceDef = itemsData.essences[battle.essenceId];
+          bossReward = {
+            money: BOSS_MONEY_REWARD,
+            essenceId: battle.essenceId,
+            essenceName: essenceDef ? essenceDef.name : battle.essenceId
+          };
+        }
+
+        // Grant battle money
+        const moneyGain = Math.floor(battle.wildPet.level * 5 + 10);
+        db.prepare('UPDATE players SET money = money + ? WHERE id = ?')
+          .run(moneyGain, battle.playerId);
 
         activeBattles.delete(battleId);
         return res.json({
@@ -103,11 +189,13 @@ function createBattleRouter(db) {
           battleEnd: true,
           playerWin: true,
           expGain,
+          moneyGain,
           levelResult,
+          bossReward,
           wildPetDef: petsData.pets.find(p => p.id === battle.wildPet.pet_id)
         });
       } else {
-        // Player's active pet fainted - check for more team members
+        // Player's active pet fainted
         db.prepare('UPDATE player_pets SET current_hp = 0 WHERE id = ?')
           .run(battle.activePet.id);
 
@@ -135,7 +223,6 @@ function createBattleRouter(db) {
       }
     }
 
-    // Update HP in memory
     res.json({
       ...result,
       playerPet: {
@@ -149,23 +236,56 @@ function createBattleRouter(db) {
     });
   });
 
-  // Attempt capture
+  // Attempt capture with capsule
   router.post('/capture', authMiddleware, (req, res) => {
-    const { battleId } = req.body;
+    const { battleId, capsuleId } = req.body;
     const battle = activeBattles.get(battleId);
     if (!battle || battle.userId !== req.userId) {
       return res.status(400).json({ error: '战斗不存在' });
     }
 
+    // Boss cannot be captured
+    if (battle.isBoss) {
+      return res.status(400).json({ error: 'Boss精灵不能捕获！需要击败它获取精元' });
+    }
+
+    // Check capsule
+    if (!capsuleId) {
+      return res.status(400).json({ error: '请选择胶囊' });
+    }
+
+    const capsuleDef = itemsData.capsules.find(c => c.id === capsuleId);
+    if (!capsuleDef) {
+      return res.status(400).json({ error: '胶囊类型不存在' });
+    }
+
+    // Check player has capsule
+    const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
+    const capsuleItem = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?')
+      .get(player.id, capsuleId);
+
+    if (!capsuleItem || capsuleItem.quantity <= 0) {
+      return res.status(400).json({ error: `没有${capsuleDef.name}了！去商店购买吧` });
+    }
+
+    // Consume capsule
+    db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(capsuleItem.id);
+
     const wp = battle.wildPet;
     const hpRatio = wp.current_hp / wp.max_hp;
-    // Capture rate: lower HP = higher chance
-    const captureRate = Math.min(90, Math.floor((1 - hpRatio) * 80) + 10 + (wp.level < 10 ? 15 : 0));
+
+    // Capture formula: lower HP = higher chance + capsule bonus
+    let captureRate;
+    if (capsuleDef.captureBonus >= 100) {
+      captureRate = 100; // Master capsule = guaranteed
+    } else {
+      captureRate = Math.min(95, Math.floor((1 - hpRatio) * 50) + capsuleDef.captureBonus + (wp.level < 10 ? 10 : 0));
+    }
+
     const roll = Math.random() * 100;
     const captured = roll < captureRate;
 
     if (captured) {
-      const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
       const teamCount = db.prepare('SELECT COUNT(*) as c FROM player_pets WHERE player_id = ? AND in_team = 1').get(player.id).c;
       const inTeam = teamCount < 6;
 
@@ -173,7 +293,6 @@ function createBattleRouter(db) {
         db, player.id, wp.pet_id, wp.level, inTeam, inTeam ? teamCount : -1
       );
 
-      // Update player pet HP
       db.prepare('UPDATE player_pets SET current_hp = ? WHERE id = ?')
         .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
 
@@ -182,9 +301,10 @@ function createBattleRouter(db) {
       res.json({
         captured: true,
         captureRate,
+        capsuleUsed: capsuleDef.name,
         pet: { id: instanceId, ...wp, petDef },
         inTeam,
-        message: `成功捕获了${petDef.name}！${inTeam ? '已加入队伍' : '已存入仓库'}`
+        message: `使用${capsuleDef.name}成功捕获了${petDef.name}！${inTeam ? '已加入队伍' : '已存入仓库'}`
       });
     } else {
       // Wild pet attacks back
@@ -195,7 +315,8 @@ function createBattleRouter(db) {
       res.json({
         captured: false,
         captureRate,
-        message: `捕获失败！${wp.nickname}挣脱了！`,
+        capsuleUsed: capsuleDef.name,
+        message: `${capsuleDef.name}没能抓住${wp.nickname}！它挣脱了！`,
         counterAttack: attackResult,
         playerPet: {
           ...battle.activePet,
@@ -213,7 +334,6 @@ function createBattleRouter(db) {
       return res.status(400).json({ error: '战斗不存在' });
     }
 
-    // Update HP
     db.prepare('UPDATE player_pets SET current_hp = ? WHERE id = ?')
       .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
 

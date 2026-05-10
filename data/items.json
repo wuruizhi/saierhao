@@ -1,0 +1,24 @@
+{
+  "capsules": [
+    { "id": "capsule_normal", "name": "普通胶囊", "price": 100, "captureBonus": 10, "icon": "🔵", "description": "最基础的精灵胶囊" },
+    { "id": "capsule_great", "name": "高级胶囊", "price": 500, "captureBonus": 25, "icon": "🟢", "description": "更好用的胶囊" },
+    { "id": "capsule_ultra", "name": "超级胶囊", "price": 2000, "captureBonus": 50, "icon": "🟡", "description": "捕获率大幅提升" },
+    { "id": "capsule_master", "name": "大师胶囊", "price": 10000, "captureBonus": 100, "icon": "🟣", "description": "必定捕获" }
+  ],
+  "candies": [
+    { "id": "candy_s", "name": "经验糖果 S", "price": 200, "exp": 50, "icon": "🍬", "description": "+50 经验" },
+    { "id": "candy_m", "name": "经验糖果 M", "price": 800, "exp": 200, "icon": "🍭", "description": "+200 经验" },
+    { "id": "candy_l", "name": "经验糖果 L", "price": 3000, "exp": 1000, "icon": "🧁", "description": "+1000 经验" },
+    { "id": "candy_xl", "name": "经验糖果 XL", "price": 10000, "exp": 5000, "icon": "🎂", "description": "+5000 经验" }
+  ],
+  "others": [
+    { "id": "hatch_speed", "name": "孵化加速剂", "price": 500, "icon": "⏩", "description": "精元立即孵化" }
+  ],
+  "essences": {
+    "fire": { "name": "火焰精元", "icon": "🔥", "hatchPetId": 1, "hatchTime": 300, "skipCost": 500 },
+    "water": { "name": "海洋精元", "icon": "💧", "hatchPetId": 4, "hatchTime": 300, "skipCost": 500 },
+    "grass": { "name": "森林精元", "icon": "🌿", "hatchPetId": 7, "hatchTime": 300, "skipCost": 500 },
+    "electric": { "name": "雷霆精元", "icon": "⚡", "hatchPetId": 10, "hatchTime": 600, "skipCost": 1000 },
+    "dark": { "name": "暗影精元", "icon": "🌑", "hatchPetId": 17, "hatchTime": 900, "skipCost": 2000 }
+  }
+}

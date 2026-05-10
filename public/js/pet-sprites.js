@@ -156,6 +156,102 @@ const PET_SPRITES = {
     <path d="M${s*.65} ${s*.6} L${s*.78} ${s*.55}" stroke="#6c5ce7" stroke-width="3" filter="url(#glow12)"/>
     <path d="M${s*.78} ${s*.55} L${s*.82} ${s*.48}" stroke="#a29bfe" stroke-width="2.5" filter="url(#glow12)"/>
     <path d="M${s*.42} ${s*.2} Q${s*.5} ${s*.12} ${s*.58} ${s*.2}" fill="none" stroke="#a29bfe" stroke-width="2" filter="url(#glow12)"/>
+    </svg>`,
+  13: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="fg13" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fdcb6e"/><stop offset="100%" stop-color="#e17055"/></linearGradient>
+    <filter id="glow13"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.88}" rx="${s*.22}" ry="${s*.05}" fill="rgba(0,0,0,.3)"/>
+    <ellipse cx="${s/2}" cy="${s*.58}" rx="${s*.2}" ry="${s*.26}" fill="url(#fg13)"/>
+    <circle cx="${s/2}" cy="${s*.32}" r="${s*.17}" fill="url(#fg13)"/>
+    <circle cx="${s*.43}" cy="${s*.3}" r="${s*.035}" fill="#222"/><circle cx="${s*.43}" cy="${s*.29}" r="${s*.015}" fill="white"/>
+    <circle cx="${s*.57}" cy="${s*.3}" r="${s*.035}" fill="#222"/><circle cx="${s*.57}" cy="${s*.29}" r="${s*.015}" fill="white"/>
+    <path d="M${s*.44} ${s*.36} Q${s*.5} ${s*.38} ${s*.56} ${s*.36}" stroke="#222" stroke-width="2" fill="none"/>
+    <path d="M${s*.36} ${s*.22} L${s*.28} ${s*.12}" stroke="#f1c40f" stroke-width="5" stroke-linecap="round" filter="url(#glow13)"/>
+    <path d="M${s*.64} ${s*.22} L${s*.72} ${s*.12}" stroke="#f1c40f" stroke-width="5" stroke-linecap="round" filter="url(#glow13)"/>
+    <path d="M${s*.28} ${s*.12} L${s*.22} ${s*.06} L${s*.3} ${s*.08}" stroke="#f1c40f" stroke-width="3" fill="none" filter="url(#glow13)"/>
+    <path d="M${s*.72} ${s*.12} L${s*.78} ${s*.06} L${s*.7} ${s*.08}" stroke="#f1c40f" stroke-width="3" fill="none" filter="url(#glow13)"/>
+    <path d="M${s*.65} ${s*.7} Q${s*.8} ${s*.6} ${s*.7} ${s*.82}" stroke="#f39c12" stroke-width="3" fill="none"/>
+    </svg>`,
+  14: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="fg14" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f1c40f"/><stop offset="100%" stop-color="#e67e22"/></linearGradient>
+    <filter id="glow14"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.9}" rx="${s*.28}" ry="${s*.06}" fill="rgba(0,0,0,.4)"/>
+    <rect x="${s*.25}" y="${s*.35}" width="${s*.5}" height="${s*.5}" rx="16" fill="url(#fg14)"/>
+    <circle cx="${s/2}" cy="${s*.28}" r="${s*.2}" fill="url(#fg14)"/>
+    <circle cx="${s*.42}" cy="${s*.26}" r="${s*.04}" fill="#fff" opacity=".9"/><circle cx="${s*.42}" cy="${s*.26}" r="${s*.02}" fill="#222"/>
+    <circle cx="${s*.58}" cy="${s*.26}" r="${s*.04}" fill="#fff" opacity=".9"/><circle cx="${s*.58}" cy="${s*.26}" r="${s*.02}" fill="#222"/>
+    <path d="M${s*.44} ${s*.33} Q${s*.5} ${s*.36} ${s*.56} ${s*.33}" stroke="#222" stroke-width="2.5" fill="none"/>
+    <path d="M${s*.35} ${s*.15} Q${s*.42} ${s*-.02} ${s*.5} ${s*.1}" fill="#f1c40f" filter="url(#glow14)"/>
+    <path d="M${s*.65} ${s*.15} Q${s*.58} ${s*-.02} ${s*.5} ${s*.1}" fill="#f1c40f" filter="url(#glow14)"/>
+    <path d="M${s*.2} ${s*.5} L${s*.08} ${s*.4}" stroke="#e67e22" stroke-width="10" stroke-linecap="round"/>
+    <path d="M${s*.8} ${s*.5} L${s*.92} ${s*.4}" stroke="#e67e22" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="${s*.5}" cy="${s*.06}" r="${s*.04}" fill="#fff" filter="url(#glow14)"/>
+    <path d="M${s*.5} ${s*.1} L${s*.5} ${s*.02}" stroke="#fff" stroke-width="2" filter="url(#glow14)"/>
+    <path d="M${s*.46} ${s*.06} L${s*.54} ${s*.06}" stroke="#fff" stroke-width="2" filter="url(#glow14)"/>
+    </svg>`,
+  15: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="fg15"><stop offset="0%" stop-color="#fff9c4"/><stop offset="100%" stop-color="#ffe082"/></radialGradient>
+    <filter id="glow15"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.82}" rx="${s*.15}" ry="${s*.04}" fill="rgba(0,0,0,.2)"/>
+    <ellipse cx="${s/2}" cy="${s*.6}" rx="${s*.16}" ry="${s*.18}" fill="url(#fg15)"/>
+    <circle cx="${s/2}" cy="${s*.4}" r="${s*.15}" fill="url(#fg15)"/>
+    <circle cx="${s*.44}" cy="${s*.37}" r="${s*.035}" fill="#6c5ce7"/><circle cx="${s*.44}" cy="${s*.36}" r="${s*.015}" fill="white"/>
+    <circle cx="${s*.56}" cy="${s*.37}" r="${s*.035}" fill="#6c5ce7"/><circle cx="${s*.56}" cy="${s*.36}" r="${s*.015}" fill="white"/>
+    <path d="M${s*.47} ${s*.43} Q${s*.5} ${s*.45} ${s*.53} ${s*.43}" stroke="#e17055" stroke-width="1.5" fill="none"/>
+    <path d="M${s*.32} ${s*.48} Q${s*.18} ${s*.35} ${s*.25} ${s*.28}" fill="rgba(255,215,0,.4)" filter="url(#glow15)"/>
+    <path d="M${s*.68} ${s*.48} Q${s*.82} ${s*.35} ${s*.75} ${s*.28}" fill="rgba(255,215,0,.4)" filter="url(#glow15)"/>
+    <ellipse cx="${s*.45}" cy="${s*.28}" rx="${s*.04}" ry="${s*.03}" fill="#ffd700" filter="url(#glow15)"/>
+    <ellipse cx="${s*.55}" cy="${s*.28}" rx="${s*.04}" ry="${s*.03}" fill="#ffd700" filter="url(#glow15)"/>
+    </svg>`,
+  16: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="fg16" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff9c4"/><stop offset="100%" stop-color="#f9a825"/></linearGradient>
+    <filter id="glow16"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.9}" rx="${s*.25}" ry="${s*.06}" fill="rgba(0,0,0,.3)"/>
+    <ellipse cx="${s/2}" cy="${s*.55}" rx="${s*.18}" ry="${s*.28}" fill="url(#fg16)"/>
+    <circle cx="${s/2}" cy="${s*.3}" r="${s*.18}" fill="url(#fg16)"/>
+    <circle cx="${s*.43}" cy="${s*.28}" r="${s*.04}" fill="#6c5ce7"/><circle cx="${s*.43}" cy="${s*.27}" r="${s*.018}" fill="white"/>
+    <circle cx="${s*.57}" cy="${s*.28}" r="${s*.04}" fill="#6c5ce7"/><circle cx="${s*.57}" cy="${s*.27}" r="${s*.018}" fill="white"/>
+    <path d="M${s*.46} ${s*.34} Q${s*.5} ${s*.37} ${s*.54} ${s*.34}" stroke="#e17055" stroke-width="2" fill="none"/>
+    <path d="M${s*.28} ${s*.42} Q${s*.05} ${s*.15} ${s*.2} ${s*.05}" fill="rgba(255,215,0,.4)" filter="url(#glow16)"/>
+    <path d="M${s*.72} ${s*.42} Q${s*.95} ${s*.15} ${s*.8} ${s*.05}" fill="rgba(255,215,0,.4)" filter="url(#glow16)"/>
+    <path d="M${s*.35} ${s*.38} Q${s*.12} ${s*.22} ${s*.22} ${s*.1}" fill="rgba(255,255,255,.3)" filter="url(#glow16)"/>
+    <path d="M${s*.65} ${s*.38} Q${s*.88} ${s*.22} ${s*.78} ${s*.1}" fill="rgba(255,255,255,.3)" filter="url(#glow16)"/>
+    <path d="M${s*.4} ${s*.35} Q${s*.2} ${s*.3} ${s*.28} ${s*.18}" fill="rgba(255,255,255,.2)" filter="url(#glow16)"/>
+    <path d="M${s*.6} ${s*.35} Q${s*.8} ${s*.3} ${s*.72} ${s*.18}" fill="rgba(255,255,255,.2)" filter="url(#glow16)"/>
+    <circle cx="${s/2}" cy="${s*.15}" r="${s*.05}" fill="#fff" filter="url(#glow16)"/>
+    <circle cx="${s/2}" cy="${s*.15}" r="${s*.025}" fill="#ffd700"/>
+    </svg>`,
+  17: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="fg17"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#4a3a8a"/></radialGradient>
+    <filter id="glow17"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.82}" rx="${s*.14}" ry="${s*.04}" fill="rgba(0,0,0,.2)"/>
+    <ellipse cx="${s/2}" cy="${s*.6}" rx="${s*.14}" ry="${s*.16}" fill="url(#fg17)"/>
+    <circle cx="${s/2}" cy="${s*.42}" r="${s*.14}" fill="url(#fg17)"/>
+    <circle cx="${s*.44}" cy="${s*.4}" r="${s*.03}" fill="#e74c3c"/><circle cx="${s*.44}" cy="${s*.4}" r="${s*.012}" fill="#222"/>
+    <circle cx="${s*.56}" cy="${s*.4}" r="${s*.03}" fill="#e74c3c"/><circle cx="${s*.56}" cy="${s*.4}" r="${s*.012}" fill="#222"/>
+    <path d="M${s*.35} ${s*.35} Q${s*.28} ${s*.2} ${s*.2} ${s*.25}" stroke="#a29bfe" stroke-width="3" fill="none" filter="url(#glow17)"/>
+    <path d="M${s*.65} ${s*.35} Q${s*.72} ${s*.2} ${s*.8} ${s*.25}" stroke="#a29bfe" stroke-width="3" fill="none" filter="url(#glow17)"/>
+    <path d="M${s*.18} ${s*.25} L${s*.15} ${s*.18}" stroke="#a29bfe" stroke-width="2" filter="url(#glow17)"/>
+    <path d="M${s*.82} ${s*.25} L${s*.85} ${s*.18}" stroke="#a29bfe" stroke-width="2" filter="url(#glow17)"/>
+    <path d="M${s*.4} ${s*.3} L${s*.42} ${s*.24}" stroke="#6c5ce7" stroke-width="2"/>
+    <path d="M${s*.6} ${s*.3} L${s*.58} ${s*.24}" stroke="#6c5ce7" stroke-width="2"/>
+    </svg>`,
+  18: (s) => `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="fg18" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#0c0020"/></linearGradient>
+    <filter id="glow18"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <ellipse cx="${s/2}" cy="${s*.9}" rx="${s*.28}" ry="${s*.06}" fill="rgba(100,0,200,.3)" filter="url(#glow18)"/>
+    <rect x="${s*.24}" y="${s*.35}" width="${s*.52}" height="${s*.5}" rx="18" fill="url(#fg18)"/>
+    <circle cx="${s/2}" cy="${s*.28}" r="${s*.2}" fill="url(#fg18)"/>
+    <circle cx="${s*.42}" cy="${s*.26}" r="${s*.04}" fill="#e74c3c" filter="url(#glow18)"/><circle cx="${s*.42}" cy="${s*.26}" r="${s*.018}" fill="#222"/>
+    <circle cx="${s*.58}" cy="${s*.26}" r="${s*.04}" fill="#e74c3c" filter="url(#glow18)"/><circle cx="${s*.58}" cy="${s*.26}" r="${s*.018}" fill="#222"/>
+    <path d="M${s*.44} ${s*.34} Q${s*.5} ${s*.37} ${s*.56} ${s*.34}" stroke="#a29bfe" stroke-width="2.5" fill="none"/>
+    <path d="M${s*.35} ${s*.15} Q${s*.3} ${s*-.02} ${s*.22} ${s*.08}" fill="#6c5ce7" filter="url(#glow18)"/>
+    <path d="M${s*.65} ${s*.15} Q${s*.7} ${s*-.02} ${s*.78} ${s*.08}" fill="#6c5ce7" filter="url(#glow18)"/>
+    <path d="M${s*.2} ${s*.5} L${s*.08} ${s*.38}" stroke="#2d1b69" stroke-width="10" stroke-linecap="round"/>
+    <path d="M${s*.8} ${s*.5} L${s*.92} ${s*.38}" stroke="#2d1b69" stroke-width="10" stroke-linecap="round"/>
+    <path d="M${s*.08} ${s*.38} L${s*.05} ${s*.32}" stroke="#a29bfe" stroke-width="3" filter="url(#glow18)"/>
+    <path d="M${s*.92} ${s*.38} L${s*.95} ${s*.32}" stroke="#a29bfe" stroke-width="3" filter="url(#glow18)"/>
+    <circle cx="${s/2}" cy="${s*.5}" r="${s*.06}" fill="rgba(100,0,200,.5)" filter="url(#glow18)"/>
     </svg>`
 };
 

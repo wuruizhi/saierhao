@@ -6,13 +6,57 @@
       "description": "一颗被熔岩覆盖的炽热星球，到处是喷涌的火山和流淌的岩浆。",
       "theme": "fire",
       "bgColor": "#1a0a00",
-      "wildPets": [
-        { "petId": 1, "minLevel": 3, "maxLevel": 8, "rate": 60 },
-        { "petId": 10, "minLevel": 5, "maxLevel": 10, "rate": 30 },
-        { "petId": 12, "minLevel": 8, "maxLevel": 12, "rate": 10 }
-      ],
-      "boss": { "petId": 3, "level": 30, "name": "炎帝猩·守护者" },
-      "requiredLevel": 1
+      "requiredLevel": 1,
+      "scenes": [
+        {
+          "id": 0,
+          "name": "熔岩入口",
+          "icon": "🌋",
+          "description": "火焰星的入口区域，地面散发着灼热的气息。",
+          "bgGradient": "linear-gradient(180deg, #1a0a00 0%, #3d1200 40%, #6b2000 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 1,
+          "wildPets": [
+            { "petId": 1, "minLevel": 3, "maxLevel": 8, "rate": 70 },
+            { "petId": 10, "minLevel": 3, "maxLevel": 6, "rate": 20 },
+            { "petId": 17, "minLevel": 3, "maxLevel": 5, "rate": 10 }
+          ]
+        },
+        {
+          "id": 1,
+          "name": "烈焰峡谷",
+          "icon": "🔥",
+          "description": "峡谷两侧的岩壁不断喷射着火焰，只有勇者才敢深入。",
+          "bgGradient": "linear-gradient(180deg, #2d0800 0%, #6b1a00 40%, #a03000 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 8,
+          "wildPets": [
+            { "petId": 1, "minLevel": 8, "maxLevel": 14, "rate": 40 },
+            { "petId": 2, "minLevel": 16, "maxLevel": 20, "rate": 25 },
+            { "petId": 10, "minLevel": 8, "maxLevel": 12, "rate": 20 },
+            { "petId": 17, "minLevel": 8, "maxLevel": 12, "rate": 15 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "火山核心",
+          "icon": "💀",
+          "description": "火焰星最深处，炽热的熔岩之心。传说炎帝猩在此守护着远古之力。",
+          "bgGradient": "linear-gradient(180deg, #4a0e00 0%, #8b1a00 40%, #ff4500 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 16,
+          "wildPets": [
+            { "petId": 2, "minLevel": 16, "maxLevel": 25, "rate": 45 },
+            { "petId": 1, "minLevel": 12, "maxLevel": 18, "rate": 30 },
+            { "petId": 10, "minLevel": 15, "maxLevel": 20, "rate": 15 },
+            { "petId": 12, "minLevel": 18, "maxLevel": 22, "rate": 10 }
+          ],
+          "boss": { "petId": 3, "level": 30, "name": "炎帝猩·守护者", "rate": 10, "essenceId": "fire" }
+        }
+      ]
     },
     {
       "id": 2,
@@ -20,13 +64,57 @@
       "description": "深蓝色的海洋星球，水下隐藏着古老的遗迹和强大的水系精灵。",
       "theme": "water",
       "bgColor": "#000a1a",
-      "wildPets": [
-        { "petId": 4, "minLevel": 3, "maxLevel": 8, "rate": 60 },
-        { "petId": 10, "minLevel": 5, "maxLevel": 10, "rate": 25 },
-        { "petId": 11, "minLevel": 8, "maxLevel": 12, "rate": 15 }
-      ],
-      "boss": { "petId": 6, "level": 30, "name": "海皇蛙·深海领主" },
-      "requiredLevel": 1
+      "requiredLevel": 1,
+      "scenes": [
+        {
+          "id": 0,
+          "name": "浅海沙滩",
+          "icon": "🏖️",
+          "description": "温暖的浅海区域，波浪轻柔拍打着金色沙滩。",
+          "bgGradient": "linear-gradient(180deg, #001833 0%, #003366 40%, #1a6699 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 1,
+          "wildPets": [
+            { "petId": 4, "minLevel": 3, "maxLevel": 8, "rate": 70 },
+            { "petId": 15, "minLevel": 3, "maxLevel": 6, "rate": 20 },
+            { "petId": 10, "minLevel": 3, "maxLevel": 6, "rate": 10 }
+          ]
+        },
+        {
+          "id": 1,
+          "name": "珊瑚迷宫",
+          "icon": "🐚",
+          "description": "五彩斑斓的珊瑚礁迷宫，隐藏着许多神秘的水系精灵。",
+          "bgGradient": "linear-gradient(180deg, #001a4d 0%, #003380 40%, #0055b3 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 8,
+          "wildPets": [
+            { "petId": 4, "minLevel": 8, "maxLevel": 14, "rate": 40 },
+            { "petId": 5, "minLevel": 16, "maxLevel": 20, "rate": 25 },
+            { "petId": 15, "minLevel": 8, "maxLevel": 12, "rate": 20 },
+            { "petId": 10, "minLevel": 8, "maxLevel": 12, "rate": 15 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "深海遗迹",
+          "icon": "🌊",
+          "description": "沉睡万年的深海遗迹，海皇蛙在最深处守护着古老秘宝。",
+          "bgGradient": "linear-gradient(180deg, #000d33 0%, #001a66 40%, #003399 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 16,
+          "wildPets": [
+            { "petId": 5, "minLevel": 16, "maxLevel": 25, "rate": 45 },
+            { "petId": 4, "minLevel": 12, "maxLevel": 18, "rate": 30 },
+            { "petId": 15, "minLevel": 15, "maxLevel": 20, "rate": 15 },
+            { "petId": 11, "minLevel": 18, "maxLevel": 22, "rate": 10 }
+          ],
+          "boss": { "petId": 6, "level": 30, "name": "海皇蛙·深海领主", "rate": 10, "essenceId": "water" }
+        }
+      ]
     },
     {
       "id": 3,
@@ -34,13 +122,57 @@
       "description": "被茂密森林覆盖的绿色星球，巨大的古树直插云霄。",
       "theme": "grass",
       "bgColor": "#001a0a",
-      "wildPets": [
-        { "petId": 7, "minLevel": 3, "maxLevel": 8, "rate": 60 },
-        { "petId": 10, "minLevel": 5, "maxLevel": 10, "rate": 25 },
-        { "petId": 12, "minLevel": 8, "maxLevel": 12, "rate": 15 }
-      ],
-      "boss": { "petId": 9, "level": 30, "name": "森林守护·古树之灵" },
-      "requiredLevel": 5
+      "requiredLevel": 5,
+      "scenes": [
+        {
+          "id": 0,
+          "name": "林间小道",
+          "icon": "🌿",
+          "description": "阳光透过树叶洒在林间小道上，空气中弥漫着草木清香。",
+          "bgGradient": "linear-gradient(180deg, #001a0a 0%, #003316 40%, #006622 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 5,
+          "wildPets": [
+            { "petId": 7, "minLevel": 5, "maxLevel": 10, "rate": 70 },
+            { "petId": 15, "minLevel": 5, "maxLevel": 8, "rate": 15 },
+            { "petId": 17, "minLevel": 5, "maxLevel": 8, "rate": 15 }
+          ]
+        },
+        {
+          "id": 1,
+          "name": "蘑菇森林",
+          "icon": "🍄",
+          "description": "巨型蘑菇组成的奇幻森林，到处是闪烁的孢子。",
+          "bgGradient": "linear-gradient(180deg, #002d10 0%, #005522 40%, #008838 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 10,
+          "wildPets": [
+            { "petId": 7, "minLevel": 10, "maxLevel": 18, "rate": 40 },
+            { "petId": 8, "minLevel": 16, "maxLevel": 22, "rate": 25 },
+            { "petId": 17, "minLevel": 10, "maxLevel": 16, "rate": 20 },
+            { "petId": 15, "minLevel": 10, "maxLevel": 16, "rate": 15 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "古树之心",
+          "icon": "🌳",
+          "description": "万年古树的核心，森林守护者沉睡于此。",
+          "bgGradient": "linear-gradient(180deg, #003d15 0%, #006628 40%, #00993d 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 20,
+          "wildPets": [
+            { "petId": 8, "minLevel": 20, "maxLevel": 30, "rate": 45 },
+            { "petId": 7, "minLevel": 15, "maxLevel": 22, "rate": 25 },
+            { "petId": 12, "minLevel": 18, "maxLevel": 25, "rate": 15 },
+            { "petId": 17, "minLevel": 18, "maxLevel": 24, "rate": 15 }
+          ],
+          "boss": { "petId": 9, "level": 36, "name": "森林守护·古树之灵", "rate": 10, "essenceId": "grass" }
+        }
+      ]
     },
     {
       "id": 4,
@@ -48,13 +180,57 @@
       "description": "电闪雷鸣的风暴星球，永不停歇的闪电照亮紫色天空。",
       "theme": "electric",
       "bgColor": "#1a1500",
-      "wildPets": [
-        { "petId": 10, "minLevel": 8, "maxLevel": 15, "rate": 50 },
-        { "petId": 1, "minLevel": 8, "maxLevel": 12, "rate": 25 },
-        { "petId": 4, "minLevel": 8, "maxLevel": 12, "rate": 25 }
-      ],
-      "boss": { "petId": 10, "level": 40, "name": "雷电鼠·雷神" },
-      "requiredLevel": 10
+      "requiredLevel": 10,
+      "scenes": [
+        {
+          "id": 0,
+          "name": "雷鸣平原",
+          "icon": "⚡",
+          "description": "闪电不时划过天际的广阔平原，空气中充满了静电。",
+          "bgGradient": "linear-gradient(180deg, #1a1500 0%, #332b00 40%, #665500 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 10,
+          "wildPets": [
+            { "petId": 10, "minLevel": 10, "maxLevel": 18, "rate": 60 },
+            { "petId": 1, "minLevel": 10, "maxLevel": 15, "rate": 20 },
+            { "petId": 4, "minLevel": 10, "maxLevel": 15, "rate": 20 }
+          ]
+        },
+        {
+          "id": 1,
+          "name": "闪电峡谷",
+          "icon": "🌩️",
+          "description": "峡谷中雷电密集交织，只有电系精灵才能自如行动。",
+          "bgGradient": "linear-gradient(180deg, #332200 0%, #664400 40%, #997700 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 18,
+          "wildPets": [
+            { "petId": 10, "minLevel": 18, "maxLevel": 25, "rate": 35 },
+            { "petId": 13, "minLevel": 20, "maxLevel": 28, "rate": 30 },
+            { "petId": 7, "minLevel": 18, "maxLevel": 22, "rate": 20 },
+            { "petId": 1, "minLevel": 18, "maxLevel": 22, "rate": 15 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "雷神殿堂",
+          "icon": "🏛️",
+          "description": "雷霆星最高处的神殿，传说雷神在此掌控天雷。",
+          "bgGradient": "linear-gradient(180deg, #4d3d00 0%, #806600 40%, #cc9900 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 30,
+          "wildPets": [
+            { "petId": 13, "minLevel": 28, "maxLevel": 38, "rate": 45 },
+            { "petId": 10, "minLevel": 25, "maxLevel": 32, "rate": 25 },
+            { "petId": 2, "minLevel": 25, "maxLevel": 30, "rate": 15 },
+            { "petId": 5, "minLevel": 25, "maxLevel": 30, "rate": 15 }
+          ],
+          "boss": { "petId": 14, "level": 45, "name": "万雷神君·雷神", "rate": 10, "essenceId": "electric" }
+        }
+      ]
     },
     {
       "id": 5,
@@ -62,13 +238,57 @@
       "description": "半边永昼半边永夜的神秘星球，光明与黑暗的力量在此交汇。",
       "theme": "neutral",
       "bgColor": "#0a0a1a",
-      "wildPets": [
-        { "petId": 11, "minLevel": 12, "maxLevel": 20, "rate": 40 },
-        { "petId": 12, "minLevel": 12, "maxLevel": 20, "rate": 40 },
-        { "petId": 10, "minLevel": 10, "maxLevel": 15, "rate": 20 }
-      ],
-      "boss": { "petId": 12, "level": 50, "name": "暗影刺客·虚空之主" },
-      "requiredLevel": 20
+      "requiredLevel": 20,
+      "scenes": [
+        {
+          "id": 0,
+          "name": "晨曦之地",
+          "icon": "🌅",
+          "description": "永恒黎明笼罩的圣地，柔和的金光赋予一切温暖与希望。",
+          "bgGradient": "linear-gradient(180deg, #1a1033 0%, #332066 40%, #553399 100%)",
+          "maxSpawns": 4,
+          "refreshInterval": 30,
+          "requiredLevel": 20,
+          "wildPets": [
+            { "petId": 15, "minLevel": 20, "maxLevel": 28, "rate": 50 },
+            { "petId": 11, "minLevel": 20, "maxLevel": 28, "rate": 30 },
+            { "petId": 10, "minLevel": 18, "maxLevel": 24, "rate": 20 }
+          ]
+        },
+        {
+          "id": 1,
+          "name": "黄昏边界",
+          "icon": "🌗",
+          "description": "光与暗的交界地带，两种力量在此激烈碰撞。",
+          "bgGradient": "linear-gradient(180deg, #1a0a33 0%, #330d66 40%, #551a99 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 30,
+          "wildPets": [
+            { "petId": 11, "minLevel": 28, "maxLevel": 36, "rate": 30 },
+            { "petId": 12, "minLevel": 28, "maxLevel": 36, "rate": 30 },
+            { "petId": 15, "minLevel": 25, "maxLevel": 32, "rate": 20 },
+            { "petId": 17, "minLevel": 25, "maxLevel": 32, "rate": 20 }
+          ]
+        },
+        {
+          "id": 2,
+          "name": "永夜深渊",
+          "icon": "🌑",
+          "description": "永恒黑夜的最深处，暗影刺客在此统治着一切。",
+          "bgGradient": "linear-gradient(180deg, #0d0020 0%, #1a0040 40%, #330066 100%)",
+          "maxSpawns": 5,
+          "refreshInterval": 30,
+          "requiredLevel": 40,
+          "wildPets": [
+            { "petId": 12, "minLevel": 35, "maxLevel": 45, "rate": 35 },
+            { "petId": 11, "minLevel": 35, "maxLevel": 42, "rate": 25 },
+            { "petId": 17, "minLevel": 32, "maxLevel": 40, "rate": 25 },
+            { "petId": 15, "minLevel": 32, "maxLevel": 40, "rate": 15 }
+          ],
+          "boss": { "petId": 18, "level": 55, "name": "深渊魔君·虚空之主", "rate": 10, "essenceId": "dark" }
+        }
+      ]
     }
   ]
 }
