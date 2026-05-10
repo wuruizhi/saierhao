@@ -8,6 +8,7 @@ const createAuthRouter = require('./routes/auth');
 const createPlayerRouter = require('./routes/player');
 const createBattleRouter = require('./routes/battle');
 const createShopRouter = require('./routes/shop');
+const createAdminRouter = require('./routes/admin');
 const PvpManager = require('./game/pvp-manager');
 const SceneManager = require('./game/scene-manager');
 
@@ -21,6 +22,10 @@ console.log('✅ 数据库初始化完成');
 const sceneManager = new SceneManager();
 console.log('✅ 场景管理器初始化完成');
 
+// Initialize PVP manager (needed by admin router)
+const pvpManager = new PvpManager(db);
+console.log('✅ PVP管理器初始化完成');
+
 // Create Express app
 const app = express();
 app.use(express.json());
@@ -33,6 +38,12 @@ app.use('/api/auth', createAuthRouter(db));
 app.use('/api/player', createPlayerRouter(db));
 app.use('/api/battle', createBattleRouter(db, sceneManager));
 app.use('/api/shop', createShopRouter(db));
+app.use('/api/admin', createAdminRouter(db, pvpManager));
+
+// Admin page route
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 
 // SPA fallback
 app.get('*', (req, res) => {
@@ -44,7 +55,6 @@ const server = http.createServer(app);
 
 // WebSocket server for PVP
 const wss = new WebSocketServer({ server, path: '/ws' });
-const pvpManager = new PvpManager(db);
 
 wss.on('connection', (ws, req) => {
   pvpManager.handleConnection(ws, req);

@@ -27,6 +27,9 @@
       <button class="hub-nav-btn" data-section="team" id="nav-team">
         <span class="nav-icon">🎒</span><span>精灵背包</span>
       </button>
+      <button class="hub-nav-btn" data-section="pokedex" id="nav-pokedex">
+        <span class="nav-icon">📖</span><span>图鉴</span>
+      </button>
       <button class="hub-nav-btn" data-section="shop" id="nav-shop">
         <span class="nav-icon">🏪</span><span>商店</span>
       </button>
@@ -65,6 +68,7 @@
           <button type="submit" class="btn btn-primary btn-full" id="auth-submit">登录</button>
           <p class="auth-error" id="auth-error"></p>
         </form>
+        <a href="/admin" class="admin-entry-link" id="admin-entry">🛡️ 管理员后台</a>
       </div>
     </div>
   </div>
@@ -105,6 +109,16 @@
         <h3>🥚 精元</h3>
         <div class="pet-grid" id="essence-grid"></div>
       </div>
+    </section>
+
+    <!-- Pokedex section -->
+    <section id="section-pokedex" class="hub-section">
+      <h2 class="section-title">📖 图鉴</h2>
+      <div class="pokedex-tabs">
+        <button class="pokedex-tab active" data-dex="pets" id="dex-tab-pets">🐾 精灵图鉴</button>
+        <button class="pokedex-tab" data-dex="boss" id="dex-tab-boss">👑 Boss图鉴</button>
+      </div>
+      <div class="pokedex-container" id="pokedex-container"></div>
     </section>
 
     <!-- Shop section -->
@@ -156,7 +170,7 @@
   <!-- ===== PLANET DETAIL / SCENE SELECT ===== -->
   <div id="screen-planet-detail" class="screen">
     <div class="planet-detail-container">
-      <button class="btn btn-back" id="planet-detail-back">← 返回星球列表</button>
+      <button class="btn btn-back btn-back-fixed" id="planet-detail-back">← 返回星球列表</button>
       <h2 class="section-title glow-text" id="planet-detail-title"></h2>
       <p class="section-subtitle" id="planet-detail-desc"></p>
       <div class="scene-select-grid" id="scene-select-grid"></div>
@@ -167,13 +181,15 @@
   <div id="screen-scene" class="screen">
     <div class="scene-container">
       <div class="scene-info-bar">
-        <button class="btn btn-back btn-sm" id="scene-back">← 返回</button>
+        <button class="btn btn-back btn-back-fixed btn-sm" id="scene-back">← 返回</button>
         <span class="scene-name" id="scene-name"></span>
         <span class="scene-timer" id="scene-timer">🔄 30s</span>
       </div>
       <div class="scene-viewport" id="scene-viewport">
         <!-- Wild pets rendered here by JS -->
       </div>
+      <!-- Scene navigation bar for switching scenes within same planet -->
+      <div class="scene-nav-bar" id="scene-nav-bar"></div>
       <p class="scene-hint">💡 点击地面移动赛尔 · 点击精灵走近触发战斗</p>
     </div>
   </div>
@@ -271,6 +287,14 @@
       <div class="pet-detail-stats" id="pet-detail-stats"></div>
       <div class="pet-detail-skills" id="pet-detail-skills"></div>
       <div class="pet-detail-actions" id="pet-detail-actions"></div>
+    </div>
+  </div>
+
+  <!-- ===== POKEDEX DETAIL MODAL ===== -->
+  <div id="modal-dex-detail" class="modal">
+    <div class="modal-content glass-card dex-detail-modal">
+      <button class="modal-close" id="dex-detail-close">&times;</button>
+      <div id="dex-detail-content"></div>
     </div>
   </div>
 

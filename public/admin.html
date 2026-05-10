@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛尔号 - 管理后台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <h1>🛡️ 赛尔号管理后台</h1>
+      <p>请输入管理密码</p>
+      <input type="password" id="admin-password" placeholder="管理密码" autofocus>
+      <button id="login-btn" class="btn btn-primary">登录</button>
+      <p class="error" id="login-error"></p>
+      <a href="/" class="btn btn-sm" style="display:inline-flex;margin-top:16px;text-decoration:none;background:rgba(255,255,255,.08);color:var(--text-secondary);padding:8px 20px;border-radius:8px;width:100%;justify-content:center">🎮 返回游戏</a>
+    </div>
+  </div>
+
+  <div id="admin-app" style="display:none">
+    <header class="admin-header">
+      <h1>🛡️ 赛尔号管理后台</h1>
+      <div class="header-actions">
+        <button id="btn-grant-all" class="btn btn-warn" title="一键为所有玩家派发无限金币">💰 一键派发金币</button>
+        <a href="/" class="btn btn-sm" style="text-decoration:none">🎮 返回游戏</a>
+        <button id="btn-logout" class="btn btn-sm">🔙 返回登录</button>
+      </div>
+    </header>
+
+    <!-- Stats bar -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="搜索用户名...">
+      <button id="search-btn" class="btn btn-primary btn-sm">搜索</button>
+    </div>
+
+    <!-- Users table -->
+    <div class="table-wrap">
+      <table id="users-table">
+        <thead>
+          <tr>
+            <th>ID</th><th>用户名</th><th>金币</th><th>精灵数</th><th>队伍</th><th>注册时间</th><th>操作</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+
+    <!-- User detail modal -->
+    <div id="user-modal" class="modal" style="display:none">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close">&times;</button>
+        <div id="user-detail-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let adminPw = '';
+    const BASE = '/api/admin';
+
+    async function api(method, path, body) {
+      const opts = { method, headers: { 'Content-Type': 'application/json', 'x-admin-password': adminPw } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(BASE + path, opts);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '请求失败');
+      return data;
+    }
+
+    // Login
+    document.getElementById('login-btn').addEventListener('click', doLogin);
+    document.getElementById('admin-password').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+    async function doLogin() {
+      const pw = document.getElementById('admin-password').value;
+      try {
+        await api('POST', '/login', { password: pw, adminPassword: pw });
+        adminPw = pw;
+        localStorage.setItem('admin_pw', pw);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-app').style.display = 'block';
+        loadStats(); loadUsers();
+      } catch(e) {
+        document.getElementById('login-error').textContent = e.message;
+      }
+    }
+
+    // Auto-login
+    const saved = localStorage.getItem('admin_pw');
+    if (saved) { document.getElementById('admin-password').value = saved; doLogin(); }
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      localStorage.removeItem('admin_pw');
+      location.reload();
+    });
+
+    // Stats
+    async function loadStats() {
+      try {
+        const s = await api('GET', '/stats');
+        document.getElementById('stats-bar').innerHTML = `
+          <div class="stat-item"><span class="stat-num">${s.totalUsers}</span><span class="stat-label">总用户</span></div>
+          <div class="stat-item"><span class="stat-num">${s.totalPets}</span><span class="stat-label">总精灵</span></div>
+          <div class="stat-item"><span class="stat-num">${(s.totalMoney/1e8).toFixed(1)}亿</span><span class="stat-label">总金币</span></div>
+          <div class="stat-item"><span class="stat-num">${s.recentUsers}</span><span class="stat-label">24h新用户</span></div>
+        `;
+      } catch(e) {}
+    }
+
+    // Users
+    let currentPage = 1;
+    async function loadUsers(page = 1, search = '') {
+      currentPage = page;
+      try {
+        const data = await api('GET', `/users?page=${page}&limit=20&search=${encodeURIComponent(search)}`);
+        const tbody = document.getElementById('users-tbody');
+        tbody.innerHTML = '';
+        data.users.forEach(u => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${u.id}</td>
+            <td><strong>${u.username}</strong></td>
+            <td class="money">${(u.money||0).toLocaleString()}</td>
+            <td>${u.pet_count||0}</td>
+            <td>${u.team_count||0}/6</td>
+            <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
+            <td>
+              <button class="btn btn-xs btn-primary" onclick="viewUser(${u.id})">查看</button>
+              <button class="btn btn-xs btn-warn" onclick="setMoney(${u.id}, '${u.username}')">改金币</button>
+            </td>
+            <td>
+              <button class="btn btn-xs btn-danger" onclick="deleteUser(${u.id}, '${u.username}')">删除</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        renderPagination(data);
+      } catch(e) { console.error(e); }
+    }
+
+    function renderPagination(data) {
+      const div = document.getElementById('pagination');
+      div.innerHTML = '';
+      for (let i = 1; i <= data.totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-xs' + (i === data.page ? ' btn-primary' : '');
+        btn.textContent = i;
+        btn.addEventListener('click', () => loadUsers(i, document.getElementById('search-input').value));
+        div.appendChild(btn);
+      }
+    }
+
+    // Search
+    document.getElementById('search-btn').addEventListener('click', () => loadUsers(1, document.getElementById('search-input').value));
+    document.getElementById('search-input').addEventListener('keypress', e => { if (e.key === 'Enter') loadUsers(1, e.target.value); });
+
+    // Set money
+    window.setMoney = async function(userId, username) {
+      const amount = prompt(`设置 ${username} 的金币数量:`, '999999999');
+      if (amount === null) return;
+      try {
+        const r = await api('POST', `/user/${userId}/set-money`, { money: parseInt(amount) });
+        alert(r.message);
+        loadUsers(currentPage, document.getElementById('search-input').value);
+        loadStats();
+      } catch(e) { alert(e.message); }
+    };
+
+    // View user detail with full asset management
+    let _viewUserId = null;
+    window.viewUser = async function(userId) {
+      _viewUserId = userId;
+      try {
+        const data = await api('GET', `/user/${userId}`);
+        const modal = document.getElementById('user-modal');
+        const content = document.getElementById('user-detail-content');
+        
+        // ===== Money section =====
+        let moneyHtml = `
+          <div class="asset-section">
+            <h3>💰 金币管理</h3>
+            <div class="money-control">
+              <span class="money">${(data.player?.money||0).toLocaleString()}</span>
+              <input type="number" id="money-input" value="${data.player?.money||0}" class="level-input" style="width:140px">
+              <button class="btn btn-xs btn-primary" onclick="doSetMoney(${userId})">设置</button>
+              <button class="btn btn-xs btn-warn" onclick="doSetMoney(${userId}, 999999999)">设为无限</button>
+            </div>
+          </div>`;
+
+        // ===== Pets section =====
+        let petsHtml = `
+          <div class="asset-section">
+            <h3>🐾 精灵管理 (${(data.pets||[]).length}只)</h3>
+            <div class="pet-list">`;
+        (data.pets || []).forEach(p => {
+          petsHtml += `
+            <div class="pet-row ${p.in_team ? 'in-team' : ''}">
+              <span class="pet-id">#${p.id}</span>
+              <span class="pet-name">${p.nickname} (种族#${p.pet_id})</span>
+              <span class="pet-level">Lv.${p.level}</span>
+              <span class="pet-hp">HP:${p.current_hp}/${p.max_hp}</span>
+              <span>${p.in_team ? '🟢 队伍' : '📦 仓库'}</span>
+              <div class="pet-controls">
+                <input type="number" min="1" max="100" value="${p.level}" class="level-input" id="level-${p.id}" title="等级">
+                <button class="btn btn-xs" onclick="setPetLevel(${userId}, ${p.id})">改等级</button>
+                <button class="btn btn-xs" onclick="setPetHp(${userId}, ${p.id}, ${p.max_hp})">满HP</button>
+                <button class="btn btn-xs btn-danger" onclick="deletePet(${userId}, ${p.id}, '${p.nickname}')">删除</button>
+              </div>
+            </div>`;
+        });
+        petsHtml += `</div>
+            <div class="give-form">
+              <span>赠送精灵：</span>
+              <input type="number" id="give-pet-id" placeholder="精灵种族ID(1-33)" class="level-input" style="width:120px" min="1" max="33">
+              <input type="number" id="give-pet-level" placeholder="等级" class="level-input" style="width:70px" value="10" min="1" max="100">
+              <button class="btn btn-xs btn-primary" onclick="givePet(${userId})">赠送</button>
+            </div>
+          </div>`;
+
+        // ===== Items section =====
+        let itemsHtml = `
+          <div class="asset-section">
+            <h3>🎒 背包管理</h3>
+            <div class="items-grid">`;
+        (data.items || []).forEach(i => {
+          itemsHtml += `
+            <div class="item-row">
+              <span class="item-name">${i.item_id}</span>
+              <input type="number" min="0" value="${i.quantity}" class="level-input" style="width:70px" id="item-qty-${i.item_id.replace(/[^a-z0-9_]/g,'')}">
+              <button class="btn btn-xs" onclick="setItem(${userId}, '${i.item_id}')">设置数量</button>
+              <button class="btn btn-xs btn-danger" onclick="removeItem(${userId}, '${i.item_id}')">删除</button>
+            </div>`;
+        });
+        itemsHtml += `</div>
+            <div class="give-form">
+              <span>给予道具：</span>
+              <select id="give-item-id" class="level-input" style="width:150px">
+                <option value="capsule_normal">普通胶囊</option>
+                <option value="capsule_great">高级胶囊</option>
+                <option value="capsule_ultra">超级胶囊</option>
+                <option value="capsule_master">大师胶囊</option>
+                <option value="candy_small">小经验糖</option>
+                <option value="candy_medium">中经验糖</option>
+                <option value="candy_large">大经验糖</option>
+                <option value="candy_super">超级经验糖</option>
+                <option value="booster_hp">HP强化剂</option>
+                <option value="booster_attack">攻击强化剂</option>
+                <option value="booster_defense">防御强化剂</option>
+                <option value="booster_speed">速度强化剂</option>
+                <option value="level_boost">等级提升器</option>
+                <option value="evolve_stone">进化石</option>
+              </select>
+              <input type="number" id="give-item-qty" placeholder="数量" class="level-input" style="width:70px" value="10" min="1">
+              <button class="btn btn-xs btn-primary" onclick="giveItem(${userId})">给予</button>
+            </div>
+          </div>`;
+
+        // ===== Essences section =====
+        let essenceHtml = '';
+        if (data.essences && data.essences.length > 0) {
+          essenceHtml = `<div class="asset-section"><h3>🥚 精元</h3><div class="items-grid">`;
+          data.essences.forEach(e => {
+            essenceHtml += `<div class="item-row"><span>${e.essence_id}</span><span>状态: ${e.hatching ? (e.ready ? '可领取' : '孵化中') : '待孵化'}</span></div>`;
+          });
+          essenceHtml += '</div></div>';
+        }
+
+        content.innerHTML = `
+          <h2>👤 ${data.user.username} <small style="color:var(--text-dim)">(ID:${data.user.id})</small></h2>
+          <button class="btn btn-danger btn-sm" onclick="deleteUser(${data.user.id}, '${data.user.username}')" style="margin-bottom:12px">🗑️ 删除此用户</button>
+          ${moneyHtml}${petsHtml}${itemsHtml}${essenceHtml}
+        `;
+        modal.style.display = 'flex';
+      } catch(e) { alert(e.message); }
+    };
+
+    window.doSetMoney = async function(userId, amount) {
+      if (amount === undefined) amount = parseInt(document.getElementById('money-input').value);
+      try {
+        const r = await api('POST', `/user/${userId}/set-money`, { money: amount });
+        alert(r.message); viewUser(userId); loadStats();
+      } catch(e) { alert(e.message); }
+    };
+
+    window.setPetLevel = async function(userId, petId) {
+      const level = parseInt(document.getElementById(`level-${petId}`).value);
+      try {
+        const r = await api('POST', `/user/${userId}/set-pet-level`, { petInstanceId: petId, level });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.setPetHp = async function(userId, petId, maxHp) {
+      try {
+        const r = await api('POST', `/user/${userId}/set-pet-hp`, { petInstanceId: petId, hp: maxHp });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.deletePet = async function(userId, petId, name) {
+      if (!confirm(`确认删除精灵 ${name}？`)) return;
+      try {
+        const r = await api('POST', `/user/${userId}/delete-pet`, { petInstanceId: petId });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.givePet = async function(userId) {
+      const petId = parseInt(document.getElementById('give-pet-id').value);
+      const level = parseInt(document.getElementById('give-pet-level').value);
+      if (!petId || !level) return alert('请输入精灵ID和等级');
+      try {
+        const r = await api('POST', `/user/${userId}/give-pet`, { petId, level });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.giveItem = async function(userId) {
+      const itemId = document.getElementById('give-item-id').value;
+      const quantity = parseInt(document.getElementById('give-item-qty').value);
+      if (!itemId || !quantity) return alert('请选择道具和数量');
+      try {
+        const r = await api('POST', `/user/${userId}/give-item`, { itemId, quantity });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.setItem = async function(userId, itemId) {
+      const safeId = itemId.replace(/[^a-z0-9_]/g, '');
+      const quantity = parseInt(document.getElementById(`item-qty-${safeId}`).value);
+      try {
+        const r = await api('POST', `/user/${userId}/set-item`, { itemId, quantity });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    window.removeItem = async function(userId, itemId) {
+      if (!confirm(`确认删除道具 ${itemId}？`)) return;
+      try {
+        const r = await api('POST', `/user/${userId}/remove-item`, { itemId });
+        alert(r.message); viewUser(userId);
+      } catch(e) { alert(e.message); }
+    };
+
+    document.getElementById('modal-close').addEventListener('click', () => {
+      document.getElementById('user-modal').style.display = 'none';
+    });
+
+    // Delete user
+    window.deleteUser = async function(userId, username) {
+      if (!confirm(`确定要删除用户「${username}」(ID:${userId}) 及其所有精灵、道具数据吗？\n\n此操作不可撤销！`)) return;
+      try {
+        const r = await api('DELETE', `/user/${userId}`);
+        alert(r.message);
+        document.getElementById('user-modal').style.display = 'none';
+        loadUsers(currentPage, document.getElementById('search-input').value);
+        loadStats();
+      } catch(e) { alert(e.message); }
+    };
+
+    // Grant all coins
+    document.getElementById('btn-grant-all').addEventListener('click', async () => {
+      if (!confirm('确认为所有玩家派发 999,999,999 金币？')) return;
+      try {
+        const r = await api('POST', '/grant-all-coins', { money: 999999999 });
+        alert(r.message);
+        loadUsers(currentPage);
+        loadStats();
+      } catch(e) { alert(e.message); }
+    });
+  </script>
+</body>
+</html>

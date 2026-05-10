@@ -19,7 +19,12 @@ const PET_TYPE_MAP = {
   10:'electric',11:'light',12:'dark',
   13:'electric',14:'electric',
   15:'light',16:'light',
-  17:'dark',18:'dark'
+  17:'dark',18:'dark',
+  19:'fire',20:'fire',21:'fire',
+  22:'water',23:'water',24:'water',
+  25:'grass',26:'grass',27:'grass',
+  28:'electric',29:'electric',30:'electric',
+  31:'dark',32:'dark',33:'dark'
 };
 
 function renderPetSprite(container, petId, size) {

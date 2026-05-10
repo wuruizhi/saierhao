@@ -28,6 +28,8 @@ class SceneManager {
     if (!this.scenes.has(key)) {
       this.spawnPets(mapId, sceneIndex);
     }
+    // Always ensure boss exists in boss scenes
+    this.ensureBossSpawn(mapId, sceneIndex);
     return this.scenes.get(key) || [];
   }
 
@@ -54,7 +56,41 @@ class SceneManager {
   }
 
   /**
-   * Create a single spawn from scene config
+   * Ensure a boss is always present in scenes with boss config
+   */
+  ensureBossSpawn(mapId, sceneIndex) {
+    const scene = this.getScene(mapId, sceneIndex);
+    if (!scene || !scene.boss) return;
+
+    const key = this.getKey(mapId, sceneIndex);
+    const spawns = this.scenes.get(key) || [];
+    
+    // Check if a boss already exists
+    const hasBoss = spawns.some(s => s.isBoss);
+    if (hasBoss) return;
+
+    // Force-spawn a boss
+    const boss = {
+      spawnId: uuidv4(),
+      petId: scene.boss.petId,
+      level: scene.boss.level,
+      isBoss: true,
+      bossName: scene.boss.name,
+      essenceId: scene.boss.essenceId,
+      // Boss gets a prominent position
+      x: 50 + (Math.random() - 0.5) * 20,
+      y: 30 + Math.random() * 15,
+      dx: (Math.random() - 0.5) * 1,
+      dy: (Math.random() - 0.5) * 0.5,
+      spawnedAt: Date.now()
+    };
+
+    spawns.push(boss);
+    this.scenes.set(key, spawns);
+  }
+
+  /**
+   * Create a single spawn from scene config (non-boss only)
    */
   createSpawn(scene) {
     // Roll for which pet appears
@@ -71,25 +107,16 @@ class SceneManager {
     }
     if (!wildPetDef) wildPetDef = scene.wildPets[0];
 
-    // Check for boss spawn (only in scenes with boss config)
-    let isBoss = false;
-    if (scene.boss && Math.random() * 100 < scene.boss.rate) {
-      isBoss = true;
-    }
-
-    const level = isBoss
-      ? scene.boss.level
-      : wildPetDef.minLevel + Math.floor(Math.random() * (wildPetDef.maxLevel - wildPetDef.minLevel + 1));
-
-    const petId = isBoss ? scene.boss.petId : wildPetDef.petId;
+    const level = wildPetDef.minLevel + Math.floor(Math.random() * (wildPetDef.maxLevel - wildPetDef.minLevel + 1));
+    const petId = wildPetDef.petId;
 
     return {
       spawnId: uuidv4(),
       petId,
       level,
-      isBoss,
-      bossName: isBoss ? scene.boss.name : null,
-      essenceId: isBoss ? scene.boss.essenceId : null,
+      isBoss: false,
+      bossName: null,
+      essenceId: null,
       // Random position (percentage)
       x: 10 + Math.random() * 80,
       y: 20 + Math.random() * 55,
@@ -102,6 +129,7 @@ class SceneManager {
 
   /**
    * Remove a pet from scene (when battle starts or captured)
+   * For bosses: immediately respawn a new boss
    */
   removePet(mapId, sceneIndex, spawnId) {
     const key = this.getKey(mapId, sceneIndex);
@@ -113,6 +141,12 @@ class SceneManager {
 
     const removed = spawns.splice(idx, 1)[0];
     this.scenes.set(key, spawns);
+
+    // If boss was removed, immediately respawn
+    if (removed.isBoss) {
+      this.ensureBossSpawn(mapId, sceneIndex);
+    }
+
     return removed;
   }
 
@@ -140,6 +174,8 @@ class SceneManager {
 
           if (Date.now() - last >= interval) {
             this.spawnPets(map.id, i);
+            // Always ensure boss
+            this.ensureBossSpawn(map.id, i);
           }
         }
       }

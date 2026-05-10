@@ -113,10 +113,10 @@
             }
           ],
           "boss": {
-            "petId": 3,
-            "level": 30,
-            "name": "炎帝猩·守护者",
-            "rate": 10,
+            "petId": 21,
+            "level": 35,
+            "name": "焱龙帝·炎皇",
+            "rate": 100,
             "essenceId": "fire"
           }
         }
@@ -235,10 +235,10 @@
             }
           ],
           "boss": {
-            "petId": 6,
-            "level": 30,
-            "name": "海皇蛙·深海领主",
-            "rate": 10,
+            "petId": 24,
+            "level": 35,
+            "name": "渊鲲王·海神",
+            "rate": 100,
             "essenceId": "water"
           }
         }
@@ -357,10 +357,10 @@
             }
           ],
           "boss": {
-            "petId": 9,
-            "level": 36,
-            "name": "森林守护·古树之灵",
-            "rate": 10,
+            "petId": 27,
+            "level": 40,
+            "name": "蛮荒古树·森灵",
+            "rate": 100,
             "essenceId": "grass"
           }
         }
@@ -479,10 +479,10 @@
             }
           ],
           "boss": {
-            "petId": 14,
+            "petId": 30,
             "level": 45,
-            "name": "万雷神君·雷神",
-            "rate": 10,
+            "name": "天雷兽·雷帝",
+            "rate": 100,
             "essenceId": "electric"
           }
         }
@@ -601,10 +601,10 @@
             }
           ],
           "boss": {
-            "petId": 18,
+            "petId": 33,
             "level": 55,
-            "name": "深渊魔君·虚空之主",
-            "rate": 10,
+            "name": "虚空魔神·混沌",
+            "rate": 100,
             "essenceId": "dark"
           }
         }

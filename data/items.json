@@ -1,40 +1,41 @@
 {
   "capsules": [
-    { "id": "capsule_normal", "name": "普通胶囊", "price": 100, "captureBonus": 10, "icon": "🔵", "description": "最基础的精灵胶囊" },
-    { "id": "capsule_great", "name": "高级胶囊", "price": 500, "captureBonus": 25, "icon": "🟢", "description": "更好用的胶囊" },
-    { "id": "capsule_ultra", "name": "超级胶囊", "price": 2000, "captureBonus": 50, "icon": "🟡", "description": "捕获率大幅提升" },
-    { "id": "capsule_master", "name": "大师胶囊", "price": 10000, "captureBonus": 100, "icon": "🟣", "description": "必定捕获" },
-    { "id": "capsule_legend", "name": "传说胶囊", "price": 50000, "captureBonus": 100, "icon": "👑", "description": "必定捕获+捕获后直接升至30级" }
+    { "id": "capsule_normal", "name": "普通胶囊", "price": 100, "captureBonus": 10, "icon": "🔵", "description": "最基础的精灵胶囊。捕获率基础+10%，适用于低等级或血量较低的野生精灵。" },
+    { "id": "capsule_great", "name": "高级胶囊", "price": 500, "captureBonus": 25, "icon": "🟢", "description": "改良型精灵胶囊。捕获率基础+25%，适用于中等级精灵，推荐削减目标HP后使用。" },
+    { "id": "capsule_ultra", "name": "超级胶囊", "price": 2000, "captureBonus": 50, "icon": "🟡", "description": "高科技精灵胶囊。捕获率基础+50%，对高等级和稀有精灵效果显著。" },
+    { "id": "capsule_master", "name": "大师胶囊", "price": 10000, "captureBonus": 100, "icon": "🟣", "description": "传说级胶囊，100%捕获率！对任何野生精灵必定成功捕获，Boss除外（Boss不可捕获）。" },
+    { "id": "capsule_legend", "name": "传说胶囊", "price": 50000, "captureBonus": 100, "icon": "👑", "description": "至尊胶囊，100%捕获率且捕获后精灵直升30级！最珍贵的收藏道具，Boss除外。" }
   ],
   "candies": [
-    { "id": "candy_s", "name": "经验糖果 S", "price": 200, "exp": 50, "icon": "🍬", "description": "+50 经验" },
-    { "id": "candy_m", "name": "经验糖果 M", "price": 800, "exp": 200, "icon": "🍭", "description": "+200 经验" },
-    { "id": "candy_l", "name": "经验糖果 L", "price": 3000, "exp": 1000, "icon": "🧁", "description": "+1000 经验" },
-    { "id": "candy_xl", "name": "经验糖果 XL", "price": 10000, "exp": 5000, "icon": "🎂", "description": "+5000 经验" },
-    { "id": "candy_xxl", "name": "经验糖果 XXL", "price": 50000, "exp": 30000, "icon": "💎", "description": "+30000 经验" },
-    { "id": "candy_ultimate", "name": "终极经验糖", "price": 100000, "exp": 100000, "icon": "🌟", "description": "+100000 经验" }
+    { "id": "candy_s", "name": "经验糖果 S", "price": 200, "exp": 50, "icon": "🍬", "description": "小型经验糖果，使用后精灵获得50点经验值。适合低等级精灵快速成长。" },
+    { "id": "candy_m", "name": "经验糖果 M", "price": 800, "exp": 200, "icon": "🍭", "description": "中型经验糖果，使用后精灵获得200点经验值。性价比较高的成长道具。" },
+    { "id": "candy_l", "name": "经验糖果 L", "price": 3000, "exp": 1000, "icon": "🧁", "description": "大型经验糖果，使用后精灵获得1000点经验值。可快速提升中等级精灵。" },
+    { "id": "candy_xl", "name": "经验糖果 XL", "price": 10000, "exp": 5000, "icon": "🎂", "description": "超大经验糖果，使用后精灵获得5000点经验值。高等级精灵的进阶必备。" },
+    { "id": "candy_xxl", "name": "经验糖果 XXL", "price": 50000, "exp": 30000, "icon": "💎", "description": "钻石经验糖果，使用后精灵获得30000点经验值。可一次性大幅提升等级。" },
+    { "id": "candy_ultimate", "name": "终极经验糖", "price": 100000, "exp": 100000, "icon": "🌟", "description": "终极经验糖果，使用后精灵获得100000点经验值！几乎可以从1级直接升到满级。" }
   ],
   "boosters": [
-    { "id": "booster_hp", "name": "HP强化剂", "price": 3000, "icon": "❤️", "description": "永久提升精灵HP上限10%", "stat": "hp", "multiplier": 1.1 },
-    { "id": "booster_attack", "name": "物攻强化剂", "price": 3000, "icon": "⚔️", "description": "永久提升精灵物攻10%", "stat": "attack", "multiplier": 1.1 },
-    { "id": "booster_spattack", "name": "法攻强化剂", "price": 3000, "icon": "🔮", "description": "永久提升精灵法攻10%", "stat": "spAttack", "multiplier": 1.1 },
-    { "id": "booster_defense", "name": "物防强化剂", "price": 3000, "icon": "🛡️", "description": "永久提升精灵物防10%", "stat": "defense", "multiplier": 1.1 },
-    { "id": "booster_spdefense", "name": "法防强化剂", "price": 3000, "icon": "🔰", "description": "永久提升精灵法防10%", "stat": "spDefense", "multiplier": 1.1 },
-    { "id": "booster_speed", "name": "速度强化剂", "price": 3000, "icon": "💨", "description": "永久提升精灵速度10%", "stat": "speed", "multiplier": 1.1 },
-    { "id": "booster_all", "name": "全能强化剂", "price": 20000, "icon": "🏆", "description": "永久全面提升所有属性8%", "stat": "all", "multiplier": 1.08 },
-    { "id": "booster_mega", "name": "究极强化剂", "price": 50000, "icon": "💥", "description": "永久全面提升所有属性20%", "stat": "all", "multiplier": 1.2 }
+    { "id": "booster_hp", "name": "HP强化剂", "price": 3000, "icon": "❤️", "description": "永久提升精灵HP上限10%。效果可叠加，多次使用可大幅提升生存能力。", "stat": "hp", "multiplier": 1.1 },
+    { "id": "booster_attack", "name": "物攻强化剂", "price": 3000, "icon": "⚔️", "description": "永久提升精灵物理攻击力10%。适合物理系精灵，搭配物理技能效果更佳。", "stat": "attack", "multiplier": 1.1 },
+    { "id": "booster_spattack", "name": "法攻强化剂", "price": 3000, "icon": "🔮", "description": "永久提升精灵法术攻击力10%。适合法术系精灵，可提升特殊技能伤害。", "stat": "spAttack", "multiplier": 1.1 },
+    { "id": "booster_defense", "name": "物防强化剂", "price": 3000, "icon": "🛡️", "description": "永久提升精灵物理防御力10%。增强精灵对物理攻击的抵抗能力。", "stat": "defense", "multiplier": 1.1 },
+    { "id": "booster_spdefense", "name": "法防强化剂", "price": 3000, "icon": "🔰", "description": "永久提升精灵法术防御力10%。增强精灵对法术攻击的抵抗能力。", "stat": "spDefense", "multiplier": 1.1 },
+    { "id": "booster_speed", "name": "速度强化剂", "price": 3000, "icon": "💨", "description": "永久提升精灵速度10%。速度决定出手顺序，高速精灵可抢先攻击。", "stat": "speed", "multiplier": 1.1 },
+    { "id": "booster_all", "name": "全能强化剂", "price": 20000, "icon": "🏆", "description": "永久全面提升所有属性8%。一瓶搞定所有属性，终极培养道具。", "stat": "all", "multiplier": 1.08 },
+    { "id": "booster_mega", "name": "究极强化剂", "price": 50000, "icon": "💥", "description": "永久全面提升所有属性20%！最强培养道具，可让精灵实力飞跃式增长。", "stat": "all", "multiplier": 1.2 }
   ],
   "others": [
-    { "id": "hatch_speed", "name": "孵化加速剂", "price": 500, "icon": "⏩", "description": "精元立即孵化" },
-    { "id": "level_boost", "name": "等级直升卡", "price": 20000, "icon": "📈", "description": "使用后精灵直升10级" },
-    { "id": "evolve_stone", "name": "进化石", "price": 30000, "icon": "✨", "description": "直接进化为下一形态（需满足等级）" },
-    { "id": "reset_stats", "name": "属性重置卡", "price": 10000, "icon": "🔄", "description": "重置精灵所有强化属性到基础值" }
+    { "id": "hatch_speed", "name": "孵化加速剂", "price": 500, "icon": "⏩", "description": "使用后精元立即完成孵化，无需等待。对已开始孵化的精元使用。" },
+    { "id": "level_boost", "name": "等级直升卡", "price": 20000, "icon": "📈", "description": "使用后精灵直接提升10个等级！可突破进化等级限制，快速获得更强力的形态。" },
+    { "id": "evolve_stone", "name": "进化石", "price": 30000, "icon": "✨", "description": "使精灵直接进化为下一形态。需要精灵具备进化条件（有下一进化形态）。" },
+    { "id": "reset_stats", "name": "属性重置卡", "price": 10000, "icon": "🔄", "description": "重置精灵所有强化属性到基础值。如果强化方向出错可以使用此道具重新培养。" }
   ],
   "essences": {
-    "fire": { "name": "火焰精元", "icon": "🔥", "hatchPetId": 1, "hatchTime": 300, "skipCost": 500 },
-    "water": { "name": "海洋精元", "icon": "💧", "hatchPetId": 4, "hatchTime": 300, "skipCost": 500 },
-    "grass": { "name": "森林精元", "icon": "🌿", "hatchPetId": 7, "hatchTime": 300, "skipCost": 500 },
-    "electric": { "name": "雷霆精元", "icon": "⚡", "hatchPetId": 10, "hatchTime": 600, "skipCost": 1000 },
-    "dark": { "name": "暗影精元", "icon": "🌑", "hatchPetId": 17, "hatchTime": 900, "skipCost": 2000 }
+    "fire": { "name": "焱龙精元", "icon": "🔥", "hatchPetId": 19, "hatchTime": 300, "skipCost": 500 },
+    "water": { "name": "渊鲲精元", "icon": "💧", "hatchPetId": 22, "hatchTime": 300, "skipCost": 500 },
+    "grass": { "name": "古树精元", "icon": "🌿", "hatchPetId": 25, "hatchTime": 300, "skipCost": 500 },
+    "electric": { "name": "天雷精元", "icon": "⚡", "hatchPetId": 28, "hatchTime": 600, "skipCost": 1000 },
+    "dark": { "name": "虚空精元", "icon": "🌑", "hatchPetId": 31, "hatchTime": 900, "skipCost": 2000 }
   }
 }
+

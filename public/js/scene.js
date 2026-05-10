@@ -18,6 +18,7 @@ let playerAvatar = null;
 let playerPos = { x: 50, y: 75 }; // percentage
 let playerMoving = false;
 let playerMoveAnim = null;
+let _lastTouchTime = 0; // Prevent double-trigger on mobile
 
 // Planet detail & scene selection is handled by app.js (goToPlanet → showPlanetDetail)
 // Scene back button returns to planet detail
@@ -57,19 +58,26 @@ async function enterScene3D(mapId, sceneIndex) {
     vp.style.position = 'relative';
     
     renderSceneSpawns(vp, data.spawns);
+    renderSceneNav(mapId, sceneIndex);
     showScreen('scene');
     startSceneRefresh();
     
-    // Add click-to-move listener
+    // Add click-to-move listener (use touch for mobile)
     vp.onclick = handleViewportClick;
+    vp.ontouchstart = handleViewportTouch;
   } catch(e) { toast(e.message,'error'); }
 }
+let _wanderInterval = null;
 
 function renderSceneSpawns(vp, spawns) {
   vp.innerHTML = '';
+  if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
   
   // Add player avatar first
   createPlayerAvatar(vp);
+  
+  // Track pet elements for wandering
+  const petElements = [];
   
   // Render wild pets with 3D effects
   spawns.forEach(sp => {
@@ -98,22 +106,175 @@ function renderSceneSpawns(vp, spawns) {
     
     const label = document.createElement('div');
     label.className = 'scene-pet-label';
-    label.textContent = `${sp.petDef?.name||'???'} Lv.${sp.level}`;
+    label.textContent = sp.isBoss
+      ? `👑 ${sp.bossName || sp.petDef?.name || '???'} Lv.${sp.level}`
+      : `${sp.petDef?.name||'???'} Lv.${sp.level}`;
     el.appendChild(label);
     
     // Click pet to walk toward it, then battle when close
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      walkToPet(sp.x, sp.y, sp.spawnId);
+      walkToPet(parseFloat(el.style.left), parseFloat(el.style.top), sp.spawnId);
     });
+    el.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      walkToPet(parseFloat(el.style.left), parseFloat(el.style.top), sp.spawnId);
+    }, { passive: false });
     
-    // Wander animation
-    el.style.setProperty('--wx', (Math.random()*30-15)+'px');
-    el.style.setProperty('--wy', (Math.random()*15-7)+'px');
-    el.style.animationDuration = (3+Math.random()*4)+'s';
-    el.style.animationDelay = (Math.random()*2)+'s';
     vp.appendChild(el);
+    
+    // Store for wandering (bosses wander slower)
+    petElements.push({
+      el, isBoss: sp.isBoss,
+      x: sp.x, y: sp.y,
+      targetX: sp.x, targetY: sp.y,
+      speed: sp.isBoss ? 0.15 : 0.3 + Math.random() * 0.3,
+      waitTimer: Math.random() * 80
+    });
   });
+  
+  // Start wander loop: pets move to random targets
+  _wanderInterval = setInterval(() => {
+    petElements.forEach(p => {
+      if (p.waitTimer > 0) {
+        p.waitTimer--;
+        return;
+      }
+      // Pick new target if close to current target
+      const dist = Math.sqrt((p.x - p.targetX)**2 + (p.y - p.targetY)**2);
+      if (dist < 1) {
+        // Reached target, wait then pick a new one
+        p.waitTimer = 30 + Math.random() * 60;
+        const range = p.isBoss ? 12 : 25;
+        p.targetX = Math.max(5, Math.min(92, p.x + (Math.random() - 0.5) * range));
+        p.targetY = Math.max(15, Math.min(80, p.y + (Math.random() - 0.5) * range * 0.6));
+        return;
+      }
+      // Move toward target
+      const dx = p.targetX - p.x;
+      const dy = p.targetY - p.y;
+      const angle = Math.atan2(dy, dx);
+      p.x += Math.cos(angle) * p.speed;
+      p.y += Math.sin(angle) * p.speed;
+      p.el.style.left = p.x + '%';
+      p.el.style.top = p.y + '%';
+      
+      // Flip sprite based on direction
+      const sprite = p.el.querySelector('.pet-3d-container');
+      if (sprite) {
+        sprite.style.transform = dx < 0 ? 'scaleX(-1)' : '';
+      }
+    });
+  }, 50);
+}
+
+// ===== SCENE NAVIGATION: Corner arrows inside viewport =====
+// Arrows placed at scene edge corners, pointing toward adjacent scenes
+const CORNER_POSITIONS = ['bottom-left', 'bottom-right', 'top-left', 'top-right'];
+
+async function renderSceneNav(mapId, currentIdx) {
+  const navBar = document.getElementById('scene-nav-bar');
+  if (navBar) navBar.innerHTML = '';
+  document.querySelectorAll('.scene-edge-arrow, .scene-dots-bar').forEach(el => el.remove());
+
+  try {
+    const { maps } = await API.getMaps();
+    const map = maps.find(m => m.id === mapId);
+    if (!map || !map.scenes || map.scenes.length <= 1) return;
+
+    const vp = document.getElementById('scene-viewport');
+    const scenes = map.scenes;
+    const total = scenes.length;
+
+    // ---- Corner exit arrows ----
+    const exits = [];
+
+    // Previous scene -> bottom-left corner
+    if (currentIdx > 0) {
+      exits.push({ scene: scenes[currentIdx - 1], idx: currentIdx - 1, pos: 'bottom-left', arrow: '↙' });
+    }
+    // Next scene -> bottom-right corner
+    if (currentIdx < total - 1) {
+      exits.push({ scene: scenes[currentIdx + 1], idx: currentIdx + 1, pos: 'bottom-right', arrow: '↘' });
+    }
+    // Remaining scenes -> top corners
+    const remaining = scenes
+      .map((s, i) => ({ scene: s, idx: i }))
+      .filter(({ idx }) => idx !== currentIdx && idx !== currentIdx - 1 && idx !== currentIdx + 1);
+    remaining.forEach(({ scene, idx }, i) => {
+      exits.push({
+        scene, idx,
+        pos: i === 0 ? 'top-left' : 'top-right',
+        arrow: i === 0 ? '↖' : '↗'
+      });
+    });
+
+    exits.forEach(({ scene, idx, pos, arrow }) => {
+      createEdgeArrow(vp, pos, arrow, scene, mapId, idx);
+    });
+
+    // ---- Scene indicator dots at bottom center ----
+    const dotsBar = document.createElement('div');
+    dotsBar.className = 'scene-dots-bar';
+    scenes.forEach((sc, i) => {
+      const dot = document.createElement('div');
+      dot.className = `scene-dot${i === currentIdx ? ' active' : ''}`;
+      dot.title = sc.name;
+      if (i !== currentIdx) {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          stopSceneRefresh();
+          if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
+          if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+          playerMoving = false;
+          enterScene3D(mapId, i);
+        });
+        dot.addEventListener('touchstart', (e) => {
+          e.stopPropagation(); e.preventDefault();
+          stopSceneRefresh();
+          if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
+          if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+          playerMoving = false;
+          enterScene3D(mapId, i);
+        }, { passive: false });
+      }
+      dotsBar.appendChild(dot);
+    });
+    vp.appendChild(dotsBar);
+  } catch (e) {}
+}
+
+function createEdgeArrow(vp, position, arrowIcon, scene, mapId, targetIdx) {
+  const arrow = document.createElement('div');
+  arrow.className = `scene-edge-arrow scene-edge-${position}`;
+
+  arrow.innerHTML = `
+    <span class="edge-arrow-icon">${arrowIcon}</span>
+    <div class="edge-arrow-body">
+      <span class="edge-arrow-hint">前往</span>
+      <span class="edge-arrow-label">${scene.icon} ${scene.name}</span>
+    </div>`;
+
+  arrow.addEventListener('click', (e) => {
+    e.stopPropagation();
+    stopSceneRefresh();
+    if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
+    if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+    playerMoving = false;
+    enterScene3D(mapId, targetIdx);
+  });
+  arrow.addEventListener('touchstart', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    stopSceneRefresh();
+    if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
+    if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+    playerMoving = false;
+    enterScene3D(mapId, targetIdx);
+  }, { passive: false });
+
+  vp.appendChild(arrow);
 }
 
 // ===== PLAYER AVATAR =====
@@ -150,8 +311,24 @@ function createPlayerAvatar(vp) {
   vp.appendChild(playerAvatar);
 }
 
-// ===== CLICK TO MOVE =====
+// ===== CLICK TO MOVE (with mobile touch support) =====
+function handleViewportTouch(e) {
+  e.preventDefault(); // Prevent blue screen / scroll
+  _lastTouchTime = Date.now();
+  const touch = e.touches[0];
+  if (!touch) return;
+  const vp = e.currentTarget;
+  const rect = vp.getBoundingClientRect();
+  const targetX = ((touch.clientX - rect.left) / rect.width) * 100;
+  const targetY = ((touch.clientY - rect.top) / rect.height) * 100;
+  const clampedX = Math.max(5, Math.min(95, targetX));
+  const clampedY = Math.max(25, Math.min(90, targetY));
+  movePlayerTo(clampedX, clampedY);
+}
+
 function handleViewportClick(e) {
+  // Skip if this was triggered right after a touch event (prevent double-fire)
+  if (Date.now() - _lastTouchTime < 500) return;
   const vp = e.currentTarget;
   const rect = vp.getBoundingClientRect();
   const targetX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -295,7 +472,7 @@ function renderShopGrid(containerId, items, inventory) {
     const owned = inventory[item.id] || 0;
     const el = document.createElement('div');
     el.className = 'shop-item';
-    el.innerHTML = `<span class="shop-item-icon">${item.icon}</span><span class="shop-item-name">${item.name}</span><span class="shop-item-price">${item.price}💰</span><span class="shop-item-owned">拥有: ${owned}</span><button class="btn btn-primary btn-xs" onclick="buyItem('${item.id}')">购买</button>`;
+    el.innerHTML = `<span class="shop-item-icon">${item.icon}</span><div class="shop-item-info"><span class="shop-item-name">${item.name}</span><span class="shop-item-desc">${item.description || ''}</span></div><span class="shop-item-price">${item.price}💰</span><span class="shop-item-owned">拥有: ${owned}</span><button class="btn btn-primary btn-xs" onclick="buyItem('${item.id}')">购买</button>`;
     grid.appendChild(el);
   });
 }

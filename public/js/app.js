@@ -122,6 +122,7 @@ document.querySelectorAll('.hub-nav-btn').forEach(btn=>{
     showSection(btn.dataset.section);
     if(btn.dataset.section==='team'){ refreshTeam(); if(window.loadEssences) loadEssences(); }
     if(btn.dataset.section==='shop' && window.loadShop) loadShop();
+    if(btn.dataset.section==='pokedex') loadPokedex();
   });
 });
 
@@ -465,6 +466,194 @@ ws.on('pvp_turn_result', (msg) => {
 });
 
 ws.on('pvp_opponent_disconnected', ()=>{ toast('对手已断开连接','error'); setTimeout(()=>showScreen('hub'),1500); });
+
+// ===== POKEDEX =====
+let _pokedexData = null;
+let _pokedexMode = 'pets'; // 'pets' or 'boss'
+
+document.querySelectorAll('.pokedex-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.pokedex-tab').forEach(t => t.classList.toggle('active', t === tab));
+    _pokedexMode = tab.dataset.dex;
+    renderPokedex();
+  });
+});
+
+async function loadPokedex() {
+  if (!_pokedexData) {
+    try {
+      _pokedexData = await API.pokedex();
+    } catch(e) { toast(e.message, 'error'); return; }
+  }
+  renderPokedex();
+}
+
+function renderPokedex() {
+  if (!_pokedexData) return;
+  const container = document.getElementById('pokedex-container');
+  container.innerHTML = '';
+  const pets = _pokedexData.pets || [];
+  
+  if (_pokedexMode === 'boss') {
+    // Boss pokedex: show Boss evolution lines
+    const bossLines = [
+      { name: '焱龙帝系列', ids: [19,20,21], theme: 'fire', planet: '火焰星' },
+      { name: '渊鲲王系列', ids: [22,23,24], theme: 'water', planet: '海洋星' },
+      { name: '蛮荒古树系列', ids: [25,26,27], theme: 'grass', planet: '丛林星' },
+      { name: '天雷兽系列', ids: [28,29,30], theme: 'electric', planet: '雷霆星' },
+      { name: '虚空魔神系列', ids: [31,32,33], theme: 'dark', planet: '光暗星' }
+    ];
+    bossLines.forEach(line => {
+      const section = document.createElement('div');
+      section.className = 'dex-boss-section glass-card';
+      section.innerHTML = `<h3 class="dex-boss-title"><span class="dex-boss-planet">${line.planet}</span> ${line.name}</h3>`;
+      const grid = document.createElement('div');
+      grid.className = 'dex-evo-chain';
+      line.ids.forEach((id, idx) => {
+        const pet = pets.find(p => p.id === id);
+        if (!pet) return;
+        if (idx > 0) {
+          const arrow = document.createElement('div');
+          arrow.className = 'dex-evo-arrow';
+          arrow.textContent = '→';
+          grid.appendChild(arrow);
+        }
+        const card = document.createElement('div');
+        card.className = `dex-card dex-card-boss type-${pet.type}`;
+        card.innerHTML = `<div class="dex-card-sprite" id="dex-sp-${pet.id}"></div><div class="dex-card-name">${pet.name}</div><div class="dex-card-form">${pet.form}</div>`;
+        card.addEventListener('click', () => showDexDetail(pet));
+        grid.appendChild(card);
+        setTimeout(() => renderPetSprite(document.getElementById(`dex-sp-${pet.id}`), pet.id, 72), 0);
+      });
+      section.appendChild(grid);
+      container.appendChild(section);
+    });
+  } else {
+    // Normal pet pokedex: group by type
+    const normalPets = pets.filter(p => !p.isBossLine);
+    const types = ['fire','water','grass','electric','light','dark'];
+    const typeLabels = {fire:'🔥 火系',water:'💧 水系',grass:'🌿 草系',electric:'⚡ 电系',light:'✨ 光系',dark:'🌑 暗系'};
+    types.forEach(type => {
+      const typePets = normalPets.filter(p => p.type === type);
+      if (typePets.length === 0) return;
+      const section = document.createElement('div');
+      section.className = 'dex-type-section';
+      section.innerHTML = `<h3 class="dex-type-title">${typeLabels[type] || type}</h3>`;
+      const grid = document.createElement('div');
+      grid.className = 'dex-grid';
+      typePets.forEach(pet => {
+        const card = document.createElement('div');
+        card.className = `dex-card type-${pet.type}`;
+        card.innerHTML = `<div class="dex-card-sprite" id="dex-sp-${pet.id}"></div><div class="dex-card-name">${pet.name}</div><div class="dex-card-form">${pet.form}</div>`;
+        card.addEventListener('click', () => showDexDetail(pet));
+        grid.appendChild(card);
+        setTimeout(() => renderPetSprite(document.getElementById(`dex-sp-${pet.id}`), pet.id, 64), 0);
+      });
+      section.appendChild(grid);
+      container.appendChild(section);
+    });
+  }
+}
+
+function showDexDetail(pet) {
+  const modal = document.getElementById('modal-dex-detail');
+  const content = document.getElementById('dex-detail-content');
+  modal.classList.add('active');
+  
+  // Build evolution chain
+  let evoHtml = '';
+  if (pet.isBossLine || pet.evolution || pet.form !== '幼体') {
+    // Find entire evo chain
+    const allPets = _pokedexData.pets;
+    let chain = [pet];
+    // Find root
+    let root = pet;
+    let visited = new Set([pet.id]);
+    for (let i = 0; i < 5; i++) {
+      const parent = allPets.find(p => p.evolution && p.evolution.to === root.id);
+      if (parent && !visited.has(parent.id)) { root = parent; visited.add(parent.id); chain.unshift(parent); }
+      else break;
+    }
+    // Find children
+    let current = pet;
+    visited = new Set(chain.map(c => c.id));
+    for (let i = 0; i < 5; i++) {
+      if (!current.evolution) break;
+      const next = allPets.find(p => p.id === current.evolution.to);
+      if (next && !visited.has(next.id)) { chain.push(next); visited.add(next.id); current = next; }
+      else break;
+    }
+    // De-dup and keep order
+    const uniqueChain = [];
+    const seen = new Set();
+    chain.forEach(c => { if (!seen.has(c.id)) { seen.add(c.id); uniqueChain.push(c); } });
+    
+    evoHtml = `<div class="dex-detail-section"><h4>进化链</h4><div class="dex-evo-chain dex-evo-detail">`;
+    uniqueChain.forEach((ep, idx) => {
+      if (idx > 0) evoHtml += `<div class="dex-evo-arrow">→<br><small>Lv.${uniqueChain[idx-1].evolution?.level || '?'}</small></div>`;
+      const isActive = ep.id === pet.id ? ' dex-evo-active' : '';
+      evoHtml += `<div class="dex-evo-node${isActive}"><div class="dex-card-sprite" id="dex-detail-sp-${ep.id}"></div><div class="dex-card-name">${ep.name}</div><div class="dex-card-form">${ep.form}</div></div>`;
+    });
+    evoHtml += '</div></div>';
+  }
+  
+  // Stats
+  const statNames = {hp:'HP',attack:'物攻',defense:'物防',spAttack:'法攻',spDefense:'法防',speed:'速度'};
+  const maxStat = 160;
+  let statsHtml = '<div class="dex-detail-section"><h4>基础属性</h4>';
+  Object.entries(statNames).forEach(([k,n]) => {
+    const v = pet.baseStats[k] || 0;
+    const pct = Math.min(100, v / maxStat * 100);
+    statsHtml += `<div class="stat-bar-row"><span class="stat-label">${n}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${pct>60?'var(--hp-green)':pct>35?'var(--hp-yellow)':'var(--hp-red)'}"></div></div><span class="stat-value">${v}</span></div>`;
+  });
+  statsHtml += '</div>';
+
+  // Skills
+  let skillsHtml = '<div class="dex-detail-section"><h4>可学习技能</h4><div class="dex-skills-list">';
+  (pet.learnset || []).forEach(ls => {
+    const sk = SKILLS_MAP[ls.skillId];
+    skillsHtml += `<div class="dex-skill-item"><span class="dex-skill-level">Lv.${ls.level}</span><span class="dex-skill-name">${sk ? sk.name : '技能#'+ls.skillId}</span><span class="dex-skill-info">${sk ? (sk.power ? '威力'+sk.power : '辅助') : ''}</span></div>`;
+  });
+  skillsHtml += '</div></div>';
+  
+  // Lore & Capture guide
+  let loreHtml = '';
+  if (pet.lore) loreHtml += `<div class="dex-detail-section"><h4>📜 背景故事</h4><p class="dex-lore">${pet.lore}</p></div>`;
+  if (pet.captureGuide) loreHtml += `<div class="dex-detail-section"><h4>🎯 收服攻略</h4><p class="dex-capture">${pet.captureGuide}</p></div>`;
+  if (pet.captureNotes) loreHtml += `<div class="dex-detail-section dex-warning"><p>${pet.captureNotes}</p></div>`;
+  
+  content.innerHTML = `
+    <div class="dex-detail-header">
+      <div class="dex-detail-sprite" id="dex-detail-main-sprite"></div>
+      <h2 class="dex-detail-name">${pet.name}</h2>
+      <div class="dex-detail-badges">
+        <span class="pet-type-badge type-${pet.type}">${TYPE_ICONS[pet.type]||''} ${TYPE_NAMES[pet.type]||''}系</span>
+        <span class="dex-form-badge">${pet.form}</span>
+        ${pet.isBossLine ? '<span class="dex-boss-badge">👑 Boss系列</span>' : ''}
+      </div>
+      <p class="dex-detail-desc">${pet.description}</p>
+    </div>
+    ${evoHtml}
+    ${statsHtml}
+    ${skillsHtml}
+    ${loreHtml}
+  `;
+  
+  setTimeout(() => {
+    renderPetSprite(document.getElementById('dex-detail-main-sprite'), pet.id, 120);
+    // Render evo chain sprites
+    if (_pokedexData) {
+      _pokedexData.pets.forEach(p => {
+        const el = document.getElementById(`dex-detail-sp-${p.id}`);
+        if (el) renderPetSprite(el, p.id, 56);
+      });
+    }
+  }, 0);
+}
+
+document.getElementById('dex-detail-close').addEventListener('click', () => {
+  document.getElementById('modal-dex-detail').classList.remove('active');
+});
 
 // ===== INIT =====
 (async function init(){

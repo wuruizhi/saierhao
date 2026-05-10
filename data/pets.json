@@ -1,14 +1,159 @@
 {
   "typeChart": {
-    "fire":    { "strong": ["grass"], "weak": ["water"] },
-    "water":   { "strong": ["fire"],  "weak": ["grass", "electric"] },
-    "grass":   { "strong": ["water"], "weak": ["fire"] },
-    "electric":{ "strong": ["water"], "weak": [] },
-    "light":   { "strong": ["dark"],  "weak": ["dark"] },
-    "dark":    { "strong": ["light"], "weak": ["light"] },
-    "normal":  { "strong": [], "weak": [] }
+    "fire": {
+      "strong": [
+        "grass"
+      ],
+      "weak": [
+        "water"
+      ]
+    },
+    "water": {
+      "strong": [
+        "fire"
+      ],
+      "weak": [
+        "grass",
+        "electric"
+      ]
+    },
+    "grass": {
+      "strong": [
+        "water"
+      ],
+      "weak": [
+        "fire"
+      ]
+    },
+    "electric": {
+      "strong": [
+        "water"
+      ],
+      "weak": []
+    },
+    "light": {
+      "strong": [
+        "dark"
+      ],
+      "weak": [
+        "dark"
+      ]
+    },
+    "dark": {
+      "strong": [
+        "light"
+      ],
+      "weak": [
+        "light"
+      ]
+    },
+    "normal": {
+      "strong": [],
+      "weak": []
+    }
   },
-  "expTable": [0,0,10,30,60,100,150,210,280,360,450,550,660,780,910,1050,1200,1400,1620,1860,2120,2400,2700,3020,3360,3720,4100,4500,4920,5360,5820,6300,6800,7320,7860,8420,9000,9600,10220,10860,11520,12200,12900,13620,14360,15120,15900,16700,17520,18360,19220,20100,21000,21920,22860,23820,24800,25800,26820,27860,28920,30000,31100,32220,33360,34520,35700,36900,38120,39360,40620,41900,43200,44520,45860,47220,48600,50000,51420,52860,54320,55800,57300,58820,60360,61920,63500,65100,66720,68360,70020,71700,73400,75120,76860,78620,80400,82200,84020,85860],
+  "expTable": [
+    0,
+    0,
+    10,
+    30,
+    60,
+    100,
+    150,
+    210,
+    280,
+    360,
+    450,
+    550,
+    660,
+    780,
+    910,
+    1050,
+    1200,
+    1400,
+    1620,
+    1860,
+    2120,
+    2400,
+    2700,
+    3020,
+    3360,
+    3720,
+    4100,
+    4500,
+    4920,
+    5360,
+    5820,
+    6300,
+    6800,
+    7320,
+    7860,
+    8420,
+    9000,
+    9600,
+    10220,
+    10860,
+    11520,
+    12200,
+    12900,
+    13620,
+    14360,
+    15120,
+    15900,
+    16700,
+    17520,
+    18360,
+    19220,
+    20100,
+    21000,
+    21920,
+    22860,
+    23820,
+    24800,
+    25800,
+    26820,
+    27860,
+    28920,
+    30000,
+    31100,
+    32220,
+    33360,
+    34520,
+    35700,
+    36900,
+    38120,
+    39360,
+    40620,
+    41900,
+    43200,
+    44520,
+    45860,
+    47220,
+    48600,
+    50000,
+    51420,
+    52860,
+    54320,
+    55800,
+    57300,
+    58820,
+    60360,
+    61920,
+    63500,
+    65100,
+    66720,
+    68360,
+    70020,
+    71700,
+    73400,
+    75120,
+    76860,
+    78620,
+    80400,
+    82200,
+    84020,
+    85860
+  ],
   "pets": [
     {
       "id": 1,
@@ -16,16 +161,50 @@
       "type": "fire",
       "form": "幼体",
       "description": "性格活泼的小火猴，尾巴上跳动着不灭的火焰。是新手训练师最受欢迎的伙伴之一。",
-      "baseStats": { "hp": 45, "attack": 52, "defense": 40, "speed": 65, "spAttack": 55, "spDefense": 42 },
-      "growthRate": { "hp": 3.2, "attack": 2.8, "defense": 2.0, "speed": 3.0, "spAttack": 2.6, "spDefense": 2.2 },
-      "evolution": { "to": 2, "level": 16 },
+      "baseStats": {
+        "hp": 45,
+        "attack": 52,
+        "defense": 40,
+        "speed": 65,
+        "spAttack": 55,
+        "spDefense": 42
+      },
+      "growthRate": {
+        "hp": 3.2,
+        "attack": 2.8,
+        "defense": 2,
+        "speed": 3,
+        "spAttack": 2.6,
+        "spDefense": 2.2
+      },
+      "evolution": {
+        "to": 2,
+        "level": 16
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 1 },
-        { "level": 8, "skillId": 2 },
-        { "level": 14, "skillId": 8 },
-        { "level": 18, "skillId": 50 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 1
+        },
+        {
+          "level": 8,
+          "skillId": 2
+        },
+        {
+          "level": 14,
+          "skillId": 8
+        },
+        {
+          "level": 18,
+          "skillId": 50
+        }
+      ],
+      "lore": "小火猴是火焰星上最常见的幼体精灵，天生活泼好动。它尾巴上的火焰会随着心情变化而闪烁，据说在开心时火光最为明亮。",
+      "captureGuide": "初始精灵之一，可在游戏开始时选择。也可在火焰星岩浆洞穴中遇到野生个体，使用普通胶囊即可轻松捕获。"
     },
     {
       "id": 2,
@@ -33,18 +212,58 @@
       "type": "fire",
       "form": "成体",
       "description": "进化后的烈焰猿拥有更强大的火焰力量，背部的火焰在战斗时会燃烧得更旺。",
-      "baseStats": { "hp": 65, "attack": 72, "defense": 55, "speed": 80, "spAttack": 75, "spDefense": 55 },
-      "growthRate": { "hp": 3.8, "attack": 3.4, "defense": 2.6, "speed": 3.5, "spAttack": 3.2, "spDefense": 2.6 },
-      "evolution": { "to": 3, "level": 36 },
+      "baseStats": {
+        "hp": 65,
+        "attack": 72,
+        "defense": 55,
+        "speed": 80,
+        "spAttack": 75,
+        "spDefense": 55
+      },
+      "growthRate": {
+        "hp": 3.8,
+        "attack": 3.4,
+        "defense": 2.6,
+        "speed": 3.5,
+        "spAttack": 3.2,
+        "spDefense": 2.6
+      },
+      "evolution": {
+        "to": 3,
+        "level": 36
+      },
       "learnset": [
-        { "level": 1, "skillId": 1 },
-        { "level": 1, "skillId": 2 },
-        { "level": 16, "skillId": 3 },
-        { "level": 20, "skillId": 9 },
-        { "level": 26, "skillId": 10 },
-        { "level": 32, "skillId": 75 },
-        { "level": 35, "skillId": 50 }
-      ]
+        {
+          "level": 1,
+          "skillId": 1
+        },
+        {
+          "level": 1,
+          "skillId": 2
+        },
+        {
+          "level": 16,
+          "skillId": 3
+        },
+        {
+          "level": 20,
+          "skillId": 9
+        },
+        {
+          "level": 26,
+          "skillId": 10
+        },
+        {
+          "level": 32,
+          "skillId": 75
+        },
+        {
+          "level": 35,
+          "skillId": 50
+        }
+      ],
+      "lore": "烈焰猿是小火猴进化后的形态，掌握了更强大的火焰技能。它在战斗中无比勇猛，拳头上的火焰足以融化钢铁。",
+      "captureGuide": "无法在野外直接捕获。需要将小火猴培养至Lv.16后自动进化获得。"
     },
     {
       "id": 3,
@@ -52,19 +271,59 @@
       "type": "fire",
       "form": "究极体",
       "description": "传说中的炎帝猩，浑身笼罩着不灭的金色火焰，一拳可以熔化钢铁。是火系精灵中的王者。",
-      "baseStats": { "hp": 85, "attack": 95, "defense": 72, "speed": 95, "spAttack": 100, "spDefense": 72 },
-      "growthRate": { "hp": 4.2, "attack": 4.0, "defense": 3.2, "speed": 4.0, "spAttack": 4.2, "spDefense": 3.2 },
+      "baseStats": {
+        "hp": 85,
+        "attack": 95,
+        "defense": 72,
+        "speed": 95,
+        "spAttack": 100,
+        "spDefense": 72
+      },
+      "growthRate": {
+        "hp": 4.2,
+        "attack": 4,
+        "defense": 3.2,
+        "speed": 4,
+        "spAttack": 4.2,
+        "spDefense": 3.2
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 2 },
-        { "level": 1, "skillId": 3 },
-        { "level": 1, "skillId": 9 },
-        { "level": 36, "skillId": 10 },
-        { "level": 40, "skillId": 11 },
-        { "level": 48, "skillId": 4 },
-        { "level": 55, "skillId": 51 },
-        { "level": 60, "skillId": 76 }
-      ]
+        {
+          "level": 1,
+          "skillId": 2
+        },
+        {
+          "level": 1,
+          "skillId": 3
+        },
+        {
+          "level": 1,
+          "skillId": 9
+        },
+        {
+          "level": 36,
+          "skillId": 10
+        },
+        {
+          "level": 40,
+          "skillId": 11
+        },
+        {
+          "level": 48,
+          "skillId": 4
+        },
+        {
+          "level": 55,
+          "skillId": 51
+        },
+        {
+          "level": 60,
+          "skillId": 76
+        }
+      ],
+      "lore": "炎帝猩是火系的究极进化形态，传说中火焰星上最强大的火系精灵之一。全身散发着帝王般的焰光气场。",
+      "captureGuide": "无法在野外直接捕获。需要将烈焰猿培养至Lv.36后自动进化获得。终极形态，值得培养。"
     },
     {
       "id": 4,
@@ -72,16 +331,50 @@
       "type": "water",
       "form": "幼体",
       "description": "温顺可爱的水灵蛙，身体能分泌出清澈的水珠。喜欢在雨天唱歌。",
-      "baseStats": { "hp": 50, "attack": 42, "defense": 48, "speed": 55, "spAttack": 58, "spDefense": 50 },
-      "growthRate": { "hp": 3.4, "attack": 2.2, "defense": 2.6, "speed": 2.6, "spAttack": 3.0, "spDefense": 2.8 },
-      "evolution": { "to": 5, "level": 16 },
+      "baseStats": {
+        "hp": 50,
+        "attack": 42,
+        "defense": 48,
+        "speed": 55,
+        "spAttack": 58,
+        "spDefense": 50
+      },
+      "growthRate": {
+        "hp": 3.4,
+        "attack": 2.2,
+        "defense": 2.6,
+        "speed": 2.6,
+        "spAttack": 3,
+        "spDefense": 2.8
+      },
+      "evolution": {
+        "to": 5,
+        "level": 16
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 5 },
-        { "level": 8, "skillId": 12 },
-        { "level": 14, "skillId": 52 },
-        { "level": 18, "skillId": 6 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 5
+        },
+        {
+          "level": 8,
+          "skillId": 12
+        },
+        {
+          "level": 14,
+          "skillId": 52
+        },
+        {
+          "level": 18,
+          "skillId": 6
+        }
+      ],
+      "lore": "水灵蛙栖息在海洋星的浅水区域，性格温顺善良。它皮肤上的水滴能净化污水，是海洋生态的守护者。",
+      "captureGuide": "初始精灵之一，可在游戏开始时选择。也可在海洋星珊瑚浅滩中遇到野生个体。"
     },
     {
       "id": 5,
@@ -89,17 +382,54 @@
       "type": "water",
       "form": "成体",
       "description": "碧波蛙掌握了更强的水之力量，能操控周围的水形成漩涡。",
-      "baseStats": { "hp": 70, "attack": 58, "defense": 65, "speed": 70, "spAttack": 78, "spDefense": 68 },
-      "growthRate": { "hp": 3.8, "attack": 2.8, "defense": 3.0, "speed": 3.0, "spAttack": 3.6, "spDefense": 3.2 },
-      "evolution": { "to": 6, "level": 36 },
+      "baseStats": {
+        "hp": 70,
+        "attack": 58,
+        "defense": 65,
+        "speed": 70,
+        "spAttack": 78,
+        "spDefense": 68
+      },
+      "growthRate": {
+        "hp": 3.8,
+        "attack": 2.8,
+        "defense": 3,
+        "speed": 3,
+        "spAttack": 3.6,
+        "spDefense": 3.2
+      },
+      "evolution": {
+        "to": 6,
+        "level": 36
+      },
       "learnset": [
-        { "level": 1, "skillId": 5 },
-        { "level": 1, "skillId": 6 },
-        { "level": 16, "skillId": 13 },
-        { "level": 22, "skillId": 74 },
-        { "level": 28, "skillId": 53 },
-        { "level": 34, "skillId": 14 }
-      ]
+        {
+          "level": 1,
+          "skillId": 5
+        },
+        {
+          "level": 1,
+          "skillId": 6
+        },
+        {
+          "level": 16,
+          "skillId": 13
+        },
+        {
+          "level": 22,
+          "skillId": 74
+        },
+        {
+          "level": 28,
+          "skillId": 53
+        },
+        {
+          "level": 34,
+          "skillId": 14
+        }
+      ],
+      "lore": "碧波蛙拥有强大的水流操控能力，能掀起小型龙卷风。在海洋星的训练师中，它是最受欢迎的中坚力量。",
+      "captureGuide": "无法在野外直接捕获。需要将水灵蛙培养至Lv.16后自动进化获得。"
     },
     {
       "id": 6,
@@ -107,19 +437,59 @@
       "type": "water",
       "form": "究极体",
       "description": "海洋之王海皇蛙，手持三叉戟，能呼唤海啸。是水系最强精灵之一。",
-      "baseStats": { "hp": 90, "attack": 78, "defense": 85, "speed": 82, "spAttack": 105, "spDefense": 88 },
-      "growthRate": { "hp": 4.2, "attack": 3.2, "defense": 3.6, "speed": 3.4, "spAttack": 4.4, "spDefense": 3.8 },
+      "baseStats": {
+        "hp": 90,
+        "attack": 78,
+        "defense": 85,
+        "speed": 82,
+        "spAttack": 105,
+        "spDefense": 88
+      },
+      "growthRate": {
+        "hp": 4.2,
+        "attack": 3.2,
+        "defense": 3.6,
+        "speed": 3.4,
+        "spAttack": 4.4,
+        "spDefense": 3.8
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 6 },
-        { "level": 1, "skillId": 13 },
-        { "level": 1, "skillId": 74 },
-        { "level": 36, "skillId": 14 },
-        { "level": 42, "skillId": 16 },
-        { "level": 50, "skillId": 15 },
-        { "level": 55, "skillId": 54 },
-        { "level": 60, "skillId": 70 }
-      ]
+        {
+          "level": 1,
+          "skillId": 6
+        },
+        {
+          "level": 1,
+          "skillId": 13
+        },
+        {
+          "level": 1,
+          "skillId": 74
+        },
+        {
+          "level": 36,
+          "skillId": 14
+        },
+        {
+          "level": 42,
+          "skillId": 16
+        },
+        {
+          "level": 50,
+          "skillId": 15
+        },
+        {
+          "level": 55,
+          "skillId": 54
+        },
+        {
+          "level": 60,
+          "skillId": 70
+        }
+      ],
+      "lore": "海皇蛙是海洋星水系精灵的王者，能操控深海洋流。据说它一声蛙鸣可以让海水退潮数百米。",
+      "captureGuide": "无法在野外直接捕获。需要将碧波蛙培养至Lv.36后自动进化获得。水系最强精灵之一。"
     },
     {
       "id": 7,
@@ -127,16 +497,50 @@
       "type": "grass",
       "form": "幼体",
       "description": "头顶嫩绿叶片的小精灵，通过光合作用获取能量。性格温和善良。",
-      "baseStats": { "hp": 48, "attack": 45, "defense": 55, "speed": 45, "spAttack": 52, "spDefense": 58 },
-      "growthRate": { "hp": 3.0, "attack": 2.4, "defense": 2.8, "speed": 2.2, "spAttack": 2.8, "spDefense": 3.0 },
-      "evolution": { "to": 8, "level": 16 },
+      "baseStats": {
+        "hp": 48,
+        "attack": 45,
+        "defense": 55,
+        "speed": 45,
+        "spAttack": 52,
+        "spDefense": 58
+      },
+      "growthRate": {
+        "hp": 3,
+        "attack": 2.4,
+        "defense": 2.8,
+        "speed": 2.2,
+        "spAttack": 2.8,
+        "spDefense": 3
+      },
+      "evolution": {
+        "to": 8,
+        "level": 16
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 17 },
-        { "level": 8, "skillId": 18 },
-        { "level": 12, "skillId": 19 },
-        { "level": 16, "skillId": 55 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 17
+        },
+        {
+          "level": 8,
+          "skillId": 18
+        },
+        {
+          "level": 12,
+          "skillId": 19
+        },
+        {
+          "level": 16,
+          "skillId": 55
+        }
+      ],
+      "lore": "叶小芽是丛林星中最可爱的植物型精灵，头顶的嫩芽会在阳光下发出柔和的绿色光芒。",
+      "captureGuide": "初始精灵之一，可在游戏开始时选择。也可在丛林星翡翠森林中遇到野生个体。"
     },
     {
       "id": 8,
@@ -144,18 +548,58 @@
       "type": "grass",
       "form": "成体",
       "description": "翠叶龙背上长出了坚硬的叶片铠甲，能发射锋利的飞叶。",
-      "baseStats": { "hp": 68, "attack": 65, "defense": 72, "speed": 60, "spAttack": 72, "spDefense": 75 },
-      "growthRate": { "hp": 3.6, "attack": 3.0, "defense": 3.4, "speed": 2.8, "spAttack": 3.4, "spDefense": 3.4 },
-      "evolution": { "to": 9, "level": 36 },
+      "baseStats": {
+        "hp": 68,
+        "attack": 65,
+        "defense": 72,
+        "speed": 60,
+        "spAttack": 72,
+        "spDefense": 75
+      },
+      "growthRate": {
+        "hp": 3.6,
+        "attack": 3,
+        "defense": 3.4,
+        "speed": 2.8,
+        "spAttack": 3.4,
+        "spDefense": 3.4
+      },
+      "evolution": {
+        "to": 9,
+        "level": 36
+      },
       "learnset": [
-        { "level": 1, "skillId": 17 },
-        { "level": 1, "skillId": 18 },
-        { "level": 1, "skillId": 19 },
-        { "level": 16, "skillId": 20 },
-        { "level": 24, "skillId": 21 },
-        { "level": 30, "skillId": 56 },
-        { "level": 34, "skillId": 73 }
-      ]
+        {
+          "level": 1,
+          "skillId": 17
+        },
+        {
+          "level": 1,
+          "skillId": 18
+        },
+        {
+          "level": 1,
+          "skillId": 19
+        },
+        {
+          "level": 16,
+          "skillId": 20
+        },
+        {
+          "level": 24,
+          "skillId": 21
+        },
+        {
+          "level": 30,
+          "skillId": 56
+        },
+        {
+          "level": 34,
+          "skillId": 73
+        }
+      ],
+      "lore": "翠叶龙由叶小芽进化而来，身上覆盖着坚硬的树皮铠甲。它能与植物沟通，被称为'林间行者'。",
+      "captureGuide": "无法在野外直接捕获。需要将叶小芽培养至Lv.16后自动进化获得。"
     },
     {
       "id": 9,
@@ -163,19 +607,59 @@
       "type": "grass",
       "form": "究极体",
       "description": "古老森林的守护者，巨大的身躯与森林融为一体。拥有操控植物的强大力量。",
-      "baseStats": { "hp": 95, "attack": 82, "defense": 95, "speed": 70, "spAttack": 92, "spDefense": 100 },
-      "growthRate": { "hp": 4.4, "attack": 3.4, "defense": 4.0, "speed": 3.0, "spAttack": 3.8, "spDefense": 4.2 },
+      "baseStats": {
+        "hp": 95,
+        "attack": 82,
+        "defense": 95,
+        "speed": 70,
+        "spAttack": 92,
+        "spDefense": 100
+      },
+      "growthRate": {
+        "hp": 4.4,
+        "attack": 3.4,
+        "defense": 4,
+        "speed": 3,
+        "spAttack": 3.8,
+        "spDefense": 4.2
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 18 },
-        { "level": 1, "skillId": 20 },
-        { "level": 1, "skillId": 21 },
-        { "level": 36, "skillId": 23 },
-        { "level": 42, "skillId": 19 },
-        { "level": 50, "skillId": 22 },
-        { "level": 55, "skillId": 57 },
-        { "level": 60, "skillId": 70 }
-      ]
+        {
+          "level": 1,
+          "skillId": 18
+        },
+        {
+          "level": 1,
+          "skillId": 20
+        },
+        {
+          "level": 1,
+          "skillId": 21
+        },
+        {
+          "level": 36,
+          "skillId": 23
+        },
+        {
+          "level": 42,
+          "skillId": 19
+        },
+        {
+          "level": 50,
+          "skillId": 22
+        },
+        {
+          "level": 55,
+          "skillId": 57
+        },
+        {
+          "level": 60,
+          "skillId": 70
+        }
+      ],
+      "lore": "森林守护是丛林星最古老的草系精灵之一，身躯如同一棵行走的巨树。它守护着古老森林的和平。",
+      "captureGuide": "无法在野外直接捕获。需要将翠叶龙培养至Lv.36后自动进化获得。草系最强精灵之一。"
     },
     {
       "id": 10,
@@ -183,16 +667,50 @@
       "type": "electric",
       "form": "幼体",
       "description": "浑身带电的小精灵，颊部的电气囊能释放强烈的电击。在雷雨天特别活跃。",
-      "baseStats": { "hp": 55, "attack": 60, "defense": 45, "speed": 95, "spAttack": 85, "spDefense": 50 },
-      "growthRate": { "hp": 3.0, "attack": 2.8, "defense": 2.2, "speed": 4.0, "spAttack": 3.6, "spDefense": 2.6 },
-      "evolution": { "to": 13, "level": 20 },
+      "baseStats": {
+        "hp": 55,
+        "attack": 60,
+        "defense": 45,
+        "speed": 95,
+        "spAttack": 85,
+        "spDefense": 50
+      },
+      "growthRate": {
+        "hp": 3,
+        "attack": 2.8,
+        "defense": 2.2,
+        "speed": 4,
+        "spAttack": 3.6,
+        "spDefense": 2.6
+      },
+      "evolution": {
+        "to": 13,
+        "level": 20
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 24 },
-        { "level": 8, "skillId": 25 },
-        { "level": 14, "skillId": 58 },
-        { "level": 18, "skillId": 80 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 24
+        },
+        {
+          "level": 8,
+          "skillId": 25
+        },
+        {
+          "level": 14,
+          "skillId": 58
+        },
+        {
+          "level": 18,
+          "skillId": 80
+        }
+      ],
+      "lore": "雷电鼠是雷霆星上随处可见的可爱小精灵，金黄色的毛发中会不时闪烁电火花。抚摸它时要小心静电！",
+      "captureGuide": "可在雷霆星电磁平原中遇到野生个体。出现频率较高，使用普通胶囊即可捕获。"
     },
     {
       "id": 11,
@@ -200,17 +718,54 @@
       "type": "light",
       "form": "成体",
       "description": "来自光明星域的天使精灵，金色羽翼散发着神圣光辉。拥有治愈与光明之力。",
-      "baseStats": { "hp": 70, "attack": 55, "defense": 65, "speed": 80, "spAttack": 95, "spDefense": 90 },
-      "growthRate": { "hp": 3.4, "attack": 2.6, "defense": 3.0, "speed": 3.4, "spAttack": 4.0, "spDefense": 3.8 },
-      "evolution": { "to": 16, "level": 40 },
+      "baseStats": {
+        "hp": 70,
+        "attack": 55,
+        "defense": 65,
+        "speed": 80,
+        "spAttack": 95,
+        "spDefense": 90
+      },
+      "growthRate": {
+        "hp": 3.4,
+        "attack": 2.6,
+        "defense": 3,
+        "speed": 3.4,
+        "spAttack": 4,
+        "spDefense": 3.8
+      },
+      "evolution": {
+        "to": 16,
+        "level": 40
+      },
       "learnset": [
-        { "level": 1, "skillId": 29 },
-        { "level": 1, "skillId": 62 },
-        { "level": 20, "skillId": 30 },
-        { "level": 26, "skillId": 31 },
-        { "level": 32, "skillId": 63 },
-        { "level": 38, "skillId": 32 }
-      ]
+        {
+          "level": 1,
+          "skillId": 29
+        },
+        {
+          "level": 1,
+          "skillId": 62
+        },
+        {
+          "level": 20,
+          "skillId": 30
+        },
+        {
+          "level": 26,
+          "skillId": 31
+        },
+        {
+          "level": 32,
+          "skillId": 63
+        },
+        {
+          "level": 38,
+          "skillId": 32
+        }
+      ],
+      "lore": "光羽雀是光暗星光明面的精灵，羽毛能折射出七彩光芒。在黑夜中，它的翅膀就是最明亮的灯塔。",
+      "captureGuide": "可在光暗星曙光领域中遇到野生个体。光系精灵较为稀有，建议使用高级胶囊。"
     },
     {
       "id": 12,
@@ -218,17 +773,54 @@
       "type": "dark",
       "form": "成体",
       "description": "潜伏在暗影中的刺客精灵，速度极快，擅长暗杀和偷袭。传说从未有人见过它的真面目。",
-      "baseStats": { "hp": 60, "attack": 95, "defense": 55, "speed": 100, "spAttack": 70, "spDefense": 60 },
-      "growthRate": { "hp": 3.0, "attack": 4.0, "defense": 2.6, "speed": 4.2, "spAttack": 3.2, "spDefense": 2.8 },
-      "evolution": { "to": 18, "level": 40 },
+      "baseStats": {
+        "hp": 60,
+        "attack": 95,
+        "defense": 55,
+        "speed": 100,
+        "spAttack": 70,
+        "spDefense": 60
+      },
+      "growthRate": {
+        "hp": 3,
+        "attack": 4,
+        "defense": 2.6,
+        "speed": 4.2,
+        "spAttack": 3.2,
+        "spDefense": 2.8
+      },
+      "evolution": {
+        "to": 18,
+        "level": 40
+      },
       "learnset": [
-        { "level": 1, "skillId": 34 },
-        { "level": 1, "skillId": 65 },
-        { "level": 20, "skillId": 35 },
-        { "level": 26, "skillId": 36 },
-        { "level": 32, "skillId": 66 },
-        { "level": 38, "skillId": 37 }
-      ]
+        {
+          "level": 1,
+          "skillId": 34
+        },
+        {
+          "level": 1,
+          "skillId": 65
+        },
+        {
+          "level": 20,
+          "skillId": 35
+        },
+        {
+          "level": 26,
+          "skillId": 36
+        },
+        {
+          "level": 32,
+          "skillId": 66
+        },
+        {
+          "level": 38,
+          "skillId": 37
+        }
+      ],
+      "lore": "暗影蝠栖息在光暗星的阴暗洞穴中，用超声波定位猎物。虽然外表阴森，但驯服后非常忠诚。",
+      "captureGuide": "可在光暗星永夜深渊中遇到野生个体。暗系精灵较为稀有，建议削减HP后捕获。"
     },
     {
       "id": 13,
@@ -236,17 +828,54 @@
       "type": "electric",
       "form": "成体",
       "description": "雷电鼠进化而成的雷霆豹，全身覆盖着闪电纹路的皮毛，奔跑速度堪比闪电。",
-      "baseStats": { "hp": 72, "attack": 80, "defense": 58, "speed": 110, "spAttack": 95, "spDefense": 60 },
-      "growthRate": { "hp": 3.6, "attack": 3.4, "defense": 2.6, "speed": 4.4, "spAttack": 3.8, "spDefense": 2.8 },
-      "evolution": { "to": 14, "level": 40 },
+      "baseStats": {
+        "hp": 72,
+        "attack": 80,
+        "defense": 58,
+        "speed": 110,
+        "spAttack": 95,
+        "spDefense": 60
+      },
+      "growthRate": {
+        "hp": 3.6,
+        "attack": 3.4,
+        "defense": 2.6,
+        "speed": 4.4,
+        "spAttack": 3.8,
+        "spDefense": 2.8
+      },
+      "evolution": {
+        "to": 14,
+        "level": 40
+      },
       "learnset": [
-        { "level": 1, "skillId": 24 },
-        { "level": 1, "skillId": 25 },
-        { "level": 20, "skillId": 26 },
-        { "level": 28, "skillId": 59 },
-        { "level": 34, "skillId": 39 },
-        { "level": 38, "skillId": 72 }
-      ]
+        {
+          "level": 1,
+          "skillId": 24
+        },
+        {
+          "level": 1,
+          "skillId": 25
+        },
+        {
+          "level": 20,
+          "skillId": 26
+        },
+        {
+          "level": 28,
+          "skillId": 59
+        },
+        {
+          "level": 34,
+          "skillId": 39
+        },
+        {
+          "level": 38,
+          "skillId": 72
+        }
+      ],
+      "lore": "雷霆豹是雷电鼠的进化形态，速度快如闪电。在雷暴天气中，它能借助天雷的力量瞬间移动。",
+      "captureGuide": "无法在野外直接捕获。需要将雷电鼠培养至Lv.18后自动进化获得。速度型精灵的优秀选择。"
     },
     {
       "id": 14,
@@ -254,19 +883,59 @@
       "type": "electric",
       "form": "究极体",
       "description": "掌控天雷的究极精灵，一声怒吼便能引发万雷齐鸣。传说中雷霆星的主宰者。",
-      "baseStats": { "hp": 88, "attack": 98, "defense": 72, "speed": 125, "spAttack": 115, "spDefense": 75 },
-      "growthRate": { "hp": 4.0, "attack": 3.8, "defense": 3.2, "speed": 4.8, "spAttack": 4.4, "spDefense": 3.2 },
+      "baseStats": {
+        "hp": 88,
+        "attack": 98,
+        "defense": 72,
+        "speed": 125,
+        "spAttack": 115,
+        "spDefense": 75
+      },
+      "growthRate": {
+        "hp": 4,
+        "attack": 3.8,
+        "defense": 3.2,
+        "speed": 4.8,
+        "spAttack": 4.4,
+        "spDefense": 3.2
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 25 },
-        { "level": 1, "skillId": 26 },
-        { "level": 1, "skillId": 39 },
-        { "level": 40, "skillId": 27 },
-        { "level": 48, "skillId": 28 },
-        { "level": 55, "skillId": 60 },
-        { "level": 60, "skillId": 40 },
-        { "level": 65, "skillId": 76 }
-      ]
+        {
+          "level": 1,
+          "skillId": 25
+        },
+        {
+          "level": 1,
+          "skillId": 26
+        },
+        {
+          "level": 1,
+          "skillId": 39
+        },
+        {
+          "level": 40,
+          "skillId": 27
+        },
+        {
+          "level": 48,
+          "skillId": 28
+        },
+        {
+          "level": 55,
+          "skillId": 60
+        },
+        {
+          "level": 60,
+          "skillId": 40
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ],
+      "lore": "万雷神君是雷霆星电系精灵的顶点，据说它的咆哮能引来绵延不绝的雷暴。连天雷兽都承认它的实力。",
+      "captureGuide": "无法在野外直接捕获。需要将雷霆豹培养至Lv.40后自动进化获得。电系最强精灵之一。"
     },
     {
       "id": 15,
@@ -274,16 +943,50 @@
       "type": "light",
       "form": "幼体",
       "description": "小巧玲珑的光之精灵，金色的羽毛能发出微弱的光芒。性格胆小但充满好奇心。",
-      "baseStats": { "hp": 45, "attack": 35, "defense": 42, "speed": 65, "spAttack": 55, "spDefense": 50 },
-      "growthRate": { "hp": 2.8, "attack": 2.0, "defense": 2.4, "speed": 3.0, "spAttack": 2.8, "spDefense": 2.6 },
-      "evolution": { "to": 11, "level": 20 },
+      "baseStats": {
+        "hp": 45,
+        "attack": 35,
+        "defense": 42,
+        "speed": 65,
+        "spAttack": 55,
+        "spDefense": 50
+      },
+      "growthRate": {
+        "hp": 2.8,
+        "attack": 2,
+        "defense": 2.4,
+        "speed": 3,
+        "spAttack": 2.8,
+        "spDefense": 2.6
+      },
+      "evolution": {
+        "to": 11,
+        "level": 20
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 41 },
-        { "level": 8, "skillId": 29 },
-        { "level": 14, "skillId": 62 },
-        { "level": 18, "skillId": 30 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 41
+        },
+        {
+          "level": 8,
+          "skillId": 29
+        },
+        {
+          "level": 14,
+          "skillId": 62
+        },
+        {
+          "level": 18,
+          "skillId": 30
+        }
+      ],
+      "lore": "光翼天使是光羽雀的进化形态，拥有纯净的光之力量。它的出现被视为吉兆和祝福。",
+      "captureGuide": "无法在野外直接捕获。需要将光羽雀培养至Lv.22后自动进化获得。"
     },
     {
       "id": 16,
@@ -291,19 +994,59 @@
       "type": "light",
       "form": "究极体",
       "description": "光明星域的至高守护者，六翼展开时散发的圣光能净化一切黑暗。拥有治愈万物的神圣力量。",
-      "baseStats": { "hp": 90, "attack": 70, "defense": 82, "speed": 92, "spAttack": 120, "spDefense": 110 },
-      "growthRate": { "hp": 4.0, "attack": 3.0, "defense": 3.4, "speed": 3.8, "spAttack": 4.6, "spDefense": 4.2 },
+      "baseStats": {
+        "hp": 90,
+        "attack": 70,
+        "defense": 82,
+        "speed": 92,
+        "spAttack": 120,
+        "spDefense": 110
+      },
+      "growthRate": {
+        "hp": 4,
+        "attack": 3,
+        "defense": 3.4,
+        "speed": 3.8,
+        "spAttack": 4.6,
+        "spDefense": 4.2
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 29 },
-        { "level": 1, "skillId": 31 },
-        { "level": 1, "skillId": 30 },
-        { "level": 40, "skillId": 32 },
-        { "level": 48, "skillId": 33 },
-        { "level": 55, "skillId": 64 },
-        { "level": 60, "skillId": 42 },
-        { "level": 65, "skillId": 76 }
-      ]
+        {
+          "level": 1,
+          "skillId": 29
+        },
+        {
+          "level": 1,
+          "skillId": 31
+        },
+        {
+          "level": 1,
+          "skillId": 30
+        },
+        {
+          "level": 40,
+          "skillId": 32
+        },
+        {
+          "level": 48,
+          "skillId": 33
+        },
+        {
+          "level": 55,
+          "skillId": 64
+        },
+        {
+          "level": 60,
+          "skillId": 42
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ],
+      "lore": "圣光大天使是光系精灵的巅峰，六翼齐展时能驱散方圆数里的黑暗。它是光暗星光明面的守护者。",
+      "captureGuide": "无法在野外直接捕获。需要将光翼天使培养至Lv.42后自动进化获得。光系最强精灵。"
     },
     {
       "id": 17,
@@ -311,16 +1054,50 @@
       "type": "dark",
       "form": "幼体",
       "description": "栖息在黑暗洞穴中的小蝙蝠精灵，用超声波感知周围环境。虽然看起来可怕，但其实很温驯。",
-      "baseStats": { "hp": 42, "attack": 50, "defense": 38, "speed": 72, "spAttack": 45, "spDefense": 40 },
-      "growthRate": { "hp": 2.6, "attack": 2.6, "defense": 2.0, "speed": 3.2, "spAttack": 2.4, "spDefense": 2.2 },
-      "evolution": { "to": 12, "level": 20 },
+      "baseStats": {
+        "hp": 42,
+        "attack": 50,
+        "defense": 38,
+        "speed": 72,
+        "spAttack": 45,
+        "spDefense": 40
+      },
+      "growthRate": {
+        "hp": 2.6,
+        "attack": 2.6,
+        "defense": 2,
+        "speed": 3.2,
+        "spAttack": 2.4,
+        "spDefense": 2.2
+      },
+      "evolution": {
+        "to": 12,
+        "level": 20
+      },
       "learnset": [
-        { "level": 1, "skillId": 7 },
-        { "level": 1, "skillId": 43 },
-        { "level": 8, "skillId": 34 },
-        { "level": 14, "skillId": 65 },
-        { "level": 18, "skillId": 78 }
-      ]
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 43
+        },
+        {
+          "level": 8,
+          "skillId": 34
+        },
+        {
+          "level": 14,
+          "skillId": 65
+        },
+        {
+          "level": 18,
+          "skillId": 78
+        }
+      ],
+      "lore": "暗影刺客是暗影蝠的进化形态，精通潜行和暗杀术。在暗处几乎不可能被发现，是最完美的暗杀者。",
+      "captureGuide": "无法在野外直接捕获。需要将暗影蝠培养至Lv.22后自动进化获得。"
     },
     {
       "id": 18,
@@ -328,18 +1105,903 @@
       "type": "dark",
       "form": "究极体",
       "description": "从永夜深渊中诞生的终极暗影存在，能吞噬一切光明。传说它的出现预示着黑夜的永恒降临。",
-      "baseStats": { "hp": 82, "attack": 120, "defense": 72, "speed": 115, "spAttack": 90, "spDefense": 75 },
-      "growthRate": { "hp": 3.8, "attack": 4.6, "defense": 3.2, "speed": 4.4, "spAttack": 3.6, "spDefense": 3.2 },
+      "baseStats": {
+        "hp": 82,
+        "attack": 120,
+        "defense": 72,
+        "speed": 115,
+        "spAttack": 90,
+        "spDefense": 75
+      },
+      "growthRate": {
+        "hp": 3.8,
+        "attack": 4.6,
+        "defense": 3.2,
+        "speed": 4.4,
+        "spAttack": 3.6,
+        "spDefense": 3.2
+      },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 34 },
-        { "level": 1, "skillId": 35 },
-        { "level": 1, "skillId": 36 },
-        { "level": 40, "skillId": 37 },
-        { "level": 48, "skillId": 38 },
-        { "level": 55, "skillId": 67 },
-        { "level": 60, "skillId": 44 },
-        { "level": 65, "skillId": 79 }
+        {
+          "level": 1,
+          "skillId": 34
+        },
+        {
+          "level": 1,
+          "skillId": 35
+        },
+        {
+          "level": 1,
+          "skillId": 36
+        },
+        {
+          "level": 40,
+          "skillId": 37
+        },
+        {
+          "level": 48,
+          "skillId": 38
+        },
+        {
+          "level": 55,
+          "skillId": 67
+        },
+        {
+          "level": 60,
+          "skillId": 44
+        },
+        {
+          "level": 65,
+          "skillId": 79
+        }
+      ],
+      "lore": "深渊魔君是暗系精灵的王者，操控着深渊中的暗黑力量。传说它曾是虚空魔神的部下，获得了一部分混沌之力。",
+      "captureGuide": "无法在野外直接捕获。需要将暗影刺客培养至Lv.42后自动进化获得。暗系最强精灵。"
+    },
+    {
+      "id": 19,
+      "name": "焰龙雏",
+      "type": "fire",
+      "form": "幼体",
+      "isBossLine": true,
+      "description": "焱龙帝的幼体，身上覆盖着滚烫的龙鳞，眼中跳动着远古之焰。",
+      "lore": "传说焱龙帝诞生于火焰星核心的岩浆湖中，焰龙雏继承了远古龙族血脉。它们极为稀有，只有击败焱龙帝才能获取其精元。",
+      "captureGuide": "无法在野外捕获。击败火焰星Boss「焱龙帝·炎皇」后获取火焰精元，孵化即可获得焰龙雏。",
+      "baseStats": {
+        "hp": 55,
+        "attack": 60,
+        "defense": 50,
+        "speed": 50,
+        "spAttack": 65,
+        "spDefense": 48
+      },
+      "growthRate": {
+        "hp": 3.6,
+        "attack": 3.2,
+        "defense": 2.6,
+        "speed": 2.6,
+        "spAttack": 3.4,
+        "spDefense": 2.4
+      },
+      "evolution": {
+        "to": 20,
+        "level": 20
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 1
+        },
+        {
+          "level": 8,
+          "skillId": 2
+        },
+        {
+          "level": 14,
+          "skillId": 8
+        },
+        {
+          "level": 18,
+          "skillId": 71
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "烈焰巨龙",
+      "type": "fire",
+      "form": "成体",
+      "isBossLine": true,
+      "description": "焱龙帝的成体，双翼燃烧着不灭之火，咆哮声可融化岩石。",
+      "lore": "烈焰巨龙继承了焱龙帝七成的力量，被视为火焰星最危险的生物之一。",
+      "baseStats": {
+        "hp": 78,
+        "attack": 85,
+        "defense": 68,
+        "speed": 72,
+        "spAttack": 90,
+        "spDefense": 65
+      },
+      "growthRate": {
+        "hp": 4,
+        "attack": 3.8,
+        "defense": 3,
+        "speed": 3.2,
+        "spAttack": 4,
+        "spDefense": 3
+      },
+      "evolution": {
+        "to": 21,
+        "level": 40
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 2
+        },
+        {
+          "level": 1,
+          "skillId": 8
+        },
+        {
+          "level": 20,
+          "skillId": 3
+        },
+        {
+          "level": 28,
+          "skillId": 9
+        },
+        {
+          "level": 34,
+          "skillId": 10
+        },
+        {
+          "level": 38,
+          "skillId": 75
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "焱龙帝",
+      "type": "fire",
+      "form": "Boss完全体",
+      "isBossLine": true,
+      "description": "火焰星的终极守护者，远古龙族之王。全身笼罩着可焚天灭地的神焰，一声龙吟可引爆火山群。",
+      "lore": "焱龙帝自火焰星诞生之日起便守护着这颗星球。传说它体内封印着创世之火，连炎帝猩见到它都要俯首称臣。",
+      "captureGuide": "Boss不可直接捕获！需击败后获取精元孵化幼体。建议携带水系究极体，利用属性克制。Boss血量极高，建议携带减防技能。",
+      "captureNotes": "⚠ Boss每次击败后会立即重生。推荐等级≥35，携带大量回复道具。",
+      "baseStats": {
+        "hp": 120,
+        "attack": 110,
+        "defense": 90,
+        "speed": 85,
+        "spAttack": 130,
+        "spDefense": 88
+      },
+      "growthRate": {
+        "hp": 4.8,
+        "attack": 4.4,
+        "defense": 3.8,
+        "speed": 3.6,
+        "spAttack": 4.8,
+        "spDefense": 3.6
+      },
+      "evolution": null,
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 3
+        },
+        {
+          "level": 1,
+          "skillId": 9
+        },
+        {
+          "level": 1,
+          "skillId": 10
+        },
+        {
+          "level": 40,
+          "skillId": 11
+        },
+        {
+          "level": 48,
+          "skillId": 4
+        },
+        {
+          "level": 55,
+          "skillId": 51
+        },
+        {
+          "level": 60,
+          "skillId": 75
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "渊鲲幼",
+      "type": "water",
+      "form": "幼体",
+      "isBossLine": true,
+      "description": "渊鲲王的幼体，身披深蓝色鳞甲，能在深海自如游弋。",
+      "lore": "渊鲲王被视为海洋星的创世神兽，渊鲲幼继承了远古海兽的血脉。",
+      "captureGuide": "无法在野外捕获。击败海洋星Boss「渊鲲王·海神」后获取海洋精元孵化获得。",
+      "baseStats": {
+        "hp": 60,
+        "attack": 48,
+        "defense": 55,
+        "speed": 45,
+        "spAttack": 68,
+        "spDefense": 58
+      },
+      "growthRate": {
+        "hp": 3.8,
+        "attack": 2.6,
+        "defense": 3,
+        "speed": 2.4,
+        "spAttack": 3.6,
+        "spDefense": 3.2
+      },
+      "evolution": {
+        "to": 23,
+        "level": 20
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 5
+        },
+        {
+          "level": 8,
+          "skillId": 12
+        },
+        {
+          "level": 14,
+          "skillId": 52
+        },
+        {
+          "level": 18,
+          "skillId": 74
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "深海鲲龙",
+      "type": "water",
+      "form": "成体",
+      "isBossLine": true,
+      "description": "渊鲲王的成体，巨大的身躯能掀起滔天巨浪。",
+      "lore": "深海鲲龙潜伏于海底最深处，只有感受到渊鲲王的召唤才会现身。",
+      "baseStats": {
+        "hp": 82,
+        "attack": 68,
+        "defense": 75,
+        "speed": 62,
+        "spAttack": 92,
+        "spDefense": 78
+      },
+      "growthRate": {
+        "hp": 4.2,
+        "attack": 3,
+        "defense": 3.4,
+        "speed": 2.8,
+        "spAttack": 4.2,
+        "spDefense": 3.6
+      },
+      "evolution": {
+        "to": 24,
+        "level": 40
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 5
+        },
+        {
+          "level": 1,
+          "skillId": 12
+        },
+        {
+          "level": 20,
+          "skillId": 13
+        },
+        {
+          "level": 28,
+          "skillId": 74
+        },
+        {
+          "level": 34,
+          "skillId": 14
+        },
+        {
+          "level": 38,
+          "skillId": 53
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "渊鲲王",
+      "type": "water",
+      "form": "Boss完全体",
+      "isBossLine": true,
+      "description": "海洋星的终极霸主，传说中的深渊巨兽。一次摆尾可掀起百米海啸，眼神可令万物臣服。",
+      "lore": "渊鲲王是海洋星最古老的存在，据说整个深海遗迹都是它沉睡时留下的巢穴。连海皇蛙都只是它的臣属。",
+      "captureGuide": "Boss不可直接捕获！击败后获取精元孵化。建议携带草系或电系精灵克制。Boss法攻极高，需要高法防精灵扛伤。",
+      "captureNotes": "⚠ Boss常驻深海遗迹。推荐等级≥35，草系精灵为最佳选择。",
+      "baseStats": {
+        "hp": 130,
+        "attack": 85,
+        "defense": 95,
+        "speed": 72,
+        "spAttack": 135,
+        "spDefense": 100
+      },
+      "growthRate": {
+        "hp": 5,
+        "attack": 3.4,
+        "defense": 4,
+        "speed": 3,
+        "spAttack": 5,
+        "spDefense": 4.2
+      },
+      "evolution": null,
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 13
+        },
+        {
+          "level": 1,
+          "skillId": 14
+        },
+        {
+          "level": 1,
+          "skillId": 74
+        },
+        {
+          "level": 40,
+          "skillId": 16
+        },
+        {
+          "level": 48,
+          "skillId": 15
+        },
+        {
+          "level": 55,
+          "skillId": 54
+        },
+        {
+          "level": 60,
+          "skillId": 70
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "灵木芽",
+      "type": "grass",
+      "form": "幼体",
+      "isBossLine": true,
+      "description": "蛮荒古树的幼苗，从远古树种中萌发，蕴含森林始源之力。",
+      "lore": "灵木芽是万年古树的种子所化，只有在击败蛮荒古树后才能获取其精华。",
+      "captureGuide": "无法在野外捕获。击败丛林星Boss「蛮荒古树·森灵」后获取森林精元孵化获得。",
+      "baseStats": {
+        "hp": 58,
+        "attack": 50,
+        "defense": 62,
+        "speed": 40,
+        "spAttack": 60,
+        "spDefense": 65
+      },
+      "growthRate": {
+        "hp": 3.4,
+        "attack": 2.8,
+        "defense": 3.2,
+        "speed": 2.2,
+        "spAttack": 3.2,
+        "spDefense": 3.4
+      },
+      "evolution": {
+        "to": 26,
+        "level": 20
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 17
+        },
+        {
+          "level": 8,
+          "skillId": 18
+        },
+        {
+          "level": 14,
+          "skillId": 19
+        },
+        {
+          "level": 18,
+          "skillId": 55
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "苍翠古木",
+      "type": "grass",
+      "form": "成体",
+      "isBossLine": true,
+      "description": "蛮荒古树的成体形态，树冠遮天蔽日，根须深入地核。",
+      "lore": "苍翠古木守护着丛林星的生态平衡，是森林守护者的上位存在。",
+      "baseStats": {
+        "hp": 85,
+        "attack": 72,
+        "defense": 85,
+        "speed": 55,
+        "spAttack": 82,
+        "spDefense": 88
+      },
+      "growthRate": {
+        "hp": 4.2,
+        "attack": 3.2,
+        "defense": 3.8,
+        "speed": 2.6,
+        "spAttack": 3.6,
+        "spDefense": 3.8
+      },
+      "evolution": {
+        "to": 27,
+        "level": 40
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 17
+        },
+        {
+          "level": 1,
+          "skillId": 18
+        },
+        {
+          "level": 20,
+          "skillId": 20
+        },
+        {
+          "level": 28,
+          "skillId": 21
+        },
+        {
+          "level": 34,
+          "skillId": 23
+        },
+        {
+          "level": 38,
+          "skillId": 73
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "蛮荒古树",
+      "type": "grass",
+      "form": "Boss完全体",
+      "isBossLine": true,
+      "description": "丛林星最古老的存在，巨大身躯与星球融为一体。操控万物生长的始源之力，一念之间可令荒漠变森林。",
+      "lore": "蛮荒古树是丛林星的本体意志化身，森林守护不过是它的一缕分身。击败它需要极大的勇气与实力。",
+      "captureGuide": "Boss不可直接捕获！击败后获取精元孵化。建议携带火系精灵利用属性克制，Boss物防法防极高，需要减防技能。",
+      "captureNotes": "⚠ Boss常驻古树之心。推荐等级≥40，火系究极体为最佳选择。Boss会使用光合作用回血！",
+      "baseStats": {
+        "hp": 140,
+        "attack": 90,
+        "defense": 110,
+        "speed": 55,
+        "spAttack": 105,
+        "spDefense": 120
+      },
+      "growthRate": {
+        "hp": 5.2,
+        "attack": 3.6,
+        "defense": 4.4,
+        "speed": 2.4,
+        "spAttack": 4.2,
+        "spDefense": 4.6
+      },
+      "evolution": null,
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 20
+        },
+        {
+          "level": 1,
+          "skillId": 21
+        },
+        {
+          "level": 1,
+          "skillId": 23
+        },
+        {
+          "level": 40,
+          "skillId": 19
+        },
+        {
+          "level": 48,
+          "skillId": 22
+        },
+        {
+          "level": 55,
+          "skillId": 57
+        },
+        {
+          "level": 60,
+          "skillId": 70
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "雷光兽",
+      "type": "electric",
+      "form": "幼体",
+      "isBossLine": true,
+      "description": "天雷兽的幼体，全身闪烁着蓝白色电弧，毛发根根竖立如避雷针。",
+      "lore": "天雷兽是雷霆星的主宰，雷光兽继承了它掌控天雷的天赋。",
+      "captureGuide": "无法在野外捕获。击败雷霆星Boss「天雷兽·雷帝」后获取雷霆精元孵化获得。",
+      "baseStats": {
+        "hp": 50,
+        "attack": 58,
+        "defense": 42,
+        "speed": 72,
+        "spAttack": 65,
+        "spDefense": 45
+      },
+      "growthRate": {
+        "hp": 3,
+        "attack": 3,
+        "defense": 2.4,
+        "speed": 3.6,
+        "spAttack": 3.4,
+        "spDefense": 2.6
+      },
+      "evolution": {
+        "to": 29,
+        "level": 20
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 24
+        },
+        {
+          "level": 8,
+          "skillId": 25
+        },
+        {
+          "level": 14,
+          "skillId": 58
+        },
+        {
+          "level": 18,
+          "skillId": 80
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "奔雷巨兽",
+      "type": "electric",
+      "form": "成体",
+      "isBossLine": true,
+      "description": "天雷兽的成体，四肢如雷柱，奔跑时地面炸裂出闪电。",
+      "lore": "奔雷巨兽的咆哮能引发雷暴，是雷霆星仅次于天雷兽的强者。",
+      "baseStats": {
+        "hp": 75,
+        "attack": 88,
+        "defense": 62,
+        "speed": 100,
+        "spAttack": 95,
+        "spDefense": 60
+      },
+      "growthRate": {
+        "hp": 3.8,
+        "attack": 3.8,
+        "defense": 2.8,
+        "speed": 4.2,
+        "spAttack": 4,
+        "spDefense": 2.8
+      },
+      "evolution": {
+        "to": 30,
+        "level": 40
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 24
+        },
+        {
+          "level": 1,
+          "skillId": 25
+        },
+        {
+          "level": 20,
+          "skillId": 26
+        },
+        {
+          "level": 28,
+          "skillId": 59
+        },
+        {
+          "level": 34,
+          "skillId": 39
+        },
+        {
+          "level": 38,
+          "skillId": 72
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "天雷兽",
+      "type": "electric",
+      "form": "Boss完全体",
+      "isBossLine": true,
+      "description": "雷霆星的绝对统治者，体内蕴含着可毁灭星球的雷电之力。一声怒吼万雷齐鸣，连万雷神君都不过是它的影子。",
+      "lore": "天雷兽是第一道天雷化身而成的神兽，它的存在就是雷霆星永恒风暴的根源。",
+      "captureGuide": "Boss不可直接捕获！击败后获取精元孵化。Boss速度极快，建议使用先制技能。草系精灵可抵抗电系攻击。",
+      "captureNotes": "⚠ Boss常驻雷神殿堂。推荐等级≥45。Boss拥有先制技能和麻痹效果，携带解麻道具。",
+      "baseStats": {
+        "hp": 100,
+        "attack": 115,
+        "defense": 78,
+        "speed": 140,
+        "spAttack": 130,
+        "spDefense": 80
+      },
+      "growthRate": {
+        "hp": 4.4,
+        "attack": 4.4,
+        "defense": 3.4,
+        "speed": 5,
+        "spAttack": 4.8,
+        "spDefense": 3.4
+      },
+      "evolution": null,
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 25
+        },
+        {
+          "level": 1,
+          "skillId": 26
+        },
+        {
+          "level": 1,
+          "skillId": 39
+        },
+        {
+          "level": 40,
+          "skillId": 27
+        },
+        {
+          "level": 48,
+          "skillId": 28
+        },
+        {
+          "level": 55,
+          "skillId": 60
+        },
+        {
+          "level": 60,
+          "skillId": 40
+        },
+        {
+          "level": 65,
+          "skillId": 76
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "name": "虚空幼蛹",
+      "type": "dark",
+      "form": "幼体",
+      "isBossLine": true,
+      "description": "虚空魔神的幼体，包裹在暗紫色茧中，散发着令人不安的气息。",
+      "lore": "虚空魔神是混沌与虚无的化身，虚空幼蛹在永夜深渊的最深处孕育。",
+      "captureGuide": "无法在野外捕获。击败光暗星Boss「虚空魔神·混沌」后获取暗影精元孵化获得。",
+      "baseStats": {
+        "hp": 48,
+        "attack": 55,
+        "defense": 45,
+        "speed": 60,
+        "spAttack": 52,
+        "spDefense": 48
+      },
+      "growthRate": {
+        "hp": 2.8,
+        "attack": 3,
+        "defense": 2.4,
+        "speed": 3.2,
+        "spAttack": 2.8,
+        "spDefense": 2.6
+      },
+      "evolution": {
+        "to": 32,
+        "level": 20
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 7
+        },
+        {
+          "level": 1,
+          "skillId": 43
+        },
+        {
+          "level": 8,
+          "skillId": 34
+        },
+        {
+          "level": 14,
+          "skillId": 65
+        },
+        {
+          "level": 18,
+          "skillId": 78
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "暗渊巨蛾",
+      "type": "dark",
+      "form": "成体",
+      "isBossLine": true,
+      "description": "虚空魔神的成体，巨大的暗翼遮蔽星光，飞过之处万物枯萎。",
+      "lore": "暗渊巨蛾是永夜深渊中最恐怖的猎手，它的翅膀能吸收一切光芒。",
+      "baseStats": {
+        "hp": 70,
+        "attack": 100,
+        "defense": 62,
+        "speed": 95,
+        "spAttack": 80,
+        "spDefense": 65
+      },
+      "growthRate": {
+        "hp": 3.4,
+        "attack": 4.2,
+        "defense": 2.8,
+        "speed": 4,
+        "spAttack": 3.6,
+        "spDefense": 3
+      },
+      "evolution": {
+        "to": 33,
+        "level": 40
+      },
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 34
+        },
+        {
+          "level": 1,
+          "skillId": 65
+        },
+        {
+          "level": 20,
+          "skillId": 35
+        },
+        {
+          "level": 28,
+          "skillId": 36
+        },
+        {
+          "level": 34,
+          "skillId": 66
+        },
+        {
+          "level": 38,
+          "skillId": 37
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "虚空魔神",
+      "type": "dark",
+      "form": "Boss完全体",
+      "isBossLine": true,
+      "description": "光暗星永夜面的终极恐怖，混沌与虚无的化身。它的存在本身就是对光明的亵渎，深渊魔君在它面前不过是一只暗影幼虫。",
+      "lore": "虚空魔神据说是宇宙诞生前的混沌意志残留，被封印在光暗星的永夜深渊中。它每次苏醒都会让半个星球陷入更深的黑暗。",
+      "captureGuide": "Boss不可直接捕获！击败后获取精元孵化。光系精灵可克制暗系，但Boss物攻和速度极高。建议使用光之护盾和减速技能。",
+      "captureNotes": "⚠ 最强Boss！常驻永夜深渊。推荐等级≥55。Boss会吸血回复，需要持续输出压制。",
+      "baseStats": {
+        "hp": 105,
+        "attack": 140,
+        "defense": 80,
+        "speed": 130,
+        "spAttack": 110,
+        "spDefense": 82
+      },
+      "growthRate": {
+        "hp": 4.2,
+        "attack": 5,
+        "defense": 3.4,
+        "speed": 4.8,
+        "spAttack": 4.4,
+        "spDefense": 3.4
+      },
+      "evolution": null,
+      "learnset": [
+        {
+          "level": 1,
+          "skillId": 35
+        },
+        {
+          "level": 1,
+          "skillId": 36
+        },
+        {
+          "level": 1,
+          "skillId": 37
+        },
+        {
+          "level": 40,
+          "skillId": 38
+        },
+        {
+          "level": 48,
+          "skillId": 66
+        },
+        {
+          "level": 55,
+          "skillId": 67
+        },
+        {
+          "level": 60,
+          "skillId": 44
+        },
+        {
+          "level": 65,
+          "skillId": 79
+        }
       ]
     }
   ]

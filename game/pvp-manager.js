@@ -289,9 +289,32 @@ class PvpManager {
     }
   }
 
+  // Force disconnect a user (called when admin deletes account)
+  kickUser(userId) {
+    const player = this.onlinePlayers.get(userId);
+    if (player) {
+      try { player.ws.close(4001, '账户已被管理员删除'); } catch (e) {}
+      this.onlinePlayers.delete(userId);
+      // Clean up any active PVP rooms
+      for (const [roomId, room] of this.pvpRooms) {
+        if (room.player1.userId === userId || room.player2.userId === userId) {
+          const otherId = room.player1.userId === userId ? room.player2.userId : room.player1.userId;
+          this.sendTo(otherId, { type: 'pvp_opponent_disconnected' });
+          this.pvpRooms.delete(roomId);
+        }
+      }
+    }
+  }
+
   broadcastOnlinePlayers() {
     const list = [];
     for (const [userId, { username }] of this.onlinePlayers) {
+      // Verify user still exists in database
+      const user = this.db.prepare('SELECT id FROM users WHERE id = ?').get(userId);
+      if (!user) {
+        this.onlinePlayers.delete(userId);
+        continue;
+      }
       list.push({ userId, username });
     }
     for (const [, { ws }] of this.onlinePlayers) {
