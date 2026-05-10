@@ -13,6 +13,33 @@
   <!-- Stars background -->
   <canvas id="stars-canvas"></canvas>
 
+  <!-- ===== TOP BAR (persistent across all game screens) ===== -->
+  <header class="top-bar" id="top-bar">
+    <div class="hub-user-info">
+      <span class="hub-username" id="hub-username"></span>
+      <span class="hub-money" id="hub-money">💰 0</span>
+      <button class="btn-logout" id="btn-logout" title="退出登录">🚪</button>
+    </div>
+    <nav class="hub-nav">
+      <button class="hub-nav-btn active" data-section="planets" id="nav-planets">
+        <span class="nav-icon">🪐</span><span>星球探险</span>
+      </button>
+      <button class="hub-nav-btn" data-section="team" id="nav-team">
+        <span class="nav-icon">🎒</span><span>精灵背包</span>
+      </button>
+      <button class="hub-nav-btn" data-section="shop" id="nav-shop">
+        <span class="nav-icon">🏪</span><span>商店</span>
+      </button>
+      <button class="hub-nav-btn" data-section="pvp" id="nav-pvp">
+        <span class="nav-icon">⚔️</span><span>对战大厅</span>
+      </button>
+      <button class="hub-nav-btn" data-section="heal" id="nav-heal">
+        <span class="nav-icon">💊</span><span>治疗中心</span>
+      </button>
+      <button class="btn-return-scene" id="btn-return-scene" style="display:none" title="返回当前场景">↩ 返回场景</button>
+    </nav>
+  </header>
+
   <!-- ===== AUTH SCREEN ===== -->
   <div id="screen-auth" class="screen active">
     <div class="auth-container">
@@ -56,29 +83,6 @@
 
   <!-- ===== MAIN HUB ===== -->
   <div id="screen-hub" class="screen">
-    <header class="hub-header">
-      <div class="hub-user-info">
-        <span class="hub-username" id="hub-username"></span>
-        <span class="hub-money" id="hub-money">💰 0</span>
-      </div>
-      <nav class="hub-nav">
-        <button class="hub-nav-btn active" data-section="planets" id="nav-planets">
-          <span class="nav-icon">🪐</span><span>星球探险</span>
-        </button>
-        <button class="hub-nav-btn" data-section="team" id="nav-team">
-          <span class="nav-icon">🎒</span><span>精灵背包</span>
-        </button>
-        <button class="hub-nav-btn" data-section="shop" id="nav-shop">
-          <span class="nav-icon">🏪</span><span>商店</span>
-        </button>
-        <button class="hub-nav-btn" data-section="pvp" id="nav-pvp">
-          <span class="nav-icon">⚔️</span><span>对战大厅</span>
-        </button>
-        <button class="hub-nav-btn" data-section="heal" id="nav-heal">
-          <span class="nav-icon">💊</span><span>治疗中心</span>
-        </button>
-      </nav>
-    </header>
 
     <!-- Planets section -->
     <section id="section-planets" class="hub-section active">

@@ -168,15 +168,23 @@ html, body {
 /* ===== HUB ===== */
 #screen-hub { flex-direction: column; align-items: stretch; justify-content: flex-start; }
 
-.hub-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 20px; background: rgba(6,8,26,.9);
-  border-bottom: 1px solid var(--glass-border); z-index: 5;
-  flex-shrink: 0;
+/* ===== TOP BAR (persistent) ===== */
+.top-bar {
+  display: none; justify-content: space-between; align-items: center;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 10px 20px; background: rgba(6,8,26,.95);
+  border-bottom: 1px solid var(--glass-border);
+  flex-shrink: 0; height: 56px;
 }
+.top-bar.visible { display: flex; }
+body.has-topbar .screen { padding-top: 56px; }
 .hub-user-info { display: flex; gap: 16px; align-items: center; }
 .hub-username { font-weight: 700; color: var(--neon-cyan); }
 .hub-money { color: var(--electric); font-weight: 700; }
+.btn-logout { background: none; border: 1px solid var(--border); color: var(--text-secondary); font-size: 14px; cursor: pointer; padding: 4px 10px; border-radius: 8px; transition: all .2s; }
+.btn-logout:hover { background: var(--hp-red); color: #fff; border-color: var(--hp-red); }
+.btn-return-scene { display: flex; align-items: center; gap: 4px; padding: 8px 14px; border: 1px solid var(--neon-cyan); background: rgba(0,245,212,.1); color: var(--neon-cyan); font-family: inherit; font-size: 12px; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); white-space: nowrap; }
+.btn-return-scene:hover { background: rgba(0,245,212,.25); }
 
 .hub-nav { display: flex; gap: 4px; }
 .hub-nav-btn {

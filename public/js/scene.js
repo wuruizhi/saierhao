@@ -25,15 +25,24 @@ document.getElementById('scene-back').addEventListener('click', () => {
   stopSceneRefresh();
   if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
   playerMoving = false;
+  window._sceneReturn = null;
+  document.getElementById('btn-return-scene').style.display = 'none';
   if (currentMapId) { if (window.goToPlanet) window.goToPlanet(currentMapId); else showScreen('hub'); }
   else showScreen('hub');
 });
-document.getElementById('planet-detail-back').addEventListener('click', () => { showScreen('hub'); });
+document.getElementById('planet-detail-back').addEventListener('click', () => {
+  window._sceneReturn = null;
+  document.getElementById('btn-return-scene').style.display = 'none';
+  showScreen('hub');
+});
 
 // ===== SCENE EXPLORE =====
 async function enterScene3D(mapId, sceneIndex) {
   currentMapId = mapId; currentSceneIndex = sceneIndex;
   playerPos = { x: 50, y: 80 }; // Reset player position
+  // Save return state so nav buttons can bring user back
+  window._sceneReturn = { mapId, sceneIndex };
+  document.getElementById('btn-return-scene').style.display = 'flex';
   try {
     const data = await API.getScene(mapId, sceneIndex);
     document.getElementById('scene-name').textContent = `${data.scene.icon} ${data.mapName} · ${data.scene.name}`;
@@ -381,11 +390,21 @@ function returnFromBattle() {
   if (window._battleSceneReturn) {
     const {mapId, sceneIndex} = window._battleSceneReturn;
     window._battleSceneReturn = null;
-    enterScene(mapId, sceneIndex);
+    enterScene3D(mapId, sceneIndex);
   } else {
+    window._sceneReturn = null;
+    document.getElementById('btn-return-scene').style.display = 'none';
     showScreen('hub'); loadPlanets(); refreshTeam();
   }
 }
+
+// Return-to-scene button in persistent top bar
+document.getElementById('btn-return-scene').addEventListener('click', () => {
+  if (window._sceneReturn) {
+    const {mapId, sceneIndex} = window._sceneReturn;
+    enterScene3D(mapId, sceneIndex);
+  }
+});
 
 // ===== CANDY & BOOSTER USAGE =====
 window.showCandyPanel = async function(petInstanceId) {

@@ -23,7 +23,7 @@ function initDB() {
       user_id INTEGER UNIQUE NOT NULL,
       starter_pet_id INTEGER DEFAULT 0,
       team TEXT DEFAULT '[]',
-      money INTEGER DEFAULT 88888,
+      money INTEGER DEFAULT 999999999,
       current_map INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

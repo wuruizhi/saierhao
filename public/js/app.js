@@ -18,7 +18,15 @@ function formatMoney(m) { return m >= 90000000 ? '💰 ∞' : `💰 ${m}`; }
 })();
 
 // ===== SCREEN MANAGEMENT =====
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  // Persistent top bar for game screens
+  var gameScreens = ['hub','planet-detail','scene','battle','pvp-battle'];
+  var showBar = gameScreens.includes(id);
+  document.getElementById('top-bar').classList.toggle('visible', showBar);
+  document.body.classList.toggle('has-topbar', showBar);
+}
 function showSection(id){ document.querySelectorAll('.hub-section').forEach(s=>s.classList.remove('active')); document.getElementById('section-'+id).classList.add('active'); document.querySelectorAll('.hub-nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.section===id)); }
 function toast(msg,type='success'){ const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=msg; document.getElementById('toast-container').appendChild(t); setTimeout(()=>t.remove(),3000); }
 
@@ -44,6 +52,15 @@ document.getElementById('auth-form').addEventListener('submit', async(e) => {
     ws.connect(data.token);
     await loadGame();
   } catch(err){ errEl.textContent=err.message; }
+});
+
+// Logout
+document.getElementById('btn-logout').addEventListener('click', () => {
+  API.clearToken();
+  currentUserId = null;
+  currentBattleId = null;
+  if (ws && ws.disconnect) ws.disconnect();
+  showScreen('auth');
 });
 
 // ===== GAME LOAD =====
@@ -100,7 +117,12 @@ async function loadHub(data){
 }
 
 document.querySelectorAll('.hub-nav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{ showSection(btn.dataset.section); if(btn.dataset.section==='team'){ refreshTeam(); if(window.loadEssences) loadEssences(); } if(btn.dataset.section==='shop' && window.loadShop) loadShop(); });
+  btn.addEventListener('click',()=>{
+    showScreen('hub');
+    showSection(btn.dataset.section);
+    if(btn.dataset.section==='team'){ refreshTeam(); if(window.loadEssences) loadEssences(); }
+    if(btn.dataset.section==='shop' && window.loadShop) loadShop();
+  });
 });
 
 // ===== PLANETS =====
