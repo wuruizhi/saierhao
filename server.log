@@ -1,0 +1,5 @@
+✅ 数据库初始化完成
+✅ 场景管理器初始化完成
+✅ PVP管理器初始化完成
+🚀 赛尔号服务器已启动: http://localhost:3000
+🌐 WebSocket 服务: ws://localhost:3000/ws

@@ -2,7 +2,7 @@
 const TYPE_NAMES = { fire:'火',water:'水',grass:'草',electric:'电',light:'光',dark:'暗',normal:'普通' };
 const TYPE_ICONS = { fire:'🔥',water:'💧',grass:'🌿',electric:'⚡',light:'✨',dark:'🌑',normal:'⚪' };
 const PLANET_ICONS = ['','🌋','🌊','🌲','⚡','🌗'];
-let currentBattleId = null, currentUserId = null, pvpRoomId = null, pvpInviteFrom = null;
+let currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null;
 let SKILLS_MAP = {};
 function getSkillName(sid) { const s = SKILLS_MAP[sid]; return s ? s.name : `技能#${sid}`; }
 function getSkillDef(sid) { return SKILLS_MAP[sid] || null; }
@@ -19,6 +19,11 @@ function formatMoney(m) { return m >= 90000000 ? '💰 ∞' : `💰 ${m}`; }
 
 // ===== SCREEN MANAGEMENT =====
 function showScreen(id){
+  const sceneScreen = document.getElementById('screen-scene');
+  if (sceneScreen && sceneScreen.classList.contains('active') && id !== 'scene' && id !== 'battle') {
+    if (window.ws) window.ws.send({ type: 'leave_scene' });
+    if (window.stopSceneRefresh) window.stopSceneRefresh();
+  }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   // Persistent top bar for game screens
@@ -36,7 +41,12 @@ document.querySelectorAll('.auth-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     authMode = tab.dataset.tab;
     document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active',t===tab));
-    document.getElementById('auth-submit').textContent = authMode==='login'?'登录':'注册';
+    const btnContent = document.querySelector('#auth-submit .btn-content');
+    if (btnContent) {
+      btnContent.textContent = authMode==='login' ? '启动跃迁程序' : '建立新连接';
+    } else {
+      document.getElementById('auth-submit').textContent = authMode==='login'?'登录':'注册';
+    }
   });
 });
 
@@ -50,7 +60,18 @@ document.getElementById('auth-form').addEventListener('submit', async(e) => {
     API.setToken(data.token);
     currentUserId = data.userId;
     ws.connect(data.token);
-    await loadGame();
+    
+    // Play warp effect before loading game
+    const warp = document.getElementById('warp-overlay');
+    if(warp) {
+      warp.classList.add('active');
+      setTimeout(async () => {
+        await loadGame();
+        setTimeout(() => warp.classList.remove('active'), 300);
+      }, 800); // switch screen at peak of warp
+    } else {
+      await loadGame();
+    }
   } catch(err){ errEl.textContent=err.message; }
 });
 
@@ -68,6 +89,7 @@ async function loadGame(){
   try {
     const data = await API.profile();
     currentUserId = data.player.user_id;
+    currentEquips = data.player.equips || {};
     document.getElementById('hub-username').textContent = data.player.user_id ? `训练师` : '';
     document.getElementById('hub-money').textContent = formatMoney(data.player.money);
     if(data.player.starter_pet_id === 0){ showStarterScreen(); }
@@ -110,21 +132,36 @@ document.getElementById('confirm-starter').addEventListener('click', async()=>{
 async function loadHub(data){
   showScreen('hub');
   const me = await API.me();
+  currentUsername = me.username;
+  currentEquips = data.player.equips || {};
   document.getElementById('hub-username').textContent = me.username;
   document.getElementById('hub-money').textContent = formatMoney(data.player.money);
   loadPlanets();
+  
+  // Preload shop data for wardrobe rendering in scenes
+  if (!shopDataCache) {
+    try {
+      shopDataCache = await API.shopList();
+    } catch (e) {
+      console.error('Failed to preload shop data', e);
+    }
+  }
+
+  // Bind hub navigation
+  document.querySelectorAll('.hub-nav-btn').forEach(btn => {
+    btn.onclick = null; // clear old listeners
+    btn.addEventListener('click', () => {
+      showScreen('hub');
+      showSection(btn.dataset.section);
+      if(btn.dataset.section === 'team'){ refreshTeam(); if(window.loadEssences) loadEssences(); }
+      if(btn.dataset.section === 'shop' && window.loadShop) loadShop();
+      if(btn.dataset.section === 'wardrobe' && window.loadWardrobe) loadWardrobe();
+      if(btn.dataset.section === 'pokedex') loadPokedex();
+    });
+  });
+
   loadTeam(data);
 }
-
-document.querySelectorAll('.hub-nav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    showScreen('hub');
-    showSection(btn.dataset.section);
-    if(btn.dataset.section==='team'){ refreshTeam(); if(window.loadEssences) loadEssences(); }
-    if(btn.dataset.section==='shop' && window.loadShop) loadShop();
-    if(btn.dataset.section==='pokedex') loadPokedex();
-  });
-});
 
 // ===== PLANETS =====
 async function loadPlanets(){
@@ -137,12 +174,53 @@ async function loadPlanets(){
     maps.forEach(m=>{
       const locked = maxLv < m.requiredLevel;
       const colors = {fire:'#ff4757',water:'#3b82f6',grass:'#22c55e',electric:'#facc15',neutral:'#a855f7'};
-      const card = document.createElement('div');
-      card.className = `planet-card glass-card${locked?' locked':''}`;
-      card.style.setProperty('--planet-color', colors[m.theme]||'#00f5d4');
-      card.innerHTML = `<div class="planet-icon">${PLANET_ICONS[m.id]||'🪐'}</div><div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked?`需要精灵达到 Lv.${m.requiredLevel}`:'可以探索'}</div>`;
-      if(!locked) card.addEventListener('click',()=>{ goToPlanet(m.id); });
-      grid.appendChild(card);
+      const pColor = colors[m.theme] || '#00f5d4';
+      
+      const container = document.createElement('div');
+      container.className = `planet-container${locked ? ' locked' : ''}`;
+      container.style.setProperty('--planet-color', pColor);
+      
+      let rgb = '0, 245, 212';
+      if(pColor.startsWith('#')) {
+        const r = parseInt(pColor.slice(1,3), 16);
+        const g = parseInt(pColor.slice(3,5), 16);
+        const b = parseInt(pColor.slice(5,7), 16);
+        rgb = `${r}, ${g}, ${b}`;
+      }
+      container.style.setProperty('--planet-color-rgb', rgb);
+      
+      const model = document.createElement('div');
+      model.className = 'planet-model';
+      model.style.backgroundImage = `url('/img/planets/${m.theme}.png')`;
+      
+      const info = document.createElement('div');
+      info.className = 'planet-info';
+      info.style.transition = 'opacity 0.3s';
+      info.innerHTML = `<div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked ? `需要 Lv.${m.requiredLevel}` : '点击降落'}</div>`;
+      
+      if(!locked) {
+        model.addEventListener('click', () => {
+          model.classList.add('zoom-in');
+          info.style.opacity = '0';
+          // Hide siblings to keep the screen clean during zoom
+          Array.from(grid.children).forEach(child => {
+            if (child !== container) child.style.opacity = '0';
+          });
+          
+          setTimeout(() => {
+            goToPlanet(m.id);
+            setTimeout(() => {
+              model.classList.remove('zoom-in');
+              info.style.opacity = '1';
+              Array.from(grid.children).forEach(child => child.style.opacity = '1');
+            }, 500);
+          }, 700);
+        });
+      }
+      
+      container.appendChild(model);
+      container.appendChild(info);
+      grid.appendChild(container);
     });
   } catch(err){ toast(err.message,'error'); }
 }
@@ -286,6 +364,221 @@ async function startExplore(mapId){
   } catch(err){ toast(err.message,'error'); }
 }
 
+// ===== SHOP =====
+let shopDataCache = null;
+let shopActiveGroup = 'supply';
+let shopActiveSub = 0;
+
+const SHOP_CATEGORIES = {
+  supply: [
+    { key: 'capsules', label: '🔵 胶囊', icon: '🔵' },
+    { key: 'candies', label: '🍬 糖果', icon: '🍬' },
+    { key: 'boosters', label: '💪 强化', icon: '💪' },
+    { key: 'others', label: '📦 道具', icon: '📦' },
+  ],
+  fashion: [
+    { key: 'head', label: '🎩 头饰', icon: '🎩' },
+    { key: 'body', label: '👕 服饰', icon: '👕' },
+    { key: 'back', label: '🦸 背饰', icon: '🦸' },
+    { key: 'accessory', label: '👓 饰品', icon: '👓' },
+  ]
+};
+
+function getShopItems(group, subKey) {
+  if (!shopDataCache) return [];
+  if (group === 'supply') {
+    return shopDataCache[subKey] || [];
+  } else {
+    return (shopDataCache.wardrobe || []).filter(w => w.part === subKey);
+  }
+}
+
+async function loadShop() {
+  try {
+    shopDataCache = await API.shopList();
+    document.getElementById('hub-money').textContent = formatMoney(shopDataCache.playerMoney);
+    renderShopTabs();
+    renderShopItems();
+  } catch(err) { toast(err.message, 'error'); }
+}
+
+function renderShopTabs() {
+  // Top tabs
+  document.querySelectorAll('.shop-top-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.group === shopActiveGroup);
+    btn.onclick = () => {
+      shopActiveGroup = btn.dataset.group;
+      shopActiveSub = 0;
+      renderShopTabs();
+      renderShopItems();
+    };
+  });
+
+  // Sub tabs
+  const subContainer = document.getElementById('shop-sub-tabs');
+  subContainer.innerHTML = '';
+  const subs = SHOP_CATEGORIES[shopActiveGroup];
+  subs.forEach((cat, i) => {
+    const items = getShopItems(shopActiveGroup, cat.key);
+    const btn = document.createElement('button');
+    btn.className = `shop-sub-tab${i === shopActiveSub ? ' active' : ''}`;
+    btn.innerHTML = `${cat.label} <span class="shop-sub-count">${items.length}</span>`;
+    btn.addEventListener('click', () => {
+      shopActiveSub = i;
+      renderShopTabs();
+      renderShopItems();
+    });
+    subContainer.appendChild(btn);
+  });
+}
+
+function renderShopItems() {
+  const panel = document.getElementById('shop-item-panel');
+  panel.innerHTML = '';
+  const subs = SHOP_CATEGORIES[shopActiveGroup];
+  const cat = subs[shopActiveSub];
+  if (!cat) return;
+  const items = getShopItems(shopActiveGroup, cat.key);
+
+  if (items.length === 0) {
+    panel.innerHTML = '<p style="color:var(--text-dim);padding:24px;text-align:center">暂无商品</p>';
+    return;
+  }
+
+  items.forEach(item => {
+    const qty = shopDataCache.inventory[item.id] || 0;
+    const row = document.createElement('div');
+    row.className = 'shop-item';
+    row.innerHTML = `
+      <span class="shop-item-icon">${item.icon}</span>
+      <div class="shop-item-info">
+        <span class="shop-item-name">${item.name}</span>
+        <span class="shop-item-desc">${item.description || ''}</span>
+      </div>
+      <span class="shop-item-owned">拥有: ${qty}</span>
+      <button class="btn btn-sm shop-buy-btn">${item.price === 0 ? '免费' : '🛒 ' + item.price + '💰'}</button>
+    `;
+    const btn = row.querySelector('.shop-buy-btn');
+    const ownedSpan = row.querySelector('.shop-item-owned');
+    btn.addEventListener('click', async () => {
+      if (confirm(`花费 ${item.price}💰 购买 ${item.name} 吗？`)) {
+        try {
+          const res = await API.shopBuy(item.id, 1);
+          document.getElementById('hub-money').textContent = formatMoney(res.playerMoney);
+          if (shopDataCache) {
+            shopDataCache.playerMoney = res.playerMoney;
+            shopDataCache.inventory[item.id] = res.newQuantity;
+          }
+          toast(res.message);
+          ownedSpan.textContent = `拥有: ${res.newQuantity}`;
+        } catch(err) { toast(err.message, 'error'); }
+      }
+    });
+    panel.appendChild(row);
+  });
+}
+window.loadShop = loadShop;
+
+
+
+// ===== WARDROBE =====
+let currentWardrobeTab = 'head';
+
+async function loadWardrobe() {
+  if (!shopDataCache) shopDataCache = await API.shopList();
+  renderWardrobeAvatar();
+  renderWardrobeGrid();
+}
+
+document.querySelectorAll('.wardrobe-tabs .pokedex-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.wardrobe-tabs .pokedex-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentWardrobeTab = tab.dataset.part;
+    renderWardrobeGrid();
+  });
+});
+
+function renderWardrobeGrid() {
+  const grid = document.getElementById('wardrobe-grid');
+  grid.innerHTML = '';
+  
+  const items = (shopDataCache.wardrobe || []).filter(w => w.part === currentWardrobeTab);
+  
+  // Add "Unequip" option
+  const unequipBtn = document.createElement('div');
+  unequipBtn.className = 'wardrobe-item-card';
+  if (!currentEquips[currentWardrobeTab]) unequipBtn.classList.add('equipped');
+  unequipBtn.innerHTML = `<span class="wardrobe-item-icon">❌</span><div class="wardrobe-item-name">脱下</div>`;
+  unequipBtn.onclick = () => equipItem(null, currentWardrobeTab);
+  grid.appendChild(unequipBtn);
+
+  items.forEach(item => {
+    // Only show if owned
+    const owned = shopDataCache.inventory[item.id] > 0;
+    if (!owned) return;
+    
+    const isEquipped = currentEquips[item.part] === item.id;
+    const div = document.createElement('div');
+    div.className = `wardrobe-item-card ${isEquipped ? 'equipped' : ''}`;
+    div.innerHTML = `
+      <span class="wardrobe-item-icon">${item.icon}</span>
+      <div class="wardrobe-item-name">${item.name}</div>
+      ${isEquipped ? '<div class="wardrobe-equipped-badge">已装备</div>' : ''}
+    `;
+    div.onclick = () => equipItem(item.id, item.part);
+    grid.appendChild(div);
+  });
+}
+
+async function equipItem(itemId, part) {
+  try {
+    await API.equipWardrobe(itemId, part);
+    if (itemId) {
+      currentEquips[part] = itemId;
+    } else {
+      delete currentEquips[part];
+    }
+    renderWardrobeGrid();
+    renderWardrobeAvatar();
+    
+    // Update real avatar if in scene
+    if (document.getElementById('player-avatar')) {
+      const wrapper = document.getElementById('player-avatar').querySelector('.player-img-wrapper');
+      applyEquipsToWrapper(wrapper, currentEquips);
+    }
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+function applyEquipsToWrapper(wrapper, equips) {
+  wrapper.querySelectorAll('.player-part').forEach(el => el.remove());
+  
+  if (!shopDataCache || !shopDataCache.wardrobe) return;
+  const wardrobeData = shopDataCache.wardrobe;
+  
+  ['back', 'body', 'head', 'accessory'].forEach(part => {
+    if (equips[part]) {
+      const itemDef = wardrobeData.find(w => w.id === equips[part]);
+      if (itemDef) {
+        const div = document.createElement('div');
+        div.className = `player-part player-part-${part}`;
+        div.textContent = itemDef.icon;
+        wrapper.appendChild(div);
+      }
+    }
+  });
+}
+
+window.applyEquipsToWrapper = applyEquipsToWrapper;
+
+function renderWardrobeAvatar() {
+  document.getElementById('wardrobe-name-tag').textContent = currentUsername || '我的赛尔';
+  const wrapper = document.querySelector('#wardrobe-avatar-preview .player-img-wrapper');
+  applyEquipsToWrapper(wrapper, currentEquips);
+}
+
 function setupBattle(pp, wp){
   document.getElementById('player-name').textContent = pp.nickname||pp.petDef?.name;
   document.getElementById('player-level').textContent = `Lv.${pp.level}`;
@@ -326,27 +619,116 @@ function updateHpBar(side, current, max){
   document.getElementById(`${side}-hp-text`).textContent = `${Math.max(0,current)} / ${max}`;
 }
 
+async function playBattleAnimationSequence(results, isPvp) {
+  const log = document.getElementById(isPvp ? 'pvp-battle-log' : 'battle-log');
+  let pPrefix = isPvp ? 'pvp-player' : 'player';
+  let ePrefix = isPvp ? 'pvp-enemy' : 'enemy';
+  
+  let pText = document.getElementById(pPrefix + '-hp-text').textContent;
+  let eText = document.getElementById(ePrefix + '-hp-text').textContent;
+  let ppHp = parseInt(pText.split('/')[0]);
+  let ppMax = parseInt(pText.split('/')[1]);
+  let epHp = parseInt(eText.split('/')[0]);
+  let wpMax = parseInt(eText.split('/')[1]);
+
+  for(let i=0; i<results.length; i++) {
+    const res = results[i];
+    
+    const p = document.createElement('p'); 
+    if (isPvp) {
+       p.textContent = `${res.attackerName}使用了${res.skillName}！`;
+    } else {
+       p.textContent = res.message;
+       if(res.critical) p.classList.add('critical'); 
+       if(res.typeMultiplier>1) p.classList.add('effective'); 
+       if(res.typeMultiplier<1) p.classList.add('not-effective'); 
+       if(res.statusEffect) p.style.color='#f59e0b'; 
+       if(res.skipped) p.style.color='#60a5fa'; 
+       if(res.shieldAbsorbed>0) p.style.color='#67e8f9';
+    }
+    log.appendChild(p);
+    log.scrollTop = log.scrollHeight;
+    
+    const isPlayerAttacking = isPvp ? (res.attackerId === currentUserId) : res.isPlayerAttacking;
+    const attackerSpriteId = isPlayerAttacking ? (pPrefix + '-sprite') : (ePrefix + '-sprite');
+    const defenderSpriteId = isPlayerAttacking ? (ePrefix + '-sprite') : (pPrefix + '-sprite');
+    
+    const attEl = document.getElementById(attackerSpriteId);
+    const defEl = document.getElementById(defenderSpriteId);
+    
+    if (attEl && !res.skipped) {
+      attEl.classList.add(isPlayerAttacking ? 'anim-dash-right' : 'anim-dash-left');
+      await new Promise(r => setTimeout(r, 200)); 
+    }
+    
+    if(res.damage > 0 || (isPvp && !res.missed)) {
+      if(defEl) {
+        defEl.classList.add('anim-shake');
+        const impact = document.createElement('div');
+        impact.className = 'impact-fx';
+        defEl.parentElement.appendChild(impact);
+        setTimeout(() => impact.remove(), 300);
+        
+        if (res.damage > 0) {
+          const dmgText = document.createElement('div');
+          dmgText.className = `damage-text ${res.critical ? 'critical' : ''}`;
+          dmgText.textContent = `-${res.damage}`;
+          defEl.parentElement.appendChild(dmgText);
+          setTimeout(() => dmgText.remove(), 1000);
+          
+          if (isPlayerAttacking) {
+            epHp = Math.max(0, epHp - res.damage);
+            updateHpBar(ePrefix, epHp, wpMax);
+          } else {
+            ppHp = Math.max(0, ppHp - res.damage);
+            updateHpBar(pPrefix, ppHp, ppMax);
+          }
+        }
+      }
+      if(isPvp) {
+         const dp=document.createElement('p'); 
+         dp.textContent = res.missed ? '没有命中！' : `造成${res.damage}伤害！${res.critical?' 暴击！':''}`;
+         if(res.critical) dp.classList.add('critical');
+         log.appendChild(dp);
+         log.scrollTop = log.scrollHeight;
+      }
+      setTimeout(() => defEl && defEl.classList.remove('anim-shake'), 600);
+    } else if (res.heal > 0) {
+      if(attEl) {
+          const healText = document.createElement('div');
+          healText.className = `damage-text heal`;
+          healText.textContent = `+${res.heal}`;
+          attEl.parentElement.appendChild(healText);
+          setTimeout(() => healText.remove(), 1000);
+          if (isPlayerAttacking) {
+            ppHp = Math.min(ppMax, ppHp + res.heal);
+            updateHpBar(pPrefix, ppHp, ppMax);
+          } else {
+            epHp = Math.min(wpMax, epHp + res.heal);
+            updateHpBar(ePrefix, epHp, wpMax);
+          }
+      }
+    }
+    
+    if (attEl) {
+      setTimeout(() => attEl.classList.remove('anim-dash-right', 'anim-dash-left'), 300);
+    }
+    await new Promise(r => setTimeout(r, 800));
+  }
+}
+
 async function doBattleAction(skillId){
   if(!currentBattleId) return;
   document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=true);
   try {
     const r = await API.battleAction(currentBattleId, skillId);
-    const log = document.getElementById('battle-log');
-    r.results.forEach(res=>{ const p=document.createElement('p'); p.textContent=res.message; if(res.critical) p.classList.add('critical'); if(res.typeMultiplier>1) p.classList.add('effective'); if(res.typeMultiplier<1) p.classList.add('not-effective'); if(res.statusEffect) p.style.color='#f59e0b'; if(res.skipped) p.style.color='#60a5fa'; if(res.shieldAbsorbed>0) p.style.color='#67e8f9'; log.appendChild(p); });
-    log.scrollTop = log.scrollHeight;
+    
+    await playBattleAnimationSequence(r.results, false);
 
     if(r.playerPet) updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp);
     if(r.wildPet) updateHpBar('enemy', r.wildPet.current_hp, r.wildPet.max_hp);
 
-    // Animations
-    r.results.forEach(res=>{
-      if(res.damage>0){
-        const target = res.isPlayerAttacking?'enemy-sprite':'player-sprite';
-        const el = document.getElementById(target);
-        el.classList.add('anim-shake'); setTimeout(()=>el.classList.remove('anim-shake'),600);
-      }
-    });
-
+    const log = document.getElementById('battle-log');
     if(r.battleEnd){
       currentBattleId = null;
       if(r.playerWin){
@@ -363,8 +745,14 @@ async function doBattleAction(skillId){
       } else {
         const p=document.createElement('p'); p.textContent='😢 战斗失败...'; p.style.color='var(--hp-red)'; log.appendChild(p);
       }
+      log.scrollTop = log.scrollHeight;
       const retFn = window.returnFromBattle || (()=>{ showScreen('hub'); loadPlanets(); refreshTeam(); });
-      setTimeout(retFn, r.playerWin&&r.levelResult?.evolved?4000:2500);
+      setTimeout(async () => {
+        if (localStorage.getItem('saierhao_auto_heal') === 'true') {
+          try { await API.heal(); toast('战斗结束，精灵体力已自动恢复！', 'success'); } catch(e){}
+        }
+        retFn();
+      }, r.playerWin&&r.levelResult?.evolved?4000:2500);
       return;
     }
   } catch(err){ toast(err.message,'error'); }
@@ -450,15 +838,18 @@ ws.on('pvp_start', (msg) => {
 
 ws.on('pvp_waiting', (msg)=>{ const log=document.getElementById('pvp-battle-log'); const p=document.createElement('p'); p.textContent=msg.message; p.style.color='var(--text-secondary)'; log.appendChild(p); });
 
-ws.on('pvp_turn_result', (msg) => {
+ws.on('pvp_turn_result', async (msg) => {
+  document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=true);
+  
+  await playBattleAnimationSequence(msg.results, true);
+  
   const log=document.getElementById('pvp-battle-log');
-  msg.results.forEach(r=>{ const p=document.createElement('p'); p.textContent=`${r.attackerName}使用了${r.skillName}，${r.missed?'没有命中！':`造成${r.damage}伤害！${r.critical?' 暴击！':''}`}`; log.appendChild(p); });
-  log.scrollTop=log.scrollHeight;
   if(msg.yourPet) updateHpBar('pvp-player',msg.yourPet.current_hp,msg.yourPet.max_hp);
   if(msg.opponentPet) updateHpBar('pvp-enemy',msg.opponentPet.current_hp,msg.opponentPet.max_hp);
   if(msg.battleEnd){
     const won=msg.winnerId===currentUserId;
     const p=document.createElement('p'); p.textContent=won?'🎉 你赢了！':'😢 你输了...'; p.style.color=won?'var(--neon-cyan)':'var(--hp-red)'; log.appendChild(p);
+    log.scrollTop=log.scrollHeight;
     setTimeout(()=>{ showScreen('hub'); refreshTeam(); },3000);
   } else {
     document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
@@ -663,7 +1054,33 @@ document.getElementById('dex-detail-close').addEventListener('click', () => {
     skills.forEach(s => { SKILLS_MAP[s.id] = s; });
   } catch(e) {}
 
+  const autoHealToggle = document.getElementById('auto-heal-toggle');
+  if (autoHealToggle) {
+    autoHealToggle.checked = localStorage.getItem('saierhao_auto_heal') === 'true';
+    autoHealToggle.addEventListener('change', (e) => {
+      localStorage.setItem('saierhao_auto_heal', e.target.checked);
+      if (e.target.checked) toast('已开启自动治疗！');
+    });
+  }
+
   if(API.token){
     try { ws.connect(API.token); await loadGame(); } catch(e){ showScreen('auth'); }
   } else { showScreen('auth'); }
+
+  // Cyber card 3D tilt
+  const authContainer = document.querySelector('.auth-container');
+  const authCard = document.querySelector('.cyber-card');
+  if (authContainer && authCard) {
+    authContainer.addEventListener('mousemove', (e) => {
+      const rect = authCard.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const rotateX = -y / 20;
+      const rotateY = x / 20;
+      authCard.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+    authContainer.addEventListener('mouseleave', () => {
+      authCard.style.transform = `perspective(1000px) rotateX(0) rotateY(0)`;
+    });
+  }
 })();

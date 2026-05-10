@@ -29,7 +29,14 @@ function createAuthRouter(db) {
     const userId = result.lastInsertRowid;
 
     // Create player profile
-    db.prepare('INSERT INTO players (user_id, money) VALUES (?, 999999999)').run(userId);
+    const playerResult = db.prepare('INSERT INTO players (user_id, money) VALUES (?, 999999999)').run(userId);
+    const playerId = playerResult.lastInsertRowid;
+
+    // Give initial wardrobe items and equip them
+    db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(playerId, 'hat_novice', 1);
+    db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(playerId, 'body_novice', 1);
+    db.prepare('INSERT INTO player_equips (player_id, part, item_id) VALUES (?, ?, ?)').run(playerId, 'head', 'hat_novice');
+    db.prepare('INSERT INTO player_equips (player_id, part, item_id) VALUES (?, ?, ?)').run(playerId, 'body', 'body_novice');
 
     const token = jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, userId, username });

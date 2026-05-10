@@ -7,11 +7,12 @@
   <meta name="description" content="赛尔号精灵养成游戏，收集精灵、战斗进化、多人对战">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/index.css?v=7">
 </head>
 <body>
   <!-- Stars background -->
   <canvas id="stars-canvas"></canvas>
+  <div id="warp-overlay"></div>
 
   <!-- ===== TOP BAR (persistent across all game screens) ===== -->
   <header class="top-bar" id="top-bar">
@@ -28,10 +29,13 @@
         <span class="nav-icon">🎒</span><span>精灵背包</span>
       </button>
       <button class="hub-nav-btn" data-section="pokedex" id="nav-pokedex">
-        <span class="nav-icon">📖</span><span>图鉴</span>
+        <span class="nav-icon">📖</span><span class="nav-text">图鉴</span>
+      </button>
+      <button class="hub-nav-btn" data-section="wardrobe" id="nav-wardrobe">
+        <span class="nav-icon">👗</span><span class="nav-text">衣橱</span>
       </button>
       <button class="hub-nav-btn" data-section="shop" id="nav-shop">
-        <span class="nav-icon">🏪</span><span>商店</span>
+        <span class="nav-icon">🏪</span><span class="nav-text">商店</span>
       </button>
       <button class="hub-nav-btn" data-section="pvp" id="nav-pvp">
         <span class="nav-icon">⚔️</span><span>对战大厅</span>
@@ -48,27 +52,34 @@
     <div class="auth-container">
       <div class="logo-wrapper">
         <div class="logo-glow"></div>
-        <h1 class="game-logo">赛尔号</h1>
-        <p class="logo-subtitle">✦ 星际精灵养成对战 ✦</p>
+        <h1 class="game-logo glitch" data-text="赛尔号">赛尔号</h1>
+        <p class="logo-subtitle typing-text">✦ 星际精灵养成对战 ✦</p>
       </div>
-      <div class="auth-card glass-card">
+      <div class="auth-card cyber-card">
+        <div class="cyber-border"></div>
+        <div class="cyber-scanline"></div>
         <div class="auth-tabs">
-          <button class="auth-tab active" data-tab="login" id="tab-login">登录</button>
-          <button class="auth-tab" data-tab="register" id="tab-register">注册</button>
+          <button class="auth-tab active" id="tab-login" data-tab="login">登录指令</button>
+          <button class="auth-tab" id="tab-register" data-tab="register">新兵报到</button>
         </div>
-        <form id="auth-form">
-          <div class="input-group">
-            <label for="auth-username">用户名</label>
-            <input type="text" id="auth-username" placeholder="输入用户名" required autocomplete="username">
+        <form id="auth-form" class="auth-form">
+          <div class="input-group cyber-input">
+            <label>通讯频段 (用户名)</label>
+            <input type="text" id="auth-username" required placeholder="输入通讯频段">
+            <span class="input-energy-line"></span>
           </div>
-          <div class="input-group">
-            <label for="auth-password">密码</label>
-            <input type="password" id="auth-password" placeholder="输入密码" required autocomplete="current-password">
+          <div class="input-group cyber-input">
+            <label>访问密钥 (密码)</label>
+            <input type="password" id="auth-password" required placeholder="输入访问密钥">
+            <span class="input-energy-line"></span>
           </div>
-          <button type="submit" class="btn btn-primary btn-full" id="auth-submit">登录</button>
-          <p class="auth-error" id="auth-error"></p>
+          <div class="auth-error" id="auth-error"></div>
+          <button type="submit" class="btn btn-primary cyber-btn" style="width:100%; margin-top:12px;" id="auth-submit">
+            <span class="btn-content">启动跃迁程序</span>
+            <span class="btn-glitch"></span>
+          </button>
         </form>
-        <a href="/admin" class="admin-entry-link" id="admin-entry">🛡️ 管理员后台</a>
+        <a href="/admin.html" class="admin-entry-link" style="position:relative; z-index:20;">◬ 进入中央控制台 (管理员)</a>
       </div>
     </div>
   </div>
@@ -121,26 +132,49 @@
       <div class="pokedex-container" id="pokedex-container"></div>
     </section>
 
+    <!-- Wardrobe section -->
+    <section id="section-wardrobe" class="hub-section">
+      <h2 class="section-title">👗 个人衣橱</h2>
+      <div class="wardrobe-container">
+        <div class="wardrobe-preview glass-card">
+          <div class="player-avatar wardrobe-avatar-preview" id="wardrobe-avatar-preview">
+            <div class="player-img-wrapper">
+              <img src="/img/player.png" alt="赛尔" class="player-sprite" draggable="false">
+              <div class="player-ground-shadow"></div>
+            </div>
+            <div class="player-name-tag" id="wardrobe-name-tag"></div>
+          </div>
+          <p class="wardrobe-hint">智能试衣间</p>
+        </div>
+        <div class="wardrobe-inventory glass-card">
+          <div class="wardrobe-tabs">
+            <button class="pokedex-tab active" data-part="head">🎩 头饰</button>
+            <button class="pokedex-tab" data-part="body">👕 衣服</button>
+            <button class="pokedex-tab" data-part="back">🦸 背饰</button>
+            <button class="pokedex-tab" data-part="accessory">👓 饰品</button>
+          </div>
+          <div class="wardrobe-grid" id="wardrobe-grid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Shop section -->
     <section id="section-shop" class="hub-section">
       <h2 class="section-title">🏪 商店</h2>
-      <div class="shop-container" id="shop-container">
-        <div class="shop-category glass-card">
-          <h3>🔵 捕获胶囊</h3>
-          <div class="shop-grid" id="shop-capsules"></div>
-        </div>
-        <div class="shop-category glass-card">
-          <h3>🍬 经验糖果</h3>
-          <div class="shop-grid" id="shop-candies"></div>
-        </div>
-        <div class="shop-category glass-card">
-          <h3>💪 属性强化</h3>
-          <div class="shop-grid" id="shop-boosters"></div>
-        </div>
-        <div class="shop-category glass-card">
-          <h3>📦 特殊道具</h3>
-          <div class="shop-grid" id="shop-others"></div>
-        </div>
+      <!-- Top-level tabs -->
+      <div class="shop-top-tabs" id="shop-top-tabs">
+        <button class="shop-top-tab active" data-group="supply">🎒 补给中心</button>
+        <button class="shop-top-tab" data-group="fashion">👗 时尚前线</button>
+      </div>
+      <!-- Sub-category tabs -->
+      <div class="shop-sub-tabs" id="shop-sub-tabs">
+        <!-- Filled by JS -->
+      </div>
+      <!-- Item list for active category -->
+      <div class="shop-item-panel glass-card" id="shop-item-panel">
+        <!-- Filled by JS -->
       </div>
     </section>
 
@@ -163,6 +197,14 @@
         <p>为你的精灵恢复全部HP</p>
         <button class="btn btn-primary btn-lg" id="heal-btn">免费治疗</button>
         <p class="heal-result" id="heal-result"></p>
+        
+        <div class="auto-heal-container">
+          <label class="toggle-switch">
+            <input type="checkbox" id="auto-heal-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="auto-heal-label">开启自动治疗 <small>(战斗后自动恢复)</small></span>
+        </div>
       </div>
     </section>
   </div>
@@ -336,10 +378,10 @@
     </div>
   </div>
 
-  <script src="js/pet-sprites.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/websocket.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/scene.js"></script>
+  <script src="js/pet-sprites.js?v=7"></script>
+  <script src="js/api.js?v=7"></script>
+  <script src="js/websocket.js?v=7"></script>
+  <script src="js/app.js?v=7"></script>
+  <script src="js/scene.js?v=7"></script>
 </body>
 </html>

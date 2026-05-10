@@ -80,6 +80,15 @@ function initDB() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (player_id) REFERENCES players(id)
     );
+
+    CREATE TABLE IF NOT EXISTS player_equips (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      part TEXT NOT NULL, -- e.g. 'head', 'body', 'back', 'accessory'
+      item_id TEXT NOT NULL,
+      UNIQUE(player_id, part),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
   `);
 
   return db;

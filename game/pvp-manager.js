@@ -9,6 +9,7 @@ class PvpManager {
   constructor(db) {
     this.db = db;
     this.onlinePlayers = new Map(); // userId -> { ws, username }
+    this.scenePlayers = new Map(); // sceneId -> Map<userId, { username, x, y, targetX, targetY }>
     this.pvpRooms = new Map(); // roomId -> { player1, player2, state }
     this.invitations = new Map(); // `${from}_${to}` -> invitation data
   }
@@ -31,6 +32,14 @@ class PvpManager {
     }
 
     const { userId, username } = decoded;
+    
+    // Kick existing connection if the same user logs in again (e.g. from another tab)
+    const existing = this.onlinePlayers.get(userId);
+    if (existing && existing.ws && existing.ws.readyState === 1) {
+      try { existing.ws.close(4001, '已在其他设备或窗口登录'); } catch(e){}
+      this.handleLeaveScene(userId);
+    }
+
     this.onlinePlayers.set(userId, { ws, username });
 
     // Send online players list
@@ -46,6 +55,7 @@ class PvpManager {
     });
 
     ws.on('close', () => {
+      this.handleLeaveScene(userId);
       this.onlinePlayers.delete(userId);
       // Clean up any active PVP rooms
       for (const [roomId, room] of this.pvpRooms) {
@@ -77,6 +87,15 @@ class PvpManager {
         break;
       case 'pvp_switch':
         this.handlePvpSwitch(userId, msg.roomId, msg.petIndex);
+        break;
+      case 'join_scene':
+        this.handleJoinScene(userId, msg.mapId, msg.sceneIndex, msg.x, msg.y);
+        break;
+      case 'leave_scene':
+        this.handleLeaveScene(userId);
+        break;
+      case 'scene_move':
+        this.handleSceneMove(userId, msg.targetX, msg.targetY);
         break;
     }
   }
@@ -294,6 +313,7 @@ class PvpManager {
     const player = this.onlinePlayers.get(userId);
     if (player) {
       try { player.ws.close(4001, '账户已被管理员删除'); } catch (e) {}
+      this.handleLeaveScene(userId);
       this.onlinePlayers.delete(userId);
       // Clean up any active PVP rooms
       for (const [roomId, room] of this.pvpRooms) {
@@ -320,6 +340,71 @@ class PvpManager {
     for (const [, { ws }] of this.onlinePlayers) {
       if (ws.readyState === 1) {
         ws.send(JSON.stringify({ type: 'online_players', players: list }));
+      }
+    }
+  }
+
+  // --- MMO SCENE SYNCHRONIZATION ---
+  handleJoinScene(userId, mapId, sceneIndex, x, y) {
+    this.handleLeaveScene(userId); // Leave any previous scene just in case
+    const sceneId = `${mapId}_${sceneIndex}`;
+    const player = this.onlinePlayers.get(userId);
+    if (!player) return;
+
+    if (!this.scenePlayers.has(sceneId)) {
+      this.scenePlayers.set(sceneId, new Map());
+    }
+    const sceneMap = this.scenePlayers.get(sceneId);
+    
+    // Fetch equips
+    const dbPlayer = this.db.prepare('SELECT id FROM players WHERE user_id = ?').get(userId);
+    const equipsList = dbPlayer ? this.db.prepare('SELECT part, item_id FROM player_equips WHERE player_id = ?').all(dbPlayer.id) : [];
+    const equips = {};
+    equipsList.forEach(e => { equips[e.part] = e.item_id; });
+
+    sceneMap.set(userId, { sceneId, username: player.username, x, y, targetX: x, targetY: y, equips });
+
+    // Send current players in this scene to the joining user
+    const currentPlayers = Array.from(sceneMap.entries())
+      .filter(([id]) => id !== userId)
+      .map(([id, data]) => ({ userId: id, ...data }));
+    this.sendTo(userId, { type: 'scene_players', players: currentPlayers });
+
+    // Broadcast to others in the scene that this user joined
+    this.broadcastToScene(sceneId, { type: 'scene_player_joined', userId, username: player.username, x, y, equips }, userId);
+  }
+
+  handleLeaveScene(userId) {
+    for (const [sceneId, sceneMap] of this.scenePlayers.entries()) {
+      if (sceneMap.has(userId)) {
+        sceneMap.delete(userId);
+        this.broadcastToScene(sceneId, { type: 'scene_player_left', userId }, userId);
+        if (sceneMap.size === 0) {
+          this.scenePlayers.delete(sceneId);
+        }
+        break;
+      }
+    }
+  }
+
+  handleSceneMove(userId, targetX, targetY) {
+    for (const [sceneId, sceneMap] of this.scenePlayers.entries()) {
+      if (sceneMap.has(userId)) {
+        const data = sceneMap.get(userId);
+        data.targetX = targetX;
+        data.targetY = targetY;
+        this.broadcastToScene(sceneId, { type: 'scene_player_moved', userId, targetX, targetY }, userId);
+        break;
+      }
+    }
+  }
+
+  broadcastToScene(sceneId, msg, excludeUserId = null) {
+    const sceneMap = this.scenePlayers.get(sceneId);
+    if (!sceneMap) return;
+    for (const [userId] of sceneMap.entries()) {
+      if (userId !== excludeUserId) {
+        this.sendTo(userId, msg);
       }
     }
   }

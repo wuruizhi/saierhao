@@ -20,6 +20,7 @@ function createShopRouter(db) {
       candies: itemsData.candies,
       boosters: itemsData.boosters || [],
       others: itemsData.others,
+      wardrobe: itemsData.wardrobe || [],
       playerMoney: player.money,
       inventory: inventoryMap
     });
@@ -32,7 +33,13 @@ function createShopRouter(db) {
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
     // Find item in catalog
-    const allItems = [...itemsData.capsules, ...itemsData.candies, ...(itemsData.boosters || []), ...itemsData.others];
+    const allItems = [
+      ...itemsData.capsules, 
+      ...itemsData.candies, 
+      ...(itemsData.boosters || []), 
+      ...itemsData.others, 
+      ...(itemsData.wardrobe || [])
+    ];
     const item = allItems.find(i => i.id === itemId);
     if (!item) return res.status(400).json({ error: '商品不存在' });
 
@@ -68,7 +75,13 @@ function createShopRouter(db) {
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
     const inventory = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND quantity > 0').all(player.id);
-    const allItems = [...itemsData.capsules, ...itemsData.candies, ...(itemsData.boosters || []), ...itemsData.others];
+    const allItems = [
+      ...itemsData.capsules, 
+      ...itemsData.candies, 
+      ...(itemsData.boosters || []), 
+      ...itemsData.others,
+      ...(itemsData.wardrobe || [])
+    ];
 
     const items = inventory.map(inv => {
       const def = allItems.find(i => i.id === inv.item_id);

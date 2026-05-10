@@ -2,6 +2,11 @@
 const API = {
   token: localStorage.getItem('saierhao_token'),
   async request(method, url, body) {
+    // Add cache-busting query param for GET requests
+    if (method === 'GET') {
+      const sep = url.includes('?') ? '&' : '?';
+      url += `${sep}_t=${Date.now()}`;
+    }
     const opts = { method, headers: { 'Content-Type': 'application/json' } };
     if (this.token) opts.headers['Authorization'] = `Bearer ${this.token}`;
     if (body) opts.body = JSON.stringify(body);
@@ -30,6 +35,7 @@ const API = {
   getEssences() { return this.request('GET', '/player/essences'); },
   hatchStart(essenceDbId) { return this.request('POST', '/player/hatch-start', { essenceDbId }); },
   hatchComplete(essenceDbId, speedUp) { return this.request('POST', '/player/hatch-complete', { essenceDbId, speedUp }); },
+  equipWardrobe(itemId, part) { return this.request('POST', '/player/equip', { itemId, part }); },
   // Battle
   getScene(mapId, sceneIndex) { return this.request('GET', `/battle/scene/${mapId}/${sceneIndex}`); },
   explore(mapId, sceneIndex, spawnId) { return this.request('POST', '/battle/explore', { mapId, sceneIndex, spawnId }); },

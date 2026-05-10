@@ -26,6 +26,7 @@ document.getElementById('scene-back').addEventListener('click', () => {
   stopSceneRefresh();
   if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
   playerMoving = false;
+  if (window.ws) window.ws.send({ type: 'leave_scene' });
   window._sceneReturn = null;
   document.getElementById('btn-return-scene').style.display = 'none';
   if (currentMapId) { if (window.goToPlanet) window.goToPlanet(currentMapId); else showScreen('hub'); }
@@ -65,16 +66,22 @@ async function enterScene3D(mapId, sceneIndex) {
     // Add click-to-move listener (use touch for mobile)
     vp.onclick = handleViewportClick;
     vp.ontouchstart = handleViewportTouch;
+    
+    if (window.ws) {
+      window.ws.send({ type: 'join_scene', mapId, sceneIndex, x: playerPos.x, y: playerPos.y });
+    }
   } catch(e) { toast(e.message,'error'); }
 }
 let _wanderInterval = null;
 
 function renderSceneSpawns(vp, spawns) {
-  vp.innerHTML = '';
+  vp.querySelectorAll('.scene-pet').forEach(el => el.remove());
   if (_wanderInterval) { clearInterval(_wanderInterval); _wanderInterval = null; }
   
-  // Add player avatar first
-  createPlayerAvatar(vp);
+  // Add player avatar first if not exists
+  if (!document.getElementById('player-avatar')) {
+    createPlayerAvatar(vp);
+  }
   
   // Track pet elements for wandering
   const petElements = [];
@@ -295,6 +302,10 @@ function createPlayerAvatar(vp) {
   img.draggable = false;
   imgWrapper.appendChild(img);
   
+  if (window.applyEquipsToWrapper && currentEquips) {
+    window.applyEquipsToWrapper(imgWrapper, currentEquips);
+  }
+  
   // Player shadow
   const shadow = document.createElement('div');
   shadow.className = 'player-ground-shadow';
@@ -305,7 +316,7 @@ function createPlayerAvatar(vp) {
   // Name tag
   const tag = document.createElement('div');
   tag.className = 'player-name-tag';
-  tag.textContent = '我的赛尔';
+  tag.textContent = currentUsername || '我的赛尔';
   playerAvatar.appendChild(tag);
   
   vp.appendChild(playerAvatar);
@@ -345,6 +356,10 @@ function movePlayerTo(targetX, targetY, callback) {
   if (!playerAvatar || playerMoving) return;
   playerMoving = true;
   
+  if (window.ws) {
+    window.ws.send({ type: 'scene_move', targetX, targetY });
+  }
+
   const startX = playerPos.x;
   const startY = playerPos.y;
   const dx = targetX - startX;
@@ -420,6 +435,7 @@ function walkToPet(petX, petY, spawnId) {
 
 async function startSceneBattle(spawnId) {
   stopSceneRefresh();
+  if (window.ws) window.ws.send({ type: 'leave_scene' });
   try {
     const data = await API.explore(currentMapId, currentSceneIndex, spawnId);
     currentBattleId = data.battleId;
@@ -453,38 +469,7 @@ function startSceneRefresh() {
 function stopSceneRefresh() { if (sceneRefreshTimer) { clearInterval(sceneRefreshTimer); sceneRefreshTimer = null; } }
 
 
-// ===== SHOP =====
-async function loadShop() {
-  try {
-    const data = await API.shopList();
-    renderShopGrid('shop-capsules', data.capsules, data.inventory);
-    renderShopGrid('shop-candies', data.candies, data.inventory);
-    if (data.boosters && data.boosters.length) renderShopGrid('shop-boosters', data.boosters, data.inventory);
-    renderShopGrid('shop-others', data.others, data.inventory);
-    document.getElementById('hub-money').textContent = formatMoney(data.playerMoney);
-  } catch(e) { toast(e.message,'error'); }
-}
-
-function renderShopGrid(containerId, items, inventory) {
-  const grid = document.getElementById(containerId);
-  grid.innerHTML = '';
-  items.forEach(item => {
-    const owned = inventory[item.id] || 0;
-    const el = document.createElement('div');
-    el.className = 'shop-item';
-    el.innerHTML = `<span class="shop-item-icon">${item.icon}</span><div class="shop-item-info"><span class="shop-item-name">${item.name}</span><span class="shop-item-desc">${item.description || ''}</span></div><span class="shop-item-price">${item.price}💰</span><span class="shop-item-owned">拥有: ${owned}</span><button class="btn btn-primary btn-xs" onclick="buyItem('${item.id}')">购买</button>`;
-    grid.appendChild(el);
-  });
-}
-
-window.buyItem = async function(itemId) {
-  try {
-    const r = await API.shopBuy(itemId, 1);
-    toast(r.message);
-    document.getElementById('hub-money').textContent = formatMoney(r.playerMoney);
-    loadShop();
-  } catch(e) { toast(e.message,'error'); }
-};
+// ===== SHOP (handled by app.js) =====
 
 // ===== CAPSULE SELECT =====
 window.showCapsuleSelect = async function() {
@@ -682,6 +667,108 @@ async function useSpecialItem(petInstanceId, itemId, itemName) {
 }
 
 window.returnFromBattle = returnFromBattle;
-window.loadShop = loadShop;
 window.loadEssences = loadEssences;
 window.enterScene3D = enterScene3D;
+
+// ===== MMO SCENE SYNCHRONIZATION =====
+let otherPlayers = new Map();
+
+function createOtherPlayerAvatar(playerInfo) {
+  const vp = document.getElementById('scene-viewport');
+  if (!vp) return null;
+  const avatar = document.createElement('div');
+  avatar.id = `other-player-${playerInfo.userId}`;
+  avatar.className = 'other-player-avatar';
+  avatar.style.left = playerInfo.x + '%';
+  avatar.style.top = playerInfo.y + '%';
+  
+  const imgWrapper = document.createElement('div');
+  imgWrapper.className = 'player-img-wrapper';
+  
+  const img = document.createElement('img');
+  img.src = '/img/player.png';
+  img.className = 'player-sprite';
+  img.draggable = false;
+  imgWrapper.appendChild(img);
+
+  if (window.applyEquipsToWrapper && playerInfo.equips) {
+    window.applyEquipsToWrapper(imgWrapper, playerInfo.equips);
+  }
+  
+  const tag = document.createElement('div');
+  tag.className = 'player-name-tag';
+  tag.textContent = playerInfo.username;
+  
+  avatar.appendChild(imgWrapper);
+  avatar.appendChild(tag);
+  vp.appendChild(avatar);
+  
+  return { el: avatar, x: playerInfo.x, y: playerInfo.y, animId: null };
+}
+
+if (window.ws) {
+  window.ws.on('scene_players', (msg) => {
+    otherPlayers.forEach(p => p.el.remove());
+    otherPlayers.clear();
+    msg.players.forEach(p => {
+      const avatar = createOtherPlayerAvatar(p);
+      if (avatar) {
+        otherPlayers.set(p.userId, avatar);
+        if (p.targetX !== p.x || p.targetY !== p.y) moveOtherPlayer(p.userId, p.targetX, p.targetY);
+      }
+    });
+  });
+
+  window.ws.on('scene_player_joined', (msg) => {
+    if (otherPlayers.has(msg.userId)) otherPlayers.get(msg.userId).el.remove();
+    const avatar = createOtherPlayerAvatar(msg);
+    if (avatar) otherPlayers.set(msg.userId, avatar);
+  });
+
+  window.ws.on('scene_player_left', (msg) => {
+    if (otherPlayers.has(msg.userId)) {
+      const p = otherPlayers.get(msg.userId);
+      if (p.animId) cancelAnimationFrame(p.animId);
+      p.el.remove();
+      otherPlayers.delete(msg.userId);
+    }
+  });
+
+  window.ws.on('scene_player_moved', (msg) => {
+    moveOtherPlayer(msg.userId, msg.targetX, msg.targetY);
+  });
+}
+
+function moveOtherPlayer(userId, targetX, targetY) {
+  const p = otherPlayers.get(userId);
+  if (!p) return;
+  if (p.animId) cancelAnimationFrame(p.animId);
+  const startX = p.x; const startY = p.y;
+  const dx = targetX - startX; const dy = targetY - startY;
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const duration = Math.min(2000, Math.max(300, distance * 25));
+  
+  const imgWrapper = p.el.querySelector('.player-img-wrapper');
+  if (dx < -2) imgWrapper.style.transform = 'scaleX(-1)';
+  else if (dx > 2) imgWrapper.style.transform = 'scaleX(1)';
+  p.el.classList.add('walking');
+  const startTime = performance.now();
+  
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / duration);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    p.x = startX + dx * ease; p.y = startY + dy * ease;
+    p.el.style.left = p.x + '%'; p.el.style.top = p.y + '%';
+    const bob = Math.sin(elapsed * 0.01) * 3;
+    p.el.querySelector('.player-sprite').style.transform = `translateY(${bob}px)`;
+    if (progress < 1) {
+      p.animId = requestAnimationFrame(step);
+    } else {
+      p.el.classList.remove('walking');
+      p.el.querySelector('.player-sprite').style.transform = '';
+      p.animId = null;
+    }
+  }
+  p.animId = requestAnimationFrame(step);
+}

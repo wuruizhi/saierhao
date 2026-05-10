@@ -25,7 +25,11 @@ function createPlayerRouter(db) {
       petDef: petsData.pets.find(pd => pd.id === p.pet_id)
     }));
 
-    res.json({ player, teamPets, storagePets });
+    const equipsList = db.prepare('SELECT part, item_id FROM player_equips WHERE player_id = ?').all(player.id);
+    const equips = {};
+    equipsList.forEach(e => { equips[e.part] = e.item_id; });
+
+    res.json({ player: { ...player, equips }, teamPets, storagePets });
   });
 
   // Choose starter pet
@@ -333,6 +337,30 @@ function createPlayerRouter(db) {
       pet: { id: instanceId, petDef },
       inTeam
     });
+  });
+
+  // Equip wardrobe item
+  router.post('/equip', authMiddleware, (req, res) => {
+    const { itemId, part } = req.body;
+    const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    if (!itemId) {
+      // Unequip
+      db.prepare('DELETE FROM player_equips WHERE player_id = ? AND part = ?').run(player.id, part);
+      return res.json({ success: true, message: '脱下装备' });
+    }
+
+    // Verify ownership
+    const inventory = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ? AND quantity > 0').get(player.id, itemId);
+    if (!inventory) {
+      return res.status(400).json({ error: '你没有这件物品' });
+    }
+
+    db.prepare('INSERT OR REPLACE INTO player_equips (player_id, part, item_id) VALUES (?, ?, ?)')
+      .run(player.id, part, itemId);
+
+    res.json({ success: true, message: '装备成功' });
   });
 
   return router;
