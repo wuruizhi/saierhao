@@ -36,15 +36,15 @@ function renderPetSprite(container, petId, size) {
   // Wrapper with breathing + float animation
   const wrapper = document.createElement('div');
   wrapper.className = 'pet-anim-wrapper';
-  wrapper.style.cssText = `width:${s}px;height:${s}px;position:relative;`;
+  wrapper.style.cssText = `width:${s}px;height:${s}px;position:relative;border-radius:50%;overflow:hidden;`;
 
   // Glow layer
   const glow = document.createElement('div');
   glow.className = 'pet-glow';
   glow.style.cssText = `
-    position:absolute;inset:-${s*0.15}px;border-radius:50%;
-    background:radial-gradient(circle,${colors.glow},transparent 70%);
-    animation:pet-glow-pulse 2s ease-in-out infinite;
+    position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle,rgba(240,240,255,0.95) 40%,${colors.glow} 75%,transparent 100%);
+    animation:pet-glow-pulse 2.5s ease-in-out infinite;
     pointer-events:none;z-index:0;
   `;
   wrapper.appendChild(glow);
@@ -54,10 +54,11 @@ function renderPetSprite(container, petId, size) {
   img.src = `/img/pets/${petId}.png`;
   img.alt = `Pet ${petId}`;
   img.style.cssText = `
-    width:${s}px;height:${s}px;object-fit:contain;
+    width:${s*0.88}px;height:${s*0.88}px;object-fit:contain;
     position:relative;z-index:1;
+    margin:${s*0.06}px;
     animation:pet-breathe 3s ease-in-out infinite, pet-float ${2.5+Math.random()}s ease-in-out infinite;
-    filter:drop-shadow(0 0 ${s*0.08}px ${colors.main});
+    filter:drop-shadow(0 0 ${s*0.06}px ${colors.main});
   `;
   img.draggable = false;
   img.onerror = function() {

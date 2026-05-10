@@ -3,6 +3,10 @@ const TYPE_NAMES = { fire:'火',water:'水',grass:'草',electric:'电',light:'�
 const TYPE_ICONS = { fire:'🔥',water:'💧',grass:'🌿',electric:'⚡',light:'✨',dark:'🌑',normal:'⚪' };
 const PLANET_ICONS = ['','🌋','🌊','🌲','⚡','🌗'];
 let currentBattleId = null, currentUserId = null, pvpRoomId = null, pvpInviteFrom = null;
+let SKILLS_MAP = {};
+function getSkillName(sid) { const s = SKILLS_MAP[sid]; return s ? s.name : `技能#${sid}`; }
+function getSkillDef(sid) { return SKILLS_MAP[sid] || null; }
+function formatMoney(m) { return m >= 90000000 ? '💰 ∞' : `💰 ${m}`; }
 
 // ===== STARS BACKGROUND =====
 (function initStars(){
@@ -48,7 +52,7 @@ async function loadGame(){
     const data = await API.profile();
     currentUserId = data.player.user_id;
     document.getElementById('hub-username').textContent = data.player.user_id ? `训练师` : '';
-    document.getElementById('hub-money').textContent = `💰 ${data.player.money}`;
+    document.getElementById('hub-money').textContent = formatMoney(data.player.money);
     if(data.player.starter_pet_id === 0){ showStarterScreen(); }
     else { await loadHub(data); }
   } catch(err){ showScreen('auth'); API.clearToken(); }
@@ -90,7 +94,7 @@ async function loadHub(data){
   showScreen('hub');
   const me = await API.me();
   document.getElementById('hub-username').textContent = me.username;
-  document.getElementById('hub-money').textContent = `💰 ${data.player.money}`;
+  document.getElementById('hub-money').textContent = formatMoney(data.player.money);
   loadPlanets();
   loadTeam(data);
 }
@@ -154,22 +158,33 @@ function showPetDetail(pet, isTeam){
   renderPetSprite(document.getElementById('pd-sprite'), pet.pet_id, 120);
 
   const stats = document.getElementById('pet-detail-stats');
-  const statNames = {attack:'攻击',defense:'防御',sp_attack:'特攻',sp_defense:'特防',speed:'速度'};
+  const statNames = {attack:'物攻',defense:'物防',sp_attack:'法攻',sp_defense:'法防',speed:'速度',hp:'生命'};
   const maxStat = 200;
   stats.innerHTML = Object.entries(statNames).map(([k,n])=>{
-    const v = pet[k]||0; const pct = Math.min(100,v/maxStat*100);
+    const v = k==='hp' ? pet.max_hp : (pet[k]||0); const pct = Math.min(100,v/maxStat*100);
     const color = pct>60?'var(--hp-green)':pct>35?'var(--hp-yellow)':'var(--hp-red)';
     return `<div class="stat-bar-row"><span class="stat-label">${n}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="stat-value">${v}</span></div>`;
   }).join('');
 
   const skillsDiv = document.getElementById('pet-detail-skills');
   const skills = Array.isArray(pet.skills)?pet.skills:[];
-  skillsDiv.innerHTML = `<h4>技能</h4>${skills.length?skills.map(sid=>`<span class="skill-btn" style="display:inline-block;margin:4px;cursor:default"><span class="skill-name">技能#${sid}</span></span>`).join(''):'<p style="color:var(--text-dim)">暂无技能</p>'}`;
+  skillsDiv.innerHTML = `<h4>技能</h4>${skills.length?skills.map(sid=>{
+    const sk = getSkillDef(sid);
+    return `<span class="skill-btn" style="display:inline-block;margin:4px;cursor:default" title="${sk?sk.description:''}"><span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta" style="font-size:10px;display:block">威力:${sk?sk.power||'-':'-'} ${sk&&sk.category==='status'?'辅助':sk&&sk.category==='physical'?'物攻':'法攻'}</span></span>`;
+  }).join(''):'<p style="color:var(--text-dim)">暂无技能</p>'}`;
 
   const actions = document.getElementById('pet-detail-actions');
-  actions.innerHTML = isTeam
+  let actionsHtml = isTeam
     ? `<button class="btn btn-danger btn-sm" onclick="swapPet(${pet.id},false)">移至仓库</button>`
     : `<button class="btn btn-primary btn-sm" onclick="swapPet(${pet.id},true)">加入队伍</button>`;
+  actionsHtml += ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#facc15,#f59e0b);color:#000" onclick="showCandyPanel(${pet.id})">🍬 喂糖果</button>`;
+  actions.innerHTML = actionsHtml;
+
+  // Candy panel (initially hidden)
+  const candyPanel = document.createElement('div');
+  candyPanel.id = 'candy-panel';
+  candyPanel.style.cssText = 'display:none;margin-top:12px;';
+  actions.appendChild(candyPanel);
 }
 document.getElementById('modal-close').addEventListener('click',()=>document.getElementById('modal-pet-detail').classList.remove('active'));
 
@@ -218,9 +233,11 @@ function setupBattle(pp, wp){
   const grid = document.getElementById('skill-grid');
   grid.innerHTML = '';
   skills.forEach(sid=>{
+    const sk = getSkillDef(sid);
     const btn = document.createElement('button');
     btn.className = 'skill-btn';
-    btn.innerHTML = `<span class="skill-name">技能 #${sid}</span><span class="skill-meta">点击使用</span>`;
+    if(sk) btn.classList.add(`type-${sk.type}`);
+    btn.innerHTML = `<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'点击使用'}</span>`;
     btn.addEventListener('click',()=>doBattleAction(sid));
     grid.appendChild(btn);
   });
@@ -240,7 +257,7 @@ async function doBattleAction(skillId){
   try {
     const r = await API.battleAction(currentBattleId, skillId);
     const log = document.getElementById('battle-log');
-    r.results.forEach(res=>{ const p=document.createElement('p'); p.textContent=res.message; if(res.critical) p.classList.add('critical'); if(res.typeMultiplier>1) p.classList.add('effective'); if(res.typeMultiplier<1) p.classList.add('not-effective'); log.appendChild(p); });
+    r.results.forEach(res=>{ const p=document.createElement('p'); p.textContent=res.message; if(res.critical) p.classList.add('critical'); if(res.typeMultiplier>1) p.classList.add('effective'); if(res.typeMultiplier<1) p.classList.add('not-effective'); if(res.statusEffect) p.style.color='#f59e0b'; if(res.skipped) p.style.color='#60a5fa'; if(res.shieldAbsorbed>0) p.style.color='#67e8f9'; log.appendChild(p); });
     log.scrollTop = log.scrollHeight;
 
     if(r.playerPet) updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp);
@@ -346,8 +363,10 @@ ws.on('pvp_start', (msg) => {
   const grid=document.getElementById('pvp-skill-grid');
   grid.innerHTML='';
   (pp.skills||[]).forEach(sid=>{
+    const sk = getSkillDef(sid);
     const btn=document.createElement('button'); btn.className='skill-btn';
-    btn.innerHTML=`<span class="skill-name">技能 #${sid}</span>`;
+    if(sk) btn.classList.add(`type-${sk.type}`);
+    btn.innerHTML=`<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'使用'}</span>`;
     btn.addEventListener('click',()=>{ ws.send({type:'pvp_action',roomId:pvpRoomId,skillId:sid}); grid.querySelectorAll('.skill-btn').forEach(b=>b.disabled=true); });
     grid.appendChild(btn);
   });
@@ -375,6 +394,12 @@ ws.on('pvp_opponent_disconnected', ()=>{ toast('对手已断开连接','error');
 
 // ===== INIT =====
 (async function init(){
+  // Load skills map
+  try {
+    const { skills } = await API.getSkills();
+    skills.forEach(s => { SKILLS_MAP[s.id] = s; });
+  } catch(e) {}
+
   if(API.token){
     try { ws.connect(API.token); await loadGame(); } catch(e){ showScreen('auth'); }
   } else { showScreen('auth'); }

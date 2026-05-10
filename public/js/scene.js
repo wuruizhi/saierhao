@@ -1,6 +1,24 @@
 // ===== SCENE & SHOP MODULE =====
 let currentMapId = null, currentSceneIndex = null, sceneRefreshTimer = null, sceneCountdown = 30;
 
+// Scene background map (planet theme -> image)
+const SCENE_BACKGROUNDS = {
+  fire: '/img/scenes/fire.png',
+  water: '/img/scenes/water.png',
+  grass: '/img/scenes/grass.png',
+  electric: '/img/scenes/electric.png',
+  dark: '/img/scenes/dark.png'
+};
+
+// Planet icons
+const PLANET_ICONS = window.PLANET_ICONS || {1:'🔥',2:'🌊',3:'🌿',4:'⚡',5:'🌙'};
+
+// ===== PLAYER AVATAR STATE =====
+let playerAvatar = null;
+let playerPos = { x: 50, y: 75 }; // percentage
+let playerMoving = false;
+let playerMoveAnim = null;
+
 // ===== PLANET DETAIL =====
 window.showPlanetDetail = async function(mapId) {
   try {
@@ -30,39 +48,200 @@ document.getElementById('planet-detail-back').addEventListener('click', () => { 
 // ===== SCENE EXPLORE =====
 async function enterScene(mapId, sceneIndex) {
   currentMapId = mapId; currentSceneIndex = sceneIndex;
+  playerPos = { x: 50, y: 80 }; // Reset player position
   try {
     const data = await API.getScene(mapId, sceneIndex);
     document.getElementById('scene-name').textContent = `${data.scene.icon} ${data.mapName} · ${data.scene.name}`;
     const vp = document.getElementById('scene-viewport');
-    vp.style.background = data.scene.bgGradient;
+    
+    // Set background image based on planet theme
+    const theme = data.mapTheme || 'fire';
+    const bgUrl = SCENE_BACKGROUNDS[theme] || SCENE_BACKGROUNDS.fire;
+    vp.style.background = `url(${bgUrl}) center/cover no-repeat`;
+    vp.style.position = 'relative';
+    
     renderSceneSpawns(vp, data.spawns);
     showScreen('scene');
     startSceneRefresh();
+    
+    // Add click-to-move listener
+    vp.onclick = handleViewportClick;
   } catch(e) { toast(e.message,'error'); }
 }
 
 function renderSceneSpawns(vp, spawns) {
   vp.innerHTML = '';
+  
+  // Add player avatar first
+  createPlayerAvatar(vp);
+  
+  // Render wild pets with 3D effects
   spawns.forEach(sp => {
     const el = document.createElement('div');
-    el.className = `scene-pet${sp.isBoss?' scene-boss':''}`;
+    el.className = `scene-pet scene-pet-3d${sp.isBoss?' scene-boss':''}`;
     el.style.left = sp.x + '%'; el.style.top = sp.y + '%';
-    el.title = `${sp.isBoss?'👑 ':''}${sp.petDef?.name||'???'} Lv.${sp.level}`;
+    el.dataset.spawnId = sp.spawnId;
+    el.dataset.petName = sp.petDef?.name || '???';
+    el.dataset.petLevel = sp.level;
+    
+    // 3D pet container
+    const pet3d = document.createElement('div');
+    pet3d.className = 'pet-3d-container';
+    
     const spriteDiv = document.createElement('div');
     spriteDiv.className = 'scene-pet-sprite';
-    renderPetSprite(spriteDiv, sp.petId, sp.isBoss ? 80 : 56);
-    el.appendChild(spriteDiv);
+    renderPetSprite(spriteDiv, sp.petId, sp.isBoss ? 80 : 60);
+    pet3d.appendChild(spriteDiv);
+    
+    // Ground shadow for 3D effect
+    const shadow = document.createElement('div');
+    shadow.className = 'pet-ground-shadow';
+    pet3d.appendChild(shadow);
+    
+    el.appendChild(pet3d);
+    
     const label = document.createElement('div');
     label.className = 'scene-pet-label';
     label.textContent = `${sp.petDef?.name||'???'} Lv.${sp.level}`;
     el.appendChild(label);
-    el.addEventListener('click', () => startSceneBattle(sp.spawnId));
-    // Random wander animation
-    el.style.setProperty('--wx', (Math.random()*40-20)+'px');
-    el.style.setProperty('--wy', (Math.random()*20-10)+'px');
+    
+    // Click pet to walk toward it, then battle when close
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      walkToPet(sp.x, sp.y, sp.spawnId);
+    });
+    
+    // Wander animation
+    el.style.setProperty('--wx', (Math.random()*30-15)+'px');
+    el.style.setProperty('--wy', (Math.random()*15-7)+'px');
     el.style.animationDuration = (3+Math.random()*4)+'s';
     el.style.animationDelay = (Math.random()*2)+'s';
     vp.appendChild(el);
+  });
+}
+
+// ===== PLAYER AVATAR =====
+function createPlayerAvatar(vp) {
+  playerAvatar = document.createElement('div');
+  playerAvatar.id = 'player-avatar';
+  playerAvatar.className = 'player-avatar';
+  playerAvatar.style.left = playerPos.x + '%';
+  playerAvatar.style.top = playerPos.y + '%';
+  
+  const imgWrapper = document.createElement('div');
+  imgWrapper.className = 'player-img-wrapper';
+  
+  const img = document.createElement('img');
+  img.src = '/img/player.png';
+  img.alt = '赛尔';
+  img.className = 'player-sprite';
+  img.draggable = false;
+  imgWrapper.appendChild(img);
+  
+  // Player shadow
+  const shadow = document.createElement('div');
+  shadow.className = 'player-ground-shadow';
+  imgWrapper.appendChild(shadow);
+  
+  playerAvatar.appendChild(imgWrapper);
+  
+  // Name tag
+  const tag = document.createElement('div');
+  tag.className = 'player-name-tag';
+  tag.textContent = '我的赛尔';
+  playerAvatar.appendChild(tag);
+  
+  vp.appendChild(playerAvatar);
+}
+
+// ===== CLICK TO MOVE =====
+function handleViewportClick(e) {
+  const vp = e.currentTarget;
+  const rect = vp.getBoundingClientRect();
+  const targetX = ((e.clientX - rect.left) / rect.width) * 100;
+  const targetY = ((e.clientY - rect.top) / rect.height) * 100;
+  
+  // Clamp to walkable area (10-90% x, 30-90% y)
+  const clampedX = Math.max(5, Math.min(95, targetX));
+  const clampedY = Math.max(25, Math.min(90, targetY));
+  
+  movePlayerTo(clampedX, clampedY);
+}
+
+function movePlayerTo(targetX, targetY, callback) {
+  if (!playerAvatar || playerMoving) return;
+  playerMoving = true;
+  
+  const startX = playerPos.x;
+  const startY = playerPos.y;
+  const dx = targetX - startX;
+  const dy = targetY - startY;
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const duration = Math.min(2000, Math.max(300, distance * 25));
+  
+  // Flip player based on direction
+  const imgWrapper = playerAvatar.querySelector('.player-img-wrapper');
+  if (dx < -2) imgWrapper.style.transform = 'scaleX(-1)';
+  else if (dx > 2) imgWrapper.style.transform = 'scaleX(1)';
+  
+  // Add walking animation class
+  playerAvatar.classList.add('walking');
+  
+  // Show click indicator
+  showClickIndicator(targetX, targetY);
+  
+  const startTime = performance.now();
+  
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / duration);
+    // Ease out
+    const ease = 1 - Math.pow(1 - progress, 3);
+    
+    playerPos.x = startX + dx * ease;
+    playerPos.y = startY + dy * ease;
+    playerAvatar.style.left = playerPos.x + '%';
+    playerAvatar.style.top = playerPos.y + '%';
+    
+    // Bobbing while walking
+    const bob = Math.sin(elapsed * 0.01) * 3;
+    playerAvatar.querySelector('.player-sprite').style.transform = `translateY(${bob}px)`;
+    
+    if (progress < 1) {
+      playerMoveAnim = requestAnimationFrame(step);
+    } else {
+      playerMoving = false;
+      playerAvatar.classList.remove('walking');
+      playerAvatar.querySelector('.player-sprite').style.transform = '';
+      if (callback) callback();
+    }
+  }
+  
+  if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+  playerMoveAnim = requestAnimationFrame(step);
+}
+
+function showClickIndicator(x, y) {
+  const vp = document.getElementById('scene-viewport');
+  const indicator = document.createElement('div');
+  indicator.className = 'click-indicator';
+  indicator.style.left = x + '%';
+  indicator.style.top = y + '%';
+  vp.appendChild(indicator);
+  setTimeout(() => indicator.remove(), 600);
+}
+
+// Walk to pet then trigger battle
+function walkToPet(petX, petY, spawnId) {
+  // Walk to position near the pet
+  const offsetX = petX + (playerPos.x < petX ? -5 : 5);
+  const offsetY = petY + 3;
+  movePlayerTo(offsetX, offsetY, () => {
+    // Check if close enough to battle
+    const dist = Math.sqrt((playerPos.x-petX)**2 + (playerPos.y-petY)**2);
+    if (dist < 12) {
+      startSceneBattle(spawnId);
+    }
   });
 }
 
@@ -77,10 +256,8 @@ async function startSceneBattle(spawnId) {
     if (data.wildPet.isBoss) {
       const log = document.getElementById('battle-log');
       log.innerHTML = `<p style="color:#ffd700;font-weight:bold">👑 Boss ${data.wildPet.bossName} 出现了！</p>`;
-      document.getElementById('btn-capture').style.display = 'none';
-    } else {
-      document.getElementById('btn-capture').style.display = '';
     }
+    document.getElementById('btn-capture').style.display = '';
   } catch(e) { toast(e.message,'error'); }
 }
 
@@ -104,6 +281,8 @@ function stopSceneRefresh() { if (sceneRefreshTimer) { clearInterval(sceneRefres
 
 document.getElementById('scene-back').addEventListener('click', () => {
   stopSceneRefresh();
+  if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+  playerMoving = false;
   if (currentMapId) showPlanetDetail(currentMapId);
   else showScreen('hub');
 });
@@ -114,8 +293,9 @@ async function loadShop() {
     const data = await API.shopList();
     renderShopGrid('shop-capsules', data.capsules, data.inventory);
     renderShopGrid('shop-candies', data.candies, data.inventory);
+    if (data.boosters && data.boosters.length) renderShopGrid('shop-boosters', data.boosters, data.inventory);
     renderShopGrid('shop-others', data.others, data.inventory);
-    document.getElementById('hub-money').textContent = `💰 ${data.playerMoney}`;
+    document.getElementById('hub-money').textContent = formatMoney(data.playerMoney);
   } catch(e) { toast(e.message,'error'); }
 }
 
@@ -135,7 +315,7 @@ window.buyItem = async function(itemId) {
   try {
     const r = await API.shopBuy(itemId, 1);
     toast(r.message);
-    document.getElementById('hub-money').textContent = `💰 ${r.playerMoney}`;
+    document.getElementById('hub-money').textContent = formatMoney(r.playerMoney);
     loadShop();
   } catch(e) { toast(e.message,'error'); }
 };
@@ -226,6 +406,105 @@ function returnFromBattle() {
     showScreen('hub'); loadPlanets(); refreshTeam();
   }
 }
+
+// ===== CANDY & BOOSTER USAGE =====
+window.showCandyPanel = async function(petInstanceId) {
+  const panel = document.getElementById('candy-panel');
+  if (!panel) return;
+  panel.style.display = 'block';
+  panel.innerHTML = '<p style="color:var(--text-dim)">加载中...</p>';
+  try {
+    const inv = await API.inventory();
+    const candies = inv.items.filter(i => i.item_id.startsWith('candy_'));
+    const boosters = inv.items.filter(i => i.item_id.startsWith('booster_'));
+    const specials = inv.items.filter(i => ['level_boost','evolve_stone','reset_stats'].includes(i.item_id));
+
+    panel.innerHTML = '';
+
+    // Candies section
+    if (candies.length > 0) {
+      const candyTitle = document.createElement('h4');
+      candyTitle.style.cssText = 'margin-bottom:8px;font-size:14px';
+      candyTitle.textContent = '🍬 经验糖果';
+      panel.appendChild(candyTitle);
+      candies.forEach(c => {
+        const btn = document.createElement('div');
+        btn.className = 'candy-option';
+        btn.innerHTML = `<span>${c.def.icon} ${c.def.name} <small style="color:var(--text-dim)">(+${c.def.exp}exp)</small></span><span>×${c.quantity}</span>`;
+        btn.addEventListener('click', () => useCandy(petInstanceId, c.item_id, c.def.name));
+        panel.appendChild(btn);
+      });
+    }
+
+    // Boosters section
+    if (boosters.length > 0) {
+      const boosterTitle = document.createElement('h4');
+      boosterTitle.style.cssText = 'margin:12px 0 8px;font-size:14px';
+      boosterTitle.textContent = '💪 强化剂';
+      panel.appendChild(boosterTitle);
+      boosters.forEach(b => {
+        const btn = document.createElement('div');
+        btn.className = 'candy-option';
+        btn.innerHTML = `<span>${b.def.icon} ${b.def.name} <small style="color:var(--text-dim)">${b.def.description}</small></span><span>×${b.quantity}</span>`;
+        btn.addEventListener('click', () => useBooster(petInstanceId, b.item_id, b.def.name));
+        panel.appendChild(btn);
+      });
+    }
+
+    // Special items section
+    if (specials.length > 0) {
+      const spTitle = document.createElement('h4');
+      spTitle.style.cssText = 'margin:12px 0 8px;font-size:14px';
+      spTitle.textContent = '📦 特殊道具';
+      panel.appendChild(spTitle);
+      specials.forEach(s => {
+        const btn = document.createElement('div');
+        btn.className = 'candy-option';
+        btn.innerHTML = `<span>${s.def.icon} ${s.def.name} <small style="color:var(--text-dim)">${s.def.description}</small></span><span>×${s.quantity}</span>`;
+        btn.addEventListener('click', () => useSpecialItem(petInstanceId, s.item_id, s.def.name));
+        panel.appendChild(btn);
+      });
+    }
+
+    if (candies.length === 0 && boosters.length === 0 && specials.length === 0) {
+      panel.innerHTML = '<p style="color:var(--text-dim);font-size:13px">没有可用道具，去商店购买吧！</p>';
+    }
+  } catch(e) { panel.innerHTML = `<p style="color:var(--hp-red)">${e.message}</p>`; }
+};
+
+async function useCandy(petInstanceId, candyId, candyName) {
+  try {
+    const r = await API.useCandy(petInstanceId, candyId, 1);
+    toast(r.message);
+    document.getElementById('modal-pet-detail').classList.remove('active');
+    refreshTeam();
+    if (r.levelResult?.evolved) {
+      setTimeout(() => showEvolution(r.levelResult), 500);
+    }
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function useBooster(petInstanceId, boosterId, boosterName) {
+  try {
+    const r = await API.useBooster(petInstanceId, boosterId);
+    toast(r.message);
+    document.getElementById('modal-pet-detail').classList.remove('active');
+    refreshTeam();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function useSpecialItem(petInstanceId, itemId, itemName) {
+  try {
+    const r = await API.useSpecialItem(petInstanceId, itemId);
+    toast(r.message);
+    document.getElementById('modal-pet-detail').classList.remove('active');
+    refreshTeam();
+    if (r.levelResult?.evolved) {
+      setTimeout(() => showEvolution(r.levelResult), 500);
+    }
+  } catch(e) { toast(e.message, 'error'); }
+}
+
 window.returnFromBattle = returnFromBattle;
 window.loadShop = loadShop;
 window.loadEssences = loadEssences;

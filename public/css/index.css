@@ -495,27 +495,109 @@ html, body {
 .scene-viewport {
   flex: 1; position: relative; overflow: hidden; min-height: 300px;
   border: 1px solid var(--glass-border); margin: 8px; border-radius: var(--radius);
+  cursor: pointer; image-rendering: auto;
 }
 .scene-hint { text-align: center; padding: 8px; font-size: 13px; color: var(--text-dim); flex-shrink: 0; }
 
-.scene-pet {
-  position: absolute; cursor: pointer; transition: transform .3s;
+/* ===== PLAYER AVATAR ===== */
+.player-avatar {
+  position: absolute; z-index: 20; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  transition: none; pointer-events: none;
+}
+.player-img-wrapper {
+  position: relative; transition: transform .1s;
+  border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle, rgba(200,220,255,0.9) 40%, rgba(0,245,212,0.3) 80%, transparent 100%);
+  width: 64px; height: 64px;
+}
+.player-sprite {
+  width: 64px; height: 64px; object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.5));
+  image-rendering: auto;
+}
+.player-ground-shadow {
+  position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+  width: 50px; height: 14px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,.5), transparent 70%);
+  animation: pet-glow-pulse 2s ease-in-out infinite;
+}
+.player-name-tag {
+  font-size: 11px; color: var(--neon-cyan); background: rgba(0,0,0,.7);
+  padding: 2px 8px; border-radius: 8px; margin-top: -2px;
+  font-weight: 700; white-space: nowrap;
+  border: 1px solid rgba(0,245,212,.3);
+}
+.player-avatar.walking .player-sprite {
+  animation: player-walk-bob .4s ease-in-out infinite;
+}
+@keyframes player-walk-bob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-3px) rotate(-3deg); }
+  75% { transform: translateY(-3px) rotate(3deg); }
+}
+
+/* ===== 3D PET EFFECTS ===== */
+.scene-pet-3d {
+  position: absolute; cursor: pointer;
   animation: wander 4s ease-in-out infinite alternate;
   display: flex; flex-direction: column; align-items: center;
   transform: translate(-50%, -50%);
+  z-index: 10;
 }
-.scene-pet:hover { transform: translate(-50%, -50%) scale(1.25); z-index: 10; }
-.scene-pet-sprite { pointer-events: none; }
-.scene-pet-label {
-  font-size: 10px; color: var(--text-secondary); background: rgba(0,0,0,.6);
-  padding: 1px 6px; border-radius: 6px; margin-top: 2px; white-space: nowrap;
+.scene-pet-3d:hover { z-index: 15; }
+.scene-pet-3d:hover .pet-3d-container {
+  transform: scale(1.15) translateY(-4px);
 }
-.scene-boss { filter: drop-shadow(0 0 12px #ffd700); }
+
+.pet-3d-container {
+  position: relative; transition: transform .3s ease;
+  perspective: 200px;
+}
+.pet-3d-container .scene-pet-sprite {
+  position: relative; z-index: 1;
+  filter: drop-shadow(2px 4px 6px rgba(0,0,0,.6));
+}
+.pet-ground-shadow {
+  position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+  width: 56px; height: 16px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0,0,0,.6), transparent 70%);
+  animation: shadow-breathe 3s ease-in-out infinite;
+}
+@keyframes shadow-breathe {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: .6; }
+  50% { transform: translateX(-50%) scale(0.85); opacity: .4; }
+}
+
+.scene-pet-3d .scene-pet-label {
+  font-size: 10px; color: var(--text-secondary); background: rgba(0,0,0,.7);
+  padding: 2px 8px; border-radius: 6px; margin-top: 2px; white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+.scene-boss .pet-3d-container {
+  filter: drop-shadow(0 0 16px rgba(255,215,0,.6));
+}
 .scene-boss .scene-pet-label { color: #ffd700; font-weight: 700; }
 
 @keyframes wander {
   0% { margin-left: 0; margin-top: 0; }
   100% { margin-left: var(--wx, 10px); margin-top: var(--wy, 5px); }
+}
+
+/* ===== CLICK INDICATOR ===== */
+.click-indicator {
+  position: absolute; transform: translate(-50%, -50%); pointer-events: none; z-index: 30;
+  width: 24px; height: 24px; border: 2px solid var(--neon-cyan);
+  border-radius: 50%; animation: click-ring .6s ease-out forwards;
+}
+.click-indicator::after {
+  content: ''; position: absolute; inset: 4px;
+  border: 1px solid rgba(0,245,212,.5); border-radius: 50%;
+  animation: click-ring .6s ease-out .1s forwards;
+}
+@keyframes click-ring {
+  0% { transform: scale(0.3); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
 /* ===== SHOP ===== */
@@ -543,3 +625,12 @@ html, body {
   cursor: pointer; transition: var(--transition); font-weight: 600;
 }
 .capsule-option:hover { background: rgba(168,85,247,.15); border: 1px solid var(--neon-purple); }
+
+/* ===== CANDY OPTION ===== */
+.candy-option {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; background: rgba(0,0,0,.2); border-radius: var(--radius-sm);
+  cursor: pointer; transition: var(--transition); font-size: 14px;
+  margin-bottom: 6px; border: 1px solid transparent;
+}
+.candy-option:hover { background: rgba(250,204,21,.15); border-color: var(--electric); }

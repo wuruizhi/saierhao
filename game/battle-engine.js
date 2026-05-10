@@ -3,9 +3,6 @@ const skillsData = require('../data/skills.json');
 
 const typeChart = petsData.typeChart;
 
-/**
- * Calculate type effectiveness multiplier
- */
 function getTypeMultiplier(attackType, defenseType) {
   if (attackType === 'normal') return 1.0;
   const chart = typeChart[attackType];
@@ -15,38 +12,38 @@ function getTypeMultiplier(attackType, defenseType) {
   return 1.0;
 }
 
-/**
- * Calculate damage for an attack
- */
 function calculateDamage(attacker, defender, skill) {
   if (skill.category === 'status') return 0;
 
   const isPhysical = skill.category === 'physical';
-  const atkStat = isPhysical ? attacker.attack : attacker.sp_attack;
-  const defStat = isPhysical ? defender.defense : defender.sp_defense;
+  const atkStat = isPhysical ? (attacker.attack || 0) : (attacker.sp_attack || 0);
+  const defStat = isPhysical ? (defender.defense || 0) : (defender.sp_defense || 0);
 
-  // Base damage formula (similar to Pokemon)
   const levelFactor = (2 * attacker.level / 5 + 2);
-  let damage = Math.floor((levelFactor * skill.power * atkStat / defStat) / 50 + 2);
+  let damage = Math.floor((levelFactor * skill.power * atkStat / Math.max(1, defStat)) / 50 + 2);
 
-  // STAB (Same Type Attack Bonus)
   const attackerDef = petsData.pets.find(p => p.id === attacker.pet_id);
   if (attackerDef && attackerDef.type === skill.type) {
     damage = Math.floor(damage * 1.5);
   }
 
-  // Type effectiveness
   const defenderDef = petsData.pets.find(p => p.id === defender.pet_id);
   const typeMultiplier = defenderDef ? getTypeMultiplier(skill.type, defenderDef.type) : 1.0;
   damage = Math.floor(damage * typeMultiplier);
 
-  // Random variance (85-100%)
+  // Execute: bonus damage when defender HP is below threshold
+  if (skill.execute && defender.current_hp / defender.max_hp < skill.execute.hpThreshold) {
+    damage = Math.floor(damage * skill.execute.damageMult);
+  }
+
   const randomFactor = (85 + Math.floor(Math.random() * 16)) / 100;
   damage = Math.floor(damage * randomFactor);
 
-  // Critical hit (6.25% chance, 1.5x)
+  // Critical hit (base 6.25%, modified by critUp)
+  let critRate = 0.0625;
+  if (attacker._critRateMult) critRate *= attacker._critRateMult;
   let critical = false;
-  if (Math.random() < 0.0625) {
+  if (Math.random() < critRate) {
     damage = Math.floor(damage * 1.5);
     critical = true;
   }
@@ -54,40 +51,184 @@ function calculateDamage(attacker, defender, skill) {
   return { damage: Math.max(1, damage), critical, typeMultiplier };
 }
 
-/**
- * Execute a PVE battle turn
- */
+// Process status effects at turn start (burn, poison damage)
+function processTurnStartStatus(pet) {
+  const messages = [];
+  if (!pet.statusEffects) return messages;
+
+  for (const effect of pet.statusEffects) {
+    if (effect.type === 'burn') {
+      const dmg = effect.damage || 10;
+      pet.current_hp = Math.max(0, pet.current_hp - dmg);
+      messages.push(`${pet.nickname}被灼烧了，受到${dmg}点伤害！`);
+    }
+    if (effect.type === 'poison') {
+      const dmg = Math.floor(pet.max_hp * (effect.hpPercent || 0.08));
+      pet.current_hp = Math.max(0, pet.current_hp - dmg);
+      messages.push(`${pet.nickname}中毒了，受到${dmg}点伤害！`);
+    }
+  }
+  return messages;
+}
+
+// Check if pet can act this turn (freeze/stun)
+function canAct(pet) {
+  if (!pet.statusEffects) return { canAct: true };
+
+  for (const effect of pet.statusEffects) {
+    if (effect.type === 'stun') {
+      return { canAct: false, reason: `${pet.nickname}被眩晕了，无法行动！` };
+    }
+    if (effect.type === 'freeze') {
+      if (Math.random() < (effect.chance || 0.5)) {
+        return { canAct: false, reason: `${pet.nickname}被冰冻了，无法行动！` };
+      }
+    }
+  }
+  return { canAct: true };
+}
+
+// Decrement status effect turns and remove expired ones
+function tickStatusEffects(pet) {
+  if (!pet.statusEffects) return [];
+  const messages = [];
+  const toRemove = [];
+
+  pet.statusEffects.forEach((effect, i) => {
+    effect.turns--;
+    if (effect.turns <= 0) {
+      toRemove.push(i);
+      // Restore stats for expired debuffs
+      if (effect.type === 'debuff' && pet._origStats) {
+        pet[effect.stat] = pet._origStats[effect.stat];
+        messages.push(`${pet.nickname}的${statLabel(effect.stat)}恢复了！`);
+      }
+      if (effect.type === 'paralyze' && pet._origStats) {
+        pet.speed = pet._origStats.speed;
+        messages.push(`${pet.nickname}的麻痹效果解除了！`);
+      }
+      messages.push(`${pet.nickname}的${statusLabel(effect.type)}效果消失了。`);
+    }
+  });
+
+  pet.statusEffects = pet.statusEffects.filter((_, i) => !toRemove.includes(i));
+
+  // Tick critUp separately
+  if (pet._critUpTurns > 0) {
+    pet._critUpTurns--;
+    if (pet._critUpTurns <= 0) {
+      pet._critRateMult = 1.0;
+      messages.push(`${pet.nickname}的会心效果消失了。`);
+    }
+  }
+
+  return messages;
+}
+
+function statLabel(stat) {
+  const map = { attack: '物攻', defense: '物防', spAttack: '法攻', spDefense: '法防', speed: '速度' };
+  return map[stat] || stat;
+}
+
+function statusLabel(type) {
+  const map = { burn: '灼烧', poison: '中毒', freeze: '冰冻', paralyze: '麻痹', stun: '眩晕', debuff: '减益' };
+  return map[type] || type;
+}
+
+// Save original stats for debuff/paralyze restoration
+function ensureOrigStats(pet) {
+  if (!pet._origStats) {
+    pet._origStats = {
+      attack: pet.attack,
+      defense: pet.defense,
+      spAttack: pet.sp_attack,
+      spDefense: pet.sp_defense,
+      speed: pet.speed
+    };
+  }
+}
+
 function executePveTurn(playerPet, enemyPet, playerSkillId) {
   const skill = skillsData.skills.find(s => s.id === playerSkillId);
   if (!skill) return { error: '技能不存在' };
 
   const results = [];
 
-  // Determine turn order
-  const playerFirst = playerPet.speed >= enemyPet.speed;
+  // Initialize status tracking
+  if (!playerPet.statusEffects) playerPet.statusEffects = [];
+  if (!enemyPet.statusEffects) enemyPet.statusEffects = [];
+  if (!playerPet._critRateMult) playerPet._critRateMult = 1.0;
+  if (!enemyPet._critRateMult) enemyPet._critRateMult = 1.0;
+  if (!playerPet._critUpTurns) playerPet._critUpTurns = 0;
+  if (!enemyPet._critUpTurns) enemyPet._critUpTurns = 0;
+  ensureOrigStats(playerPet);
+  ensureOrigStats(enemyPet);
+
+  // ---- TURN START: Process status effects ----
+  const playerStartMsgs = processTurnStartStatus(playerPet);
+  const enemyStartMsgs = processTurnStartStatus(enemyPet);
+  [...playerStartMsgs, ...enemyStartMsgs].forEach(msg => {
+    results.push({ isPlayerAttacking: null, skillName: null, message: msg, statusEffect: true });
+  });
+
+  // Check if anyone fainted from status
+  if (playerPet.current_hp <= 0) {
+    return { results, playerPet, enemyPet, battleEnd: true, playerWin: false };
+  }
+  if (enemyPet.current_hp <= 0) {
+    return { results, playerPet, enemyPet, battleEnd: true, playerWin: true };
+  }
+
+  // Determine turn order (respect priority flag)
+  let playerFirst;
+  const playerSkill = skill;
+  const enemySkill = chooseEnemySkill(enemyPet);
+
+  if (playerSkill.priority && !enemySkill.priority) {
+    playerFirst = true;
+  } else if (enemySkill.priority && !playerSkill.priority) {
+    playerFirst = false;
+  } else {
+    playerFirst = playerPet.speed >= enemyPet.speed;
+  }
 
   const attacker1 = playerFirst ? playerPet : enemyPet;
   const defender1 = playerFirst ? enemyPet : playerPet;
-  const skill1 = playerFirst ? skill : chooseEnemySkill(enemyPet);
+  const skill1 = playerFirst ? playerSkill : enemySkill;
   const isPlayer1 = playerFirst;
 
-  // First attack
-  const result1 = executeAttack(attacker1, defender1, skill1, isPlayer1);
-  results.push(result1);
-
-  // Check if defender fainted
-  if (defender1.current_hp <= 0) {
-    return { results, playerPet, enemyPet, battleEnd: true, playerWin: isPlayer1 };
+  // Check if attacker1 can act
+  const act1 = canAct(attacker1);
+  if (!act1.canAct) {
+    results.push({ isPlayerAttacking: isPlayer1, skillName: null, message: act1.reason, skipped: true });
+  } else {
+    const result1 = executeAttack(attacker1, defender1, skill1, isPlayer1);
+    results.push(result1);
+    if (defender1.current_hp <= 0) {
+      return { results, playerPet, enemyPet, battleEnd: true, playerWin: isPlayer1 };
+    }
   }
 
   // Second attack
   const attacker2 = playerFirst ? enemyPet : playerPet;
   const defender2 = playerFirst ? playerPet : enemyPet;
-  const skill2 = playerFirst ? chooseEnemySkill(enemyPet) : skill;
+  const skill2 = playerFirst ? enemySkill : playerSkill;
   const isPlayer2 = !playerFirst;
 
-  const result2 = executeAttack(attacker2, defender2, skill2, isPlayer2);
-  results.push(result2);
+  const act2 = canAct(attacker2);
+  if (!act2.canAct) {
+    results.push({ isPlayerAttacking: isPlayer2, skillName: null, message: act2.reason, skipped: true });
+  } else {
+    const result2 = executeAttack(attacker2, defender2, skill2, isPlayer2);
+    results.push(result2);
+  }
+
+  // ---- TURN END: Tick status effects ----
+  const playerEndMsgs = tickStatusEffects(playerPet);
+  const enemyEndMsgs = tickStatusEffects(enemyPet);
+  [...playerEndMsgs, ...enemyEndMsgs].forEach(msg => {
+    if (msg) results.push({ isPlayerAttacking: null, skillName: null, message: msg, statusEffect: true });
+  });
 
   const battleEnd = playerPet.current_hp <= 0 || enemyPet.current_hp <= 0;
   const playerWin = battleEnd ? enemyPet.current_hp <= 0 : null;
@@ -95,12 +236,9 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   return { results, playerPet, enemyPet, battleEnd, playerWin };
 }
 
-/**
- * Execute a single attack
- */
 function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   // Accuracy check
-  if (Math.random() * 100 > skill.accuracy) {
+  if (skill.category !== 'status' && Math.random() * 100 > skill.accuracy) {
     return {
       isPlayerAttacking,
       skillName: skill.name,
@@ -109,84 +247,194 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
     };
   }
 
-  // Status skills (heal, buff)
-  if (skill.category === 'status') {
-    if (skill.heal) {
-      const healAmount = Math.floor(attacker.max_hp * skill.heal);
-      attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + healAmount);
-      return {
-        isPlayerAttacking,
-        skillName: skill.name,
-        heal: healAmount,
-        message: `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}，恢复了${healAmount}点HP！`
-      };
-    }
-    if (skill.buff) {
-      for (const [stat, multiplier] of Object.entries(skill.buff)) {
-        attacker[stat] = Math.floor(attacker[stat] * multiplier);
-      }
-      return {
-        isPlayerAttacking,
-        skillName: skill.name,
-        buff: true,
-        message: `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}，能力提升了！`
-      };
+  // Apply buff to self (status skills)
+  if (skill.buff) {
+    ensureOrigStats(attacker);
+    for (const [stat, multiplier] of Object.entries(skill.buff)) {
+      const dbStat = stat === 'spAttack' ? 'sp_attack' : stat === 'spDefense' ? 'sp_defense' : stat;
+      attacker[dbStat] = Math.floor(attacker[dbStat] * multiplier);
     }
   }
 
-  // Damage attack
-  const { damage, critical, typeMultiplier } = calculateDamage(attacker, defender, skill);
-  defender.current_hp = Math.max(0, defender.current_hp - damage);
+  // Apply shield to self (status skills)
+  let shieldMsg = '';
+  if (skill.shield) {
+    const shieldHp = Math.floor(attacker.max_hp * skill.shield.hpPercent);
+    attacker._shieldHp = (attacker._shieldHp || 0) + shieldHp;
+    shieldMsg = ` 获得了${shieldHp}点护盾！`;
+  }
 
-  let message = `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}，造成${damage}点伤害！`;
+  // Apply critUp to self
+  if (skill.critUp) {
+    attacker._critRateMult = skill.critUp.multiplier || 2.0;
+    attacker._critUpTurns = skill.critUp.turns || 3;
+  }
+
+  // Heal
+  let healMsg = '';
+  if (skill.heal) {
+    const healAmount = Math.floor(attacker.max_hp * skill.heal);
+    attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + healAmount);
+    healMsg = ` 恢复了${healAmount}点HP！`;
+  }
+
+  // Clear debuffs
+  let clearMsg = '';
+  if (skill.clearDebuff && attacker.statusEffects) {
+    attacker.statusEffects = attacker.statusEffects.filter(e => e.type !== 'debuff' && e.type !== 'paralyze');
+    if (attacker._origStats) {
+      attacker.attack = attacker._origStats.attack;
+      attacker.defense = attacker._origStats.defense;
+      attacker.sp_attack = attacker._origStats.spAttack;
+      attacker.sp_defense = attacker._origStats.spDefense;
+      attacker.speed = attacker._origStats.speed;
+    }
+    clearMsg = ' 负面状态被清除了！';
+  }
+
+  // Status-only skill
+  if (skill.category === 'status') {
+    let msg = `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}！`;
+    if (shieldMsg) msg += shieldMsg;
+    if (healMsg) msg += healMsg;
+    if (clearMsg) msg += clearMsg;
+
+    // Apply debuff to defender from status skill (e.g., 嚎叫)
+    applyDebuff(defender, skill);
+
+    return { isPlayerAttacking, skillName: skill.name, message: msg };
+  }
+
+  // === DAMAGE ATTACK ===
+  const { damage, critical, typeMultiplier } = calculateDamage(attacker, defender, skill);
+
+  // Apply shield absorption
+  let actualDamage = damage;
+  let shieldAbsorbed = 0;
+  if (defender._shieldHp && defender._shieldHp > 0) {
+    if (defender._shieldHp >= actualDamage) {
+      shieldAbsorbed = actualDamage;
+      defender._shieldHp -= actualDamage;
+      actualDamage = 0;
+    } else {
+      shieldAbsorbed = defender._shieldHp;
+      actualDamage -= defender._shieldHp;
+      defender._shieldHp = 0;
+    }
+  }
+
+  // Apply damage to defender
+  defender.current_hp = Math.max(0, defender.current_hp - actualDamage);
+
+  let message;
+  if (actualDamage > 0) {
+    message = `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}，造成${actualDamage}点伤害！`;
+  } else if (shieldAbsorbed > 0) {
+    message = `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}，但被护盾吸收了${shieldAbsorbed}点伤害！`;
+  } else {
+    message = `${isPlayerAttacking ? '我方' : '对方'}的${attacker.nickname}使用了${skill.name}！`;
+  }
+
   if (critical) message += ' 暴击！';
   if (typeMultiplier > 1) message += ' 效果拔群！';
   if (typeMultiplier < 1) message += ' 效果不佳...';
+  if (skill.execute && defender.current_hp / defender.max_hp < skill.execute.hpThreshold) message += ' 致命一击！';
 
-  // Drain effect (e.g., 虚空吞噬)
+  // Recoil damage to self
+  let recoilDmg = 0;
+  if (skill.recoil && actualDamage > 0) {
+    recoilDmg = Math.floor(actualDamage * skill.recoil);
+    attacker.current_hp = Math.max(0, attacker.current_hp - recoilDmg);
+    message += ` ${attacker.nickname}受到了${recoilDmg}点反伤！`;
+  }
+
+  // Counter damage reflection
+  let counterDmg = 0;
+  if (skill.counter && actualDamage > 0) {
+    counterDmg = Math.floor(actualDamage * skill.counter);
+    defender.current_hp = Math.max(0, defender.current_hp - counterDmg);
+  }
+
+  // Drain (lifesteal)
   let drainHeal = 0;
-  if (skill.drain && damage > 0) {
-    drainHeal = Math.floor(damage * skill.drain);
+  if (skill.drain && actualDamage > 0) {
+    drainHeal = Math.floor(actualDamage * skill.drain);
     attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + drainHeal);
     message += ` 吸取了${drainHeal}点HP！`;
   }
 
-  // Heal on attack (e.g., 神圣制裁)
-  if (skill.heal && damage > 0) {
+  // Heal on attack
+  if (skill.heal && actualDamage > 0) {
     const healAmt = Math.floor(attacker.max_hp * skill.heal);
     attacker.current_hp = Math.min(attacker.max_hp, attacker.current_hp + healAmt);
     message += ` 恢复了${healAmt}点HP！`;
   }
 
-  if (defender.current_hp <= 0) message += ` ${!isPlayerAttacking ? '我方' : '对方'}的${defender.nickname}倒下了！`;
+  if (defender.current_hp <= 0) {
+    message += ` ${!isPlayerAttacking ? '我方' : '对方'}的${defender.nickname}倒下了！`;
+  }
+
+  // Apply debuff from attack skill
+  applyDebuff(defender, skill);
+
+  // Apply status effects from attack skill to defender
+  applyStatusEffect(defender, skill);
 
   return {
     isPlayerAttacking,
     skillName: skill.name,
-    damage,
+    damage: actualDamage,
+    shieldAbsorbed,
     critical,
     typeMultiplier,
     drainHeal,
+    recoilDmg,
+    counterDmg,
     message
   };
 }
 
-/**
- * AI: Choose a skill for the enemy
- */
+function applyDebuff(defender, skill) {
+  if (!skill.debuff) return;
+  ensureOrigStats(defender);
+  const { stat, statMult, turns } = skill.debuff;
+  const dbStat = stat === 'spAttack' ? 'sp_attack' : stat === 'spDefense' ? 'sp_defense' : stat;
+  defender[dbStat] = Math.floor(defender[dbStat] * statMult);
+  if (!defender.statusEffects) defender.statusEffects = [];
+  defender.statusEffects.push({ type: 'debuff', stat: dbStat, turns: turns || 3 });
+}
+
+function applyStatusEffect(defender, skill) {
+  if (!defender.statusEffects) defender.statusEffects = [];
+  ensureOrigStats(defender);
+
+  if (skill.burn) {
+    defender.statusEffects.push({ type: 'burn', turns: skill.burn.turns, damage: skill.burn.damage });
+  }
+  if (skill.freeze) {
+    defender.statusEffects.push({ type: 'freeze', turns: skill.freeze.turns, chance: skill.freeze.chance });
+  }
+  if (skill.poison) {
+    defender.statusEffects.push({ type: 'poison', turns: skill.poison.turns, hpPercent: skill.poison.hpPercent });
+  }
+  if (skill.paralyze) {
+    defender.speed = Math.floor(defender.speed * skill.paralyze.speedMult);
+    defender.statusEffects.push({ type: 'paralyze', turns: skill.paralyze.turns, speedMult: skill.paralyze.speedMult });
+  }
+  if (skill.stun) {
+    defender.statusEffects.push({ type: 'stun', turns: skill.stun.turns });
+  }
+}
+
 function chooseEnemySkill(enemyPet) {
-  const petSkills = JSON.parse(typeof enemyPet.skills === 'string' ? enemyPet.skills : JSON.stringify(enemyPet.skills));
+  const petSkills = typeof enemyPet.skills === 'string' ? JSON.parse(enemyPet.skills) : enemyPet.skills;
   const available = petSkills.map(id => skillsData.skills.find(s => s.id === id)).filter(Boolean);
   if (available.length === 0) {
-    return skillsData.skills.find(s => s.id === 7); // Default: tackle
+    return skillsData.skills.find(s => s.id === 61);
   }
-  // Simple AI: choose randomly, but prefer super-effective moves
   return available[Math.floor(Math.random() * available.length)];
 }
 
-/**
- * Create a wild pet encounter
- */
 function createWildPet(petId, level) {
   const petDef = petsData.pets.find(p => p.id === petId);
   if (!petDef) return null;
@@ -206,7 +454,12 @@ function createWildPet(petId, level) {
     speed: stats.speed,
     sp_attack: stats.spAttack,
     sp_defense: stats.spDefense,
-    skills: JSON.stringify(skills)
+    skills: JSON.stringify(skills),
+    statusEffects: [],
+    _critRateMult: 1.0,
+    _critUpTurns: 0,
+    _shieldHp: 0,
+    _origStats: null
   };
 }
 
@@ -216,5 +469,8 @@ module.exports = {
   executePveTurn,
   createWildPet,
   chooseEnemySkill,
-  executeAttack
+  executeAttack,
+  processTurnStartStatus,
+  canAct,
+  tickStatusEffects
 };

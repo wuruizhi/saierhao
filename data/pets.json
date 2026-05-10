@@ -20,9 +20,9 @@
       "evolution": { "to": 2, "level": 16 },
       "learnset": [
         { "level": 1, "skillId": 1 },
-        { "level": 1, "skillId": 7 },
+        { "level": 1, "skillId": 61 },
         { "level": 8, "skillId": 2 },
-        { "level": 15, "skillId": 8 }
+        { "level": 15, "skillId": 5 }
       ]
     },
     {
@@ -36,11 +36,11 @@
       "evolution": { "to": 3, "level": 36 },
       "learnset": [
         { "level": 1, "skillId": 1 },
-        { "level": 1, "skillId": 7 },
         { "level": 1, "skillId": 2 },
+        { "level": 1, "skillId": 5 },
         { "level": 16, "skillId": 3 },
         { "level": 24, "skillId": 9 },
-        { "level": 32, "skillId": 10 }
+        { "level": 32, "skillId": 7 }
       ]
     },
     {
@@ -53,12 +53,12 @@
       "growthRate": { "hp": 4.2, "attack": 4.0, "defense": 3.2, "speed": 4.0, "spAttack": 4.2, "spDefense": 3.2 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 1 },
         { "level": 1, "skillId": 2 },
         { "level": 1, "skillId": 3 },
-        { "level": 36, "skillId": 4 },
+        { "level": 1, "skillId": 7 },
+        { "level": 36, "skillId": 6 },
         { "level": 45, "skillId": 10 },
-        { "level": 55, "skillId": 11 }
+        { "level": 55, "skillId": 8 }
       ]
     },
     {
@@ -71,10 +71,10 @@
       "growthRate": { "hp": 3.4, "attack": 2.2, "defense": 2.6, "speed": 2.6, "spAttack": 3.0, "spDefense": 2.8 },
       "evolution": { "to": 5, "level": 16 },
       "learnset": [
-        { "level": 1, "skillId": 5 },
-        { "level": 1, "skillId": 7 },
-        { "level": 8, "skillId": 6 },
-        { "level": 14, "skillId": 12 }
+        { "level": 1, "skillId": 11 },
+        { "level": 1, "skillId": 61 },
+        { "level": 8, "skillId": 19 },
+        { "level": 14, "skillId": 16 }
       ]
     },
     {
@@ -87,12 +87,12 @@
       "growthRate": { "hp": 3.8, "attack": 2.8, "defense": 3.0, "speed": 3.0, "spAttack": 3.6, "spDefense": 3.2 },
       "evolution": { "to": 6, "level": 36 },
       "learnset": [
-        { "level": 1, "skillId": 5 },
-        { "level": 1, "skillId": 6 },
-        { "level": 1, "skillId": 7 },
+        { "level": 1, "skillId": 11 },
+        { "level": 1, "skillId": 12 },
+        { "level": 1, "skillId": 19 },
         { "level": 16, "skillId": 13 },
-        { "level": 24, "skillId": 14 },
-        { "level": 30, "skillId": 12 }
+        { "level": 24, "skillId": 20 },
+        { "level": 30, "skillId": 17 }
       ]
     },
     {
@@ -105,12 +105,12 @@
       "growthRate": { "hp": 4.2, "attack": 3.2, "defense": 3.6, "speed": 3.4, "spAttack": 4.4, "spDefense": 3.8 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 5 },
-        { "level": 1, "skillId": 6 },
+        { "level": 1, "skillId": 12 },
         { "level": 1, "skillId": 13 },
+        { "level": 1, "skillId": 17 },
         { "level": 36, "skillId": 15 },
         { "level": 45, "skillId": 14 },
-        { "level": 55, "skillId": 16 }
+        { "level": 55, "skillId": 18 }
       ]
     },
     {
@@ -123,10 +123,10 @@
       "growthRate": { "hp": 3.0, "attack": 2.4, "defense": 2.8, "speed": 2.2, "spAttack": 2.8, "spDefense": 3.0 },
       "evolution": { "to": 8, "level": 16 },
       "learnset": [
-        { "level": 1, "skillId": 17 },
-        { "level": 1, "skillId": 7 },
-        { "level": 8, "skillId": 18 },
-        { "level": 14, "skillId": 19 }
+        { "level": 1, "skillId": 21 },
+        { "level": 1, "skillId": 61 },
+        { "level": 8, "skillId": 22 },
+        { "level": 14, "skillId": 24 }
       ]
     },
     {
@@ -139,12 +139,12 @@
       "growthRate": { "hp": 3.6, "attack": 3.0, "defense": 3.4, "speed": 2.8, "spAttack": 3.4, "spDefense": 3.4 },
       "evolution": { "to": 9, "level": 36 },
       "learnset": [
-        { "level": 1, "skillId": 17 },
-        { "level": 1, "skillId": 18 },
-        { "level": 1, "skillId": 7 },
-        { "level": 16, "skillId": 20 },
-        { "level": 24, "skillId": 19 },
-        { "level": 32, "skillId": 21 }
+        { "level": 1, "skillId": 21 },
+        { "level": 1, "skillId": 22 },
+        { "level": 1, "skillId": 24 },
+        { "level": 16, "skillId": 30 },
+        { "level": 24, "skillId": 25 },
+        { "level": 32, "skillId": 27 }
       ]
     },
     {
@@ -157,12 +157,12 @@
       "growthRate": { "hp": 4.4, "attack": 3.4, "defense": 4.0, "speed": 3.0, "spAttack": 3.8, "spDefense": 4.2 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 17 },
-        { "level": 1, "skillId": 18 },
-        { "level": 1, "skillId": 20 },
-        { "level": 36, "skillId": 22 },
-        { "level": 45, "skillId": 21 },
-        { "level": 55, "skillId": 23 }
+        { "level": 1, "skillId": 22 },
+        { "level": 1, "skillId": 25 },
+        { "level": 1, "skillId": 27 },
+        { "level": 36, "skillId": 29 },
+        { "level": 45, "skillId": 26 },
+        { "level": 55, "skillId": 28 }
       ]
     },
     {
@@ -175,10 +175,10 @@
       "growthRate": { "hp": 3.0, "attack": 2.8, "defense": 2.2, "speed": 4.0, "spAttack": 3.6, "spDefense": 2.6 },
       "evolution": { "to": 13, "level": 20 },
       "learnset": [
-        { "level": 1, "skillId": 24 },
-        { "level": 1, "skillId": 7 },
-        { "level": 10, "skillId": 25 },
-        { "level": 18, "skillId": 26 }
+        { "level": 1, "skillId": 31 },
+        { "level": 1, "skillId": 61 },
+        { "level": 10, "skillId": 39 },
+        { "level": 18, "skillId": 37 }
       ]
     },
     {
@@ -191,12 +191,12 @@
       "growthRate": { "hp": 3.4, "attack": 2.6, "defense": 3.0, "speed": 3.4, "spAttack": 4.0, "spDefense": 3.8 },
       "evolution": { "to": 16, "level": 40 },
       "learnset": [
-        { "level": 1, "skillId": 29 },
         { "level": 1, "skillId": 41 },
-        { "level": 1, "skillId": 7 },
-        { "level": 20, "skillId": 30 },
-        { "level": 28, "skillId": 31 },
-        { "level": 36, "skillId": 32 }
+        { "level": 1, "skillId": 49 },
+        { "level": 1, "skillId": 44 },
+        { "level": 20, "skillId": 43 },
+        { "level": 28, "skillId": 42 },
+        { "level": 36, "skillId": 46 }
       ]
     },
     {
@@ -209,12 +209,12 @@
       "growthRate": { "hp": 3.0, "attack": 4.0, "defense": 2.6, "speed": 4.2, "spAttack": 3.2, "spDefense": 2.8 },
       "evolution": { "to": 18, "level": 40 },
       "learnset": [
-        { "level": 1, "skillId": 34 },
-        { "level": 1, "skillId": 43 },
-        { "level": 1, "skillId": 7 },
-        { "level": 20, "skillId": 35 },
-        { "level": 28, "skillId": 36 },
-        { "level": 36, "skillId": 37 }
+        { "level": 1, "skillId": 51 },
+        { "level": 1, "skillId": 59 },
+        { "level": 1, "skillId": 56 },
+        { "level": 20, "skillId": 52 },
+        { "level": 28, "skillId": 54 },
+        { "level": 36, "skillId": 57 }
       ]
     },
     {
@@ -227,12 +227,12 @@
       "growthRate": { "hp": 3.6, "attack": 3.4, "defense": 2.6, "speed": 4.4, "spAttack": 3.8, "spDefense": 2.8 },
       "evolution": { "to": 14, "level": 40 },
       "learnset": [
-        { "level": 1, "skillId": 24 },
-        { "level": 1, "skillId": 25 },
-        { "level": 1, "skillId": 26 },
-        { "level": 20, "skillId": 39 },
-        { "level": 30, "skillId": 27 },
-        { "level": 38, "skillId": 28 }
+        { "level": 1, "skillId": 31 },
+        { "level": 1, "skillId": 32 },
+        { "level": 1, "skillId": 39 },
+        { "level": 20, "skillId": 34 },
+        { "level": 30, "skillId": 33 },
+        { "level": 38, "skillId": 36 }
       ]
     },
     {
@@ -245,12 +245,12 @@
       "growthRate": { "hp": 4.0, "attack": 3.8, "defense": 3.2, "speed": 4.8, "spAttack": 4.4, "spDefense": 3.2 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 24 },
-        { "level": 1, "skillId": 26 },
-        { "level": 1, "skillId": 39 },
-        { "level": 40, "skillId": 27 },
-        { "level": 50, "skillId": 28 },
-        { "level": 60, "skillId": 40 }
+        { "level": 1, "skillId": 32 },
+        { "level": 1, "skillId": 34 },
+        { "level": 1, "skillId": 35 },
+        { "level": 40, "skillId": 36 },
+        { "level": 50, "skillId": 40 },
+        { "level": 60, "skillId": 38 }
       ]
     },
     {
@@ -263,10 +263,10 @@
       "growthRate": { "hp": 2.8, "attack": 2.0, "defense": 2.4, "speed": 3.0, "spAttack": 2.8, "spDefense": 2.6 },
       "evolution": { "to": 11, "level": 20 },
       "learnset": [
-        { "level": 1, "skillId": 41 },
-        { "level": 1, "skillId": 7 },
-        { "level": 8, "skillId": 29 },
-        { "level": 16, "skillId": 30 }
+        { "level": 1, "skillId": 49 },
+        { "level": 1, "skillId": 61 },
+        { "level": 8, "skillId": 41 },
+        { "level": 16, "skillId": 44 }
       ]
     },
     {
@@ -279,12 +279,12 @@
       "growthRate": { "hp": 4.0, "attack": 3.0, "defense": 3.4, "speed": 3.8, "spAttack": 4.6, "spDefense": 4.2 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 29 },
-        { "level": 1, "skillId": 31 },
-        { "level": 1, "skillId": 32 },
-        { "level": 40, "skillId": 33 },
-        { "level": 50, "skillId": 30 },
-        { "level": 60, "skillId": 42 }
+        { "level": 1, "skillId": 42 },
+        { "level": 1, "skillId": 43 },
+        { "level": 1, "skillId": 46 },
+        { "level": 40, "skillId": 45 },
+        { "level": 50, "skillId": 47 },
+        { "level": 60, "skillId": 48 }
       ]
     },
     {
@@ -297,10 +297,10 @@
       "growthRate": { "hp": 2.6, "attack": 2.6, "defense": 2.0, "speed": 3.2, "spAttack": 2.4, "spDefense": 2.2 },
       "evolution": { "to": 12, "level": 20 },
       "learnset": [
-        { "level": 1, "skillId": 43 },
-        { "level": 1, "skillId": 7 },
-        { "level": 8, "skillId": 34 },
-        { "level": 16, "skillId": 35 }
+        { "level": 1, "skillId": 59 },
+        { "level": 1, "skillId": 61 },
+        { "level": 8, "skillId": 51 },
+        { "level": 16, "skillId": 53 }
       ]
     },
     {
@@ -313,12 +313,12 @@
       "growthRate": { "hp": 3.8, "attack": 4.6, "defense": 3.2, "speed": 4.4, "spAttack": 3.6, "spDefense": 3.2 },
       "evolution": null,
       "learnset": [
-        { "level": 1, "skillId": 34 },
-        { "level": 1, "skillId": 36 },
-        { "level": 1, "skillId": 37 },
-        { "level": 40, "skillId": 38 },
-        { "level": 50, "skillId": 35 },
-        { "level": 60, "skillId": 44 }
+        { "level": 1, "skillId": 52 },
+        { "level": 1, "skillId": 54 },
+        { "level": 1, "skillId": 55 },
+        { "level": 40, "skillId": 57 },
+        { "level": 50, "skillId": 60 },
+        { "level": 60, "skillId": 58 }
       ]
     }
   ]

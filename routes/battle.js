@@ -110,7 +110,7 @@ function createBattleRouter(db, sceneManager) {
       sceneIndex,
       playerTeam: teamPets,
       activeTeamIndex: 0,
-      activePet: { ...firstTeamPet, skills: JSON.parse(firstTeamPet.skills) },
+      activePet: { ...firstTeamPet, skills: JSON.parse(firstTeamPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null },
       wildPet,
       wildPetOriginal: { ...wildPet },
       isBoss,
@@ -204,7 +204,7 @@ function createBattleRouter(db, sceneManager) {
         if (battle.activeTeamIndex < battle.playerTeam.length) {
           const nextPet = battle.playerTeam[battle.activeTeamIndex];
           if (nextPet.current_hp > 0) {
-            battle.activePet = { ...nextPet, skills: JSON.parse(nextPet.skills) };
+            battle.activePet = { ...nextPet, skills: JSON.parse(nextPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null };
             return res.json({
               ...result,
               battleEnd: false,
@@ -242,11 +242,6 @@ function createBattleRouter(db, sceneManager) {
     const battle = activeBattles.get(battleId);
     if (!battle || battle.userId !== req.userId) {
       return res.status(400).json({ error: '战斗不存在' });
-    }
-
-    // Boss cannot be captured
-    if (battle.isBoss) {
-      return res.status(400).json({ error: 'Boss精灵不能捕获！需要击败它获取精元' });
     }
 
     // Check capsule
@@ -293,18 +288,29 @@ function createBattleRouter(db, sceneManager) {
         db, player.id, wp.pet_id, wp.level, inTeam, inTeam ? teamCount : -1
       );
 
+      // Legend capsule: boost to level 30
+      if (capsuleId === 'capsule_legend') {
+        const targetLevel = 30;
+        const currentLevel = wp.level;
+        if (targetLevel > currentLevel) {
+          const neededExp = petsData.expTable.slice(currentLevel + 1, targetLevel + 1).reduce((a, b) => a + b, 0);
+          addExp(db, instanceId, neededExp);
+        }
+      }
+
       db.prepare('UPDATE player_pets SET current_hp = ? WHERE id = ?')
         .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
 
       activeBattles.delete(battleId);
       const petDef = petsData.pets.find(p => p.id === wp.pet_id);
+      const capturedPet = db.prepare('SELECT * FROM player_pets WHERE id = ?').get(instanceId);
       res.json({
         captured: true,
         captureRate,
         capsuleUsed: capsuleDef.name,
-        pet: { id: instanceId, ...wp, petDef },
+        pet: capturedPet ? { ...capturedPet, skills: JSON.parse(capturedPet.skills), petDef } : { id: instanceId, ...wp, petDef },
         inTeam,
-        message: `使用${capsuleDef.name}成功捕获了${petDef.name}！${inTeam ? '已加入队伍' : '已存入仓库'}`
+        message: `使用${capsuleDef.name}成功捕获了${petDef.name}！${inTeam ? '已加入队伍' : '已存入仓库'}${capsuleId==='capsule_legend'?' 已直升30级！':''}`
       });
     } else {
       // Wild pet attacks back

@@ -108,6 +108,115 @@ function createPlayerRouter(db) {
     res.json({ pets: petsData.pets, skills: skillsData.skills });
   });
 
+  // Get skills data
+  router.get('/skills', authMiddleware, (req, res) => {
+    res.json({ skills: skillsData.skills });
+  });
+
+  // Use stat booster on a pet
+  router.post('/use-booster', authMiddleware, (req, res) => {
+    const { petInstanceId, boosterId } = req.body;
+    const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
+    if (!pet) return res.status(404).json({ error: '精灵不存在' });
+
+    const booster = (itemsData.boosters || []).find(b => b.id === boosterId);
+    if (!booster) return res.status(400).json({ error: '强化剂不存在' });
+
+    const item = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, boosterId);
+    if (!item || item.quantity < 1) {
+      return res.status(400).json({ error: '强化剂数量不足' });
+    }
+
+    db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(item.id);
+
+    // Apply stat boost
+    if (booster.stat === 'all') {
+      db.prepare(`UPDATE player_pets SET
+        max_hp = CAST(max_hp * ? AS INTEGER),
+        current_hp = CAST(current_hp * ? AS INTEGER),
+        attack = CAST(attack * ? AS INTEGER),
+        defense = CAST(defense * ? AS INTEGER),
+        speed = CAST(speed * ? AS INTEGER),
+        sp_attack = CAST(sp_attack * ? AS INTEGER),
+        sp_defense = CAST(sp_defense * ? AS INTEGER)
+        WHERE id = ?`).run(booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, petInstanceId);
+    } else if (booster.stat === 'hp') {
+      db.prepare(`UPDATE player_pets SET max_hp = CAST(max_hp * ? AS INTEGER), current_hp = CAST(current_hp * ? AS INTEGER) WHERE id = ?`)
+        .run(booster.multiplier, booster.multiplier, petInstanceId);
+    } else {
+      const dbStat = booster.stat === 'spAttack' ? 'sp_attack' : booster.stat === 'spDefense' ? 'sp_defense' : booster.stat;
+      db.prepare(`UPDATE player_pets SET ${dbStat} = CAST(${dbStat} * ? AS INTEGER) WHERE id = ?`)
+        .run(booster.multiplier, petInstanceId);
+    }
+
+    const updatedPet = db.prepare('SELECT * FROM player_pets WHERE id = ?').get(petInstanceId);
+    res.json({
+      success: true,
+      message: `对${updatedPet.nickname}使用了${booster.name}，属性已提升！`,
+      pet: { ...updatedPet, skills: JSON.parse(updatedPet.skills), petDef: petsData.pets.find(p => p.id === updatedPet.pet_id) }
+    });
+  });
+
+  // Use special item (level boost, evolve stone, reset stats)
+  router.post('/use-special-item', authMiddleware, (req, res) => {
+    const { petInstanceId, itemId } = req.body;
+    const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
+    if (!pet) return res.status(404).json({ error: '精灵不存在' });
+
+    const specialItem = itemsData.others.find(o => o.id === itemId);
+    if (!specialItem) return res.status(400).json({ error: '道具不存在' });
+
+    const item = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
+    if (!item || item.quantity < 1) {
+      return res.status(400).json({ error: '道具数量不足' });
+    }
+
+    db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(item.id);
+
+    let message = '';
+    let levelResult = null;
+
+    if (itemId === 'level_boost') {
+      const newLevel = Math.min(100, parseInt(pet.level) + 10);
+      const neededExp = petsData.expTable.slice(parseInt(pet.level) + 1, newLevel + 1).reduce((a, b) => a + b, 0);
+      levelResult = addExp(db, petInstanceId, neededExp);
+      message = `${pet.nickname}直升了10级！`;
+    } else if (itemId === 'evolve_stone') {
+      const petDef = petsData.pets.find(p => p.id === pet.pet_id);
+      if (!petDef || !petDef.evolution) {
+        return res.status(400).json({ error: '该精灵已无法进化' });
+      }
+      const neededExp = petsData.expTable[petDef.evolution.level] - petsData.expTable[parseInt(pet.level)];
+      if (neededExp > 0) {
+        levelResult = addExp(db, petInstanceId, Math.max(neededExp, 1));
+      }
+      message = `${pet.nickname}进化了！`;
+    } else if (itemId === 'reset_stats') {
+      const petDef = petsData.pets.find(p => p.id === pet.pet_id);
+      if (petDef) {
+        const { calculateStats } = require('../game/pet-manager');
+        const baseStats = calculateStats(pet.pet_id, parseInt(pet.level));
+        db.prepare(`UPDATE player_pets SET
+          max_hp = ?, current_hp = ?, attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?
+          WHERE id = ?`).run(
+          baseStats.hp, Math.min(pet.current_hp, baseStats.hp),
+          baseStats.attack, baseStats.defense, baseStats.speed,
+          baseStats.spAttack, baseStats.spDefense,
+          petInstanceId
+        );
+      }
+      message = `${pet.nickname}的属性已重置为基础值！`;
+    }
+
+    res.json({ success: true, message, levelResult });
+  });
+
   // Use experience candy on a pet
   router.post('/use-candy', authMiddleware, (req, res) => {
     const { petInstanceId, candyId, quantity = 1 } = req.body;
