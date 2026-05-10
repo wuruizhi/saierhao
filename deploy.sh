@@ -23,6 +23,7 @@ echo "✅ Node.js $(node -v)"
 # 2. 安装依赖
 echo "📦 安装项目依赖..."
 npm install --omit=dev
+npm rebuild
 
 # 3. 安装 pm2
 if ! command -v pm2 &> /dev/null; then

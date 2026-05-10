@@ -96,7 +96,7 @@ async function loadHub(data){
 }
 
 document.querySelectorAll('.hub-nav-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{ showSection(btn.dataset.section); if(btn.dataset.section==='team') refreshTeam(); });
+  btn.addEventListener('click',()=>{ showSection(btn.dataset.section); if(btn.dataset.section==='team'){ refreshTeam(); if(window.loadEssences) loadEssences(); } if(btn.dataset.section==='shop' && window.loadShop) loadShop(); });
 });
 
 // ===== PLANETS =====
@@ -114,7 +114,7 @@ async function loadPlanets(){
       card.className = `planet-card glass-card${locked?' locked':''}`;
       card.style.setProperty('--planet-color', colors[m.theme]||'#00f5d4');
       card.innerHTML = `<div class="planet-icon">${PLANET_ICONS[m.id]||'🪐'}</div><div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked?`需要精灵达到 Lv.${m.requiredLevel}`:'可以探索'}</div>`;
-      if(!locked) card.addEventListener('click',()=>startExplore(m.id));
+      if(!locked) card.addEventListener('click',()=>{ if(window.showPlanetDetail) showPlanetDetail(m.id); else startExplore(m.id); });
       grid.appendChild(card);
     });
   } catch(err){ toast(err.message,'error'); }
@@ -188,9 +188,10 @@ document.getElementById('heal-btn').addEventListener('click', async()=>{
 // ===== BATTLE =====
 async function startExplore(mapId){
   try {
-    const data = await API.explore(mapId);
+    const data = await API.explore(mapId, 0);
     currentBattleId = data.battleId;
     showScreen('battle');
+    document.getElementById('btn-capture').style.display = '';
     setupBattle(data.playerPet, data.wildPet);
   } catch(err){ toast(err.message,'error'); }
 }
@@ -257,7 +258,10 @@ async function doBattleAction(skillId){
     if(r.battleEnd){
       currentBattleId = null;
       if(r.playerWin){
-        const p=document.createElement('p'); p.textContent=`🎉 胜利！获得 ${r.expGain} 经验值！`; p.style.color='var(--neon-cyan)'; log.appendChild(p);
+        const p=document.createElement('p'); p.textContent=`🎉 胜利！获得 ${r.expGain} 经验 ${r.moneyGain?'+ '+r.moneyGain+'💰':''}`; p.style.color='var(--neon-cyan)'; log.appendChild(p);
+        if(r.bossReward){
+          const bp=document.createElement('p'); bp.textContent=`👑 Boss奖励：${r.bossReward.essenceName} + ${r.bossReward.money}💰`; bp.style.color='#ffd700'; log.appendChild(bp);
+        }
         if(r.levelResult?.evolved){
           setTimeout(()=>showEvolution(r.levelResult), 1500);
         }
@@ -267,30 +271,25 @@ async function doBattleAction(skillId){
       } else {
         const p=document.createElement('p'); p.textContent='😢 战斗失败...'; p.style.color='var(--hp-red)'; log.appendChild(p);
       }
-      setTimeout(()=>{ showScreen('hub'); loadPlanets(); refreshTeam(); }, r.playerWin&&r.levelResult?.evolved?4000:2500);
+      const retFn = window.returnFromBattle || (()=>{ showScreen('hub'); loadPlanets(); refreshTeam(); });
+      setTimeout(retFn, r.playerWin&&r.levelResult?.evolved?4000:2500);
       return;
     }
   } catch(err){ toast(err.message,'error'); }
   document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
 }
 
-// Capture
-document.getElementById('btn-capture').addEventListener('click', async()=>{
+// Capture - now uses capsule modal
+document.getElementById('btn-capture').addEventListener('click', ()=>{
   if(!currentBattleId) return;
-  try {
-    const r = await API.capture(currentBattleId);
-    const log = document.getElementById('battle-log');
-    const p=document.createElement('p'); p.textContent=r.message; p.style.color=r.captured?'var(--neon-purple)':'var(--hp-red)'; log.appendChild(p);
-    log.scrollTop = log.scrollHeight;
-    if(r.captured){ currentBattleId=null; toast(`捕获成功！${r.inTeam?'已加入队伍':'已存入仓库'}`); setTimeout(()=>{ showScreen('hub'); refreshTeam(); },2000); }
-    else if(r.playerPet){ updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp); }
-  } catch(err){ toast(err.message,'error'); }
+  if(window.showCapsuleSelect) showCapsuleSelect();
+  else toast('请先购买胶囊','error');
 });
 
 // Run
 document.getElementById('btn-run').addEventListener('click', async()=>{
   if(!currentBattleId) return;
-  try { await API.runAway(currentBattleId); currentBattleId=null; toast('成功逃跑！'); showScreen('hub'); }
+  try { await API.runAway(currentBattleId); currentBattleId=null; toast('成功逃跑！'); const retFn = window.returnFromBattle || (()=>showScreen('hub')); retFn(); }
   catch(err){ toast(err.message,'error'); }
 });
 
