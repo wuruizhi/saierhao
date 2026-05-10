@@ -118,7 +118,7 @@ async function loadPlanets(){
       card.className = `planet-card glass-card${locked?' locked':''}`;
       card.style.setProperty('--planet-color', colors[m.theme]||'#00f5d4');
       card.innerHTML = `<div class="planet-icon">${PLANET_ICONS[m.id]||'🪐'}</div><div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked?`需要精灵达到 Lv.${m.requiredLevel}`:'可以探索'}</div>`;
-      if(!locked) card.addEventListener('click',()=>{ if(window.showPlanetDetail) showPlanetDetail(m.id); else startExplore(m.id); });
+      if(!locked) card.addEventListener('click',()=>{ goToPlanet(m.id); });
       grid.appendChild(card);
     });
   } catch(err){ toast(err.message,'error'); }
@@ -201,6 +201,15 @@ document.getElementById('heal-btn').addEventListener('click', async()=>{
 });
 
 // ===== BATTLE =====
+function goToPlanet(mapId) {
+  if (window.showPlanetDetail && typeof window.showPlanetDetail === 'function') {
+    window.showPlanetDetail(mapId);
+  } else if (typeof startExplore === 'function') {
+    startExplore(mapId);
+  }
+}
+window.goToPlanet = goToPlanet;
+
 async function startExplore(mapId){
   try {
     const data = await API.explore(mapId, 0);
