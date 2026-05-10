@@ -507,8 +507,8 @@ html, body {
 }
 .player-img-wrapper {
   position: relative; transition: transform .1s;
-  border-radius: 50%; overflow: hidden;
-  background: radial-gradient(circle, rgba(200,220,255,0.9) 40%, rgba(0,245,212,0.3) 80%, transparent 100%);
+  border-radius: 50%; overflow: visible;
+  background: radial-gradient(circle, rgba(0,245,212,0.18) 0%, rgba(0,245,212,0.08) 56%, transparent 78%);
   width: 64px; height: 64px;
 }
 .player-sprite {

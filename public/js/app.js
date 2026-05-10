@@ -200,16 +200,59 @@ document.getElementById('heal-btn').addEventListener('click', async()=>{
   catch(err){ toast(err.message,'error'); }
 });
 
-// ===== BATTLE =====
+// ===== PLANET DETAIL (fully self-contained) =====
+async function showPlanetDetail(mapId) {
+  console.log('[showPlanetDetail] START mapId:', mapId);
+  try {
+    const { maps } = await API.getMaps();
+    const map = maps.find(m => m.id === mapId);
+    if (!map) { toast('星球不存在', 'error'); return; }
+    const profile = await API.profile();
+    const maxLv = Math.max(...(profile.teamPets.length ? profile.teamPets.map(p=>p.level) : [1]));
+    document.getElementById('planet-detail-title').textContent = `${PLANET_ICONS[map.id]||'🪐'} ${map.name}`;
+    document.getElementById('planet-detail-desc').textContent = map.description;
+    const grid = document.getElementById('scene-select-grid');
+    grid.innerHTML = '';
+    (map.scenes||[]).forEach((sc, idx) => {
+      const locked = maxLv < (sc.requiredLevel || 1);
+      const card = document.createElement('div');
+      card.className = `scene-card glass-card${locked?' locked':''}`;
+      card.innerHTML = `<div class="scene-icon">${sc.icon}</div><div class="scene-card-name">${sc.name}</div><div class="scene-card-desc">${sc.description}</div><div class="scene-card-level">${locked?'🔒 需要 Lv.'+sc.requiredLevel:'Lv.'+sc.wildPets[0].minLevel+'-'+sc.wildPets[sc.wildPets.length-1].maxLevel}</div>${sc.boss?'<div class="scene-boss-tag">👑 Boss</div>':''}`;
+      if (!locked) card.addEventListener('click', () => enterScene(mapId, idx));
+      grid.appendChild(card);
+    });
+    showScreen('planet-detail');
+    console.log('[showPlanetDetail] END - showed planet-detail screen with', map.scenes.length, 'scenes');
+  } catch(e) { console.error('[showPlanetDetail] ERROR:', e); toast(e.message, 'error'); }
+}
+
+// Planet card click entry point
 function goToPlanet(mapId) {
-  if (window.showPlanetDetail && typeof window.showPlanetDetail === 'function') {
-    window.showPlanetDetail(mapId);
-  } else if (typeof startExplore === 'function') {
-    startExplore(mapId);
-  }
+  console.log('[goToPlanet] mapId:', mapId, 'typeof showPlanetDetail:', typeof showPlanetDetail);
+  showPlanetDetail(mapId);
 }
 window.goToPlanet = goToPlanet;
 
+// Scene entry: tries 3D exploration (scene.js), falls back to direct battle
+async function enterScene(mapId, sceneIndex) {
+  console.log('[enterScene] mapId:', mapId, 'sceneIndex:', sceneIndex, 'has enterScene3D:', typeof window.enterScene3D);
+  if (window.enterScene3D && typeof window.enterScene3D === 'function') {
+    return window.enterScene3D(mapId, sceneIndex);
+  }
+  // Fallback: direct battle
+  try {
+    const data = await API.explore(mapId, sceneIndex);
+    currentBattleId = data.battleId;
+    showScreen('battle');
+    document.getElementById('btn-capture').style.display = '';
+    if (data.wildPet?.isBoss) {
+      document.getElementById('battle-log').innerHTML = '<p style="color:#ffd700;font-weight:bold">👑 Boss出现了！</p>';
+    }
+    setupBattle(data.playerPet, data.wildPet);
+  } catch(err) { toast(err.message,'error'); }
+}
+
+// Legacy
 async function startExplore(mapId){
   try {
     const data = await API.explore(mapId, 0);

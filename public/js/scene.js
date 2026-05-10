@@ -7,11 +7,11 @@ const SCENE_BACKGROUNDS = {
   water: '/img/scenes/water.png',
   grass: '/img/scenes/grass.png',
   electric: '/img/scenes/electric.png',
-  dark: '/img/scenes/dark.png'
+  dark: '/img/scenes/dark.png',
+  neutral: '/img/scenes/light-twilight.png'
 };
 
-// Planet icons
-const PLANET_ICONS = window.PLANET_ICONS || {1:'🔥',2:'🌊',3:'🌿',4:'⚡',5:'🌙'};
+// Planet icons (defined in app.js, accessible globally)
 
 // ===== PLAYER AVATAR STATE =====
 let playerAvatar = null;
@@ -19,34 +19,19 @@ let playerPos = { x: 50, y: 75 }; // percentage
 let playerMoving = false;
 let playerMoveAnim = null;
 
-// ===== PLANET DETAIL =====
-window.showPlanetDetail = async function(mapId) {
-  try {
-    const {maps} = await API.getMaps();
-    const map = maps.find(m => m.id === mapId);
-    if (!map) return;
-    const profile = await API.profile();
-    const maxLv = Math.max(...(profile.teamPets.length ? profile.teamPets.map(p=>p.level) : [1]));
-    document.getElementById('planet-detail-title').textContent = `${PLANET_ICONS[map.id]||'🪐'} ${map.name}`;
-    document.getElementById('planet-detail-desc').textContent = map.description;
-    const grid = document.getElementById('scene-select-grid');
-    grid.innerHTML = '';
-    (map.scenes||[]).forEach((sc, idx) => {
-      const locked = maxLv < sc.requiredLevel;
-      const card = document.createElement('div');
-      card.className = `scene-card glass-card${locked?' locked':''}`;
-      card.innerHTML = `<div class="scene-icon">${sc.icon}</div><div class="scene-card-name">${sc.name}</div><div class="scene-card-desc">${sc.description}</div><div class="scene-card-level">${locked?'🔒 需要 Lv.'+sc.requiredLevel:'Lv.'+sc.wildPets[0].minLevel+'-'+sc.wildPets[sc.wildPets.length-1].maxLevel}</div>${sc.boss?'<div class="scene-boss-tag">👑 Boss</div>':''}`;
-      if (!locked) card.addEventListener('click', () => enterScene(mapId, idx));
-      grid.appendChild(card);
-    });
-    showScreen('planet-detail');
-  } catch(e) { toast(e.message,'error'); }
-};
-
+// Planet detail & scene selection is handled by app.js (goToPlanet → showPlanetDetail)
+// Scene back button returns to planet detail
+document.getElementById('scene-back').addEventListener('click', () => {
+  stopSceneRefresh();
+  if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
+  playerMoving = false;
+  if (currentMapId) { if (window.goToPlanet) window.goToPlanet(currentMapId); else showScreen('hub'); }
+  else showScreen('hub');
+});
 document.getElementById('planet-detail-back').addEventListener('click', () => { showScreen('hub'); });
 
 // ===== SCENE EXPLORE =====
-async function enterScene(mapId, sceneIndex) {
+async function enterScene3D(mapId, sceneIndex) {
   currentMapId = mapId; currentSceneIndex = sceneIndex;
   playerPos = { x: 50, y: 80 }; // Reset player position
   try {
@@ -54,10 +39,12 @@ async function enterScene(mapId, sceneIndex) {
     document.getElementById('scene-name').textContent = `${data.scene.icon} ${data.mapName} · ${data.scene.name}`;
     const vp = document.getElementById('scene-viewport');
     
-    // Set background image based on planet theme
+    // Prefer scene-specific art, then fall back to the planet theme.
     const theme = data.mapTheme || 'fire';
-    const bgUrl = SCENE_BACKGROUNDS[theme] || SCENE_BACKGROUNDS.fire;
-    vp.style.background = `url(${bgUrl}) center/cover no-repeat`;
+    const bgUrl = data.scene?.backgroundImage || SCENE_BACKGROUNDS[theme] || SCENE_BACKGROUNDS.fire;
+    vp.style.background = bgUrl
+      ? `url("${bgUrl}") center/cover no-repeat`
+      : (data.scene?.bgGradient || SCENE_BACKGROUNDS.fire);
     vp.style.position = 'relative';
     
     renderSceneSpawns(vp, data.spawns);
@@ -279,13 +266,6 @@ function startSceneRefresh() {
 }
 function stopSceneRefresh() { if (sceneRefreshTimer) { clearInterval(sceneRefreshTimer); sceneRefreshTimer = null; } }
 
-document.getElementById('scene-back').addEventListener('click', () => {
-  stopSceneRefresh();
-  if (playerMoveAnim) cancelAnimationFrame(playerMoveAnim);
-  playerMoving = false;
-  if (currentMapId) showPlanetDetail(currentMapId);
-  else showScreen('hub');
-});
 
 // ===== SHOP =====
 async function loadShop() {
@@ -508,4 +488,4 @@ async function useSpecialItem(petInstanceId, itemId, itemName) {
 window.returnFromBattle = returnFromBattle;
 window.loadShop = loadShop;
 window.loadEssences = loadEssences;
-window.enterScene = enterScene;
+window.enterScene3D = enterScene3D;

@@ -36,14 +36,14 @@ function renderPetSprite(container, petId, size) {
   // Wrapper with breathing + float animation
   const wrapper = document.createElement('div');
   wrapper.className = 'pet-anim-wrapper';
-  wrapper.style.cssText = `width:${s}px;height:${s}px;position:relative;border-radius:50%;overflow:hidden;`;
+  wrapper.style.cssText = `width:${s}px;height:${s}px;position:relative;border-radius:50%;overflow:visible;`;
 
   // Glow layer
   const glow = document.createElement('div');
   glow.className = 'pet-glow';
   glow.style.cssText = `
     position:absolute;inset:0;border-radius:50%;
-    background:radial-gradient(circle,rgba(240,240,255,0.95) 40%,${colors.glow} 75%,transparent 100%);
+    background:radial-gradient(circle,${colors.glow} 0%,rgba(255,255,255,0.08) 42%,transparent 78%);
     animation:pet-glow-pulse 2.5s ease-in-out infinite;
     pointer-events:none;z-index:0;
   `;
