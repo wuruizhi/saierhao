@@ -1997,7 +1997,7 @@ async function loadBase() {
     }));
 
     const petsData = await API.getBasePets();
-    allPlayerPets = petsData.pets;
+    allPlayerPets = petsData.pets || [];
     basePets = allPlayerPets.filter(p => p.in_base === 1).map(p => ({
       ...p,
       x: Math.random() * 500 + 100,
