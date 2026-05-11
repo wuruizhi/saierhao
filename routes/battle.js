@@ -5,6 +5,7 @@ const { createPetInstance, addExp, healPet } = require('../game/pet-manager');
 const mapsData = require('../data/maps.json');
 const petsData = require('../data/pets.json');
 const itemsData = require('../data/items.json');
+const storyQuestsData = require('../data/story_quests.json');
 const { incrementQuestProgress } = require('../game/quest-manager');
 
 // Store active battles in memory (per-session, cleared on server restart)
@@ -189,6 +190,67 @@ function createBattleRouter(db, sceneManager) {
         activeBattles.delete(battleId);
         incrementQuestProgress(db, battle.playerId, 'battle', 1);
         
+        // Story Quest Hook
+        try {
+          const stmt = db.prepare('SELECT * FROM player_story_quests WHERE player_id = ? AND status = "active"');
+          const activeQuests = stmt.all(battle.playerId);
+          
+          activeQuests.forEach(quest => {
+            const planetData = storyQuestsData.planets[quest.planet_id];
+            if (!planetData) return;
+            const stepData = planetData.steps.find(s => s.step === quest.quest_step);
+            if (!stepData) return;
+            
+            if (quest.planet_id === battle.mapId && (stepData.type === 'battle' || stepData.type === 'boss_battle' || stepData.type === 'npc_battle')) {
+              let validTarget = false;
+              if (Array.isArray(stepData.targetId)) {
+                validTarget = stepData.targetId.includes(battle.wildPetOriginal.pet_id);
+              } else if (stepData.targetId) {
+                validTarget = (battle.wildPetOriginal.pet_id === stepData.targetId);
+              } else {
+                validTarget = true;
+              }
+              
+              if (stepData.type === 'boss_battle' && !battle.isBoss) validTarget = false;
+              
+              if (validTarget) {
+                const newProgress = quest.progress + 1;
+                if (newProgress >= stepData.targetCount) {
+                  // Step completed
+                  const nextStepData = planetData.steps.find(s => s.step === quest.quest_step + 1);
+                  if (nextStepData) {
+                    db.prepare('UPDATE player_story_quests SET quest_step = ?, progress = 0 WHERE id = ?').run(quest.quest_step + 1, quest.id);
+                  } else {
+                    db.prepare('UPDATE player_story_quests SET status = "completed" WHERE id = ?').run(quest.id);
+                  }
+                  
+                  // Grant rewards
+                  if (stepData.rewards) {
+                    if (stepData.rewards.money) {
+                      db.prepare('UPDATE players SET money = money + ? WHERE id = ?').run(stepData.rewards.money, battle.playerId);
+                    }
+                    if (stepData.rewards.exp) {
+                      addExp(db, battle.activePet.id, stepData.rewards.exp);
+                    }
+                    if (stepData.rewards.items) {
+                      for (const [itemId, quantity] of Object.entries(stepData.rewards.items)) {
+                        const itemCheck = db.prepare('SELECT id FROM player_items WHERE player_id = ? AND item_id = ?').get(battle.playerId, itemId);
+                        if (itemCheck) {
+                          db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(quantity, itemCheck.id);
+                        } else {
+                          db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(battle.playerId, itemId, quantity);
+                        }
+                      }
+                    }
+                  }
+                } else {
+                  db.prepare('UPDATE player_story_quests SET progress = ? WHERE id = ?').run(newProgress, quest.id);
+                }
+              }
+            }
+          });
+        } catch(e) { console.error('Story quest error:', e); }
+
         return res.json({
           ...result,
           battleEnd: true,

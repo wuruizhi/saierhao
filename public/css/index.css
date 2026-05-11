@@ -1692,3 +1692,128 @@ input:checked + .toggle-slider:before {
   border-color: rgba(0,0,0,0.7) transparent transparent transparent;
 }
 
+
+/* ===== QUEST TRACKER ===== */
+.quest-tracker-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 250px;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none; /* Let clicks pass through */
+}
+.quest-tracker-title {
+  font-size: 13px;
+  color: var(--neon-cyan);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 4px;
+}
+.quest-tracker-item {
+  font-size: 12px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px #000;
+}
+.quest-tracker-progress {
+  color: var(--neon-blue);
+  font-weight: 700;
+}
+
+/* ===== DIALOGUE SYSTEM ===== */
+.dialogue-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 40px;
+  background: rgba(0,0,0,0.4);
+}
+.dialogue-overlay.active {
+  display: flex;
+}
+.dialogue-box {
+  width: 90%;
+  max-width: 800px;
+  height: 160px;
+  display: flex;
+  position: relative;
+  border: 2px solid var(--glass-border);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 245, 212, 0.1);
+  animation: slide-up 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+@keyframes slide-up {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.dialogue-avatar {
+  width: 140px;
+  height: 140px;
+  margin-top: -30px;
+  margin-left: 20px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  filter: drop-shadow(0 0 10px rgba(0,245,212,0.3));
+}
+.dialogue-content-area {
+  flex: 1;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+}
+.dialogue-name {
+  font-size: 18px;
+  color: var(--neon-cyan);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.dialogue-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  flex: 1;
+}
+.dialogue-hint {
+  align-self: flex-end;
+  font-size: 12px;
+  color: var(--text-dim);
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Quest List in Hub */
+#story-quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.story-quest-card {
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.story-quest-info h4 {
+  color: var(--neon-cyan);
+  margin-bottom: 4px;
+}
+.story-quest-info p {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.story-quest-status {
+  font-size: 13px;
+  font-weight: bold;
+}

@@ -127,6 +127,19 @@ function initDB() {
       UNIQUE(player_id, quest_id, quest_date),
       FOREIGN KEY (player_id) REFERENCES players(id)
     );
+
+    CREATE TABLE IF NOT EXISTS player_story_quests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      planet_id INTEGER NOT NULL,
+      quest_step INTEGER DEFAULT 0,
+      progress INTEGER DEFAULT 0,
+      status TEXT DEFAULT 'active', -- 'active', 'completed'
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(player_id, planet_id),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
+
     CREATE TABLE IF NOT EXISTS redemption_codes (
       code TEXT PRIMARY KEY,
       reward_money INTEGER DEFAULT 0,

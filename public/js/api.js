@@ -57,10 +57,12 @@ const API = {
   // Achievements
   getAchievements() { return this.request('GET', '/player/achievements'); },
   checkAchievements() { return this.request('POST', '/player/check-achievements'); },
-  // Daily Quests
   getDailyQuests() { return this.request('GET', '/player/daily-quests'); },
   questProgress(questType) { return this.request('POST', '/player/quest-progress', { questType }); },
   claimQuestReward(questDbId) { return this.request('POST', '/player/claim-quest-reward', { questDbId }); },
+  // Story Quests
+  getStoryQuests() { return this.request('GET', '/quests/story'); },
+  advanceStoryQuest(planetId) { return this.request('POST', '/quests/story/advance', { planetId }); },
   // Gacha
   getGachaPools() { return this.request('GET', '/player/gacha-pools'); },
   pullGacha(poolKey) { return this.request('POST', '/player/gacha', { poolKey }); },

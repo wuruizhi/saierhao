@@ -9,6 +9,7 @@ const createPlayerRouter = require('./routes/player');
 const createBattleRouter = require('./routes/battle');
 const createShopRouter = require('./routes/shop');
 const createAdminRouter = require('./routes/admin');
+const createQuestRouter = require('./routes/quest');
 const PvpManager = require('./game/pvp-manager');
 const SceneManager = require('./game/scene-manager');
 
@@ -39,6 +40,7 @@ app.use('/api/player', createPlayerRouter(db));
 app.use('/api/battle', createBattleRouter(db, sceneManager));
 app.use('/api/shop', createShopRouter(db));
 app.use('/api/admin', createAdminRouter(db, pvpManager));
+app.use('/api/quests', createQuestRouter(db));
 
 // Admin page route
 app.get('/admin', (req, res) => {

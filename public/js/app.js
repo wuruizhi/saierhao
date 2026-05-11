@@ -167,7 +167,7 @@ async function loadHub(data){
       if(btn.dataset.section === 'wardrobe' && window.loadWardrobe) loadWardrobe();
       if(btn.dataset.section === 'pokedex') loadPokedex();
       if(btn.dataset.section === 'social') loadSocial();
-      if(btn.dataset.section === 'quests') loadDailyQuests();
+      if(btn.dataset.section === 'quests') { loadDailyQuests(); loadStoryQuests(); }
       if(btn.dataset.section === 'bag') loadBag();
       if(btn.dataset.section === 'gacha') loadGacha();
       if(btn.dataset.section === 'expedition') loadExpeditions();
@@ -419,11 +419,83 @@ async function showPlanetDetail(mapId) {
 }
 
 // Planet card click entry point
-function goToPlanet(mapId) {
-  console.log('[goToPlanet] mapId:', mapId, 'typeof showPlanetDetail:', typeof showPlanetDetail);
-  showPlanetDetail(mapId);
+async function goToPlanet(mapId) {
+  console.log('[goToPlanet] mapId:', mapId);
+  try {
+    const res = await API.getStoryQuests();
+    const planetData = res.storyData[mapId];
+    
+    if (!planetData) {
+      showPlanetDetail(mapId);
+      return;
+    }
+
+    const quest = res.quests.find(q => q.planet_id === mapId);
+    
+    if (!quest) {
+      // Quest not started yet
+      promptQuestStart(mapId, async () => {
+        // Accept
+        await API.advanceStoryQuest(mapId);
+        toast('剧情任务已开启！');
+        loadStoryQuests(); // Update global tracker
+        showPlanetDetail(mapId);
+        checkAndPlayPlanetDialogue(mapId, 0); // Check for dialogue on step 0
+      }, () => {
+        // Decline (Free explore)
+        showPlanetDetail(mapId);
+      });
+    } else if (quest.status === 'active') {
+      // Quest is active, just enter but maybe play dialogue if step is dialogue
+      showPlanetDetail(mapId);
+      checkAndPlayPlanetDialogue(mapId, quest.quest_step);
+    } else {
+      // Completed
+      showPlanetDetail(mapId);
+    }
+  } catch (e) {
+    console.error(e);
+    showPlanetDetail(mapId);
+  }
 }
 window.goToPlanet = goToPlanet;
+
+async function checkAndPlayPlanetDialogue(mapId, step) {
+  try {
+    const res = await API.getStoryQuests();
+    const planetData = res.storyData[mapId];
+    if (!planetData) return;
+    const stepData = planetData.steps.find(s => s.step === step);
+    if (!stepData || stepData.type !== 'dialogue') return;
+    
+    // Play dialogue sequence
+    let q = [];
+    stepData.dialogues.forEach(d => {
+      q.push({
+        name: d.speaker,
+        text: d.text,
+        spriteUrl: d.speaker === '赛尔' ? '/img/player.png' : null
+      });
+    });
+    
+    let idx = 0;
+    const playNext = () => {
+      if (idx < q.length) {
+        const d = q[idx++];
+        showDialogue(d.name, d.text, d.spriteUrl, playNext);
+      } else {
+        // Dialogue finished, advance quest
+        API.advanceStoryQuest(mapId).then(() => {
+          loadStoryQuests(); // refresh tracker
+        });
+      }
+    };
+    playNext();
+  } catch (e) {
+    console.error(e);
+  }
+}
+window.checkAndPlayPlanetDialogue = checkAndPlayPlanetDialogue;
 
 // Scene entry: tries 3D exploration (scene.js), falls back to direct battle
 async function enterScene(mapId, sceneIndex) {
@@ -1591,6 +1663,166 @@ async function loadDailyQuests() {
     if (dot) dot.style.display = hasClaimable ? 'block' : 'none';
   } catch(e) { toast(e.message, 'error'); }
 }
+
+// ===== STORY QUESTS =====
+async function loadStoryQuests() {
+  try {
+    const res = await API.getStoryQuests();
+    const list = document.getElementById('story-quest-list');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    // Check if the tracker should be visible globally
+    const trackerContainer = document.getElementById('quest-tracker-container');
+    const trackerContent = document.getElementById('quest-tracker-content');
+    if (trackerContent) trackerContent.innerHTML = '';
+    let hasActiveStory = false;
+
+    if (!res.quests || res.quests.length === 0) {
+      list.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无主线剧情，去各大星球探索吧！</p>';
+      if (trackerContainer) trackerContainer.style.display = 'none';
+      return;
+    }
+
+    res.quests.forEach(q => {
+      const pData = res.storyData[q.planet_id];
+      if (!pData) return;
+      
+      const stepDef = pData.steps.find(s => s.step === q.quest_step);
+      
+      const card = document.createElement('div');
+      card.className = 'story-quest-card';
+      let statusHtml = '';
+      
+      if (q.status === 'completed') {
+        statusHtml = '<span style="color:var(--hp-green)">✅ 已通关</span>';
+      } else {
+        hasActiveStory = true;
+        statusHtml = `<span style="color:var(--neon-cyan)">进行中 (${q.progress}/${stepDef ? stepDef.targetCount : 0})</span>`;
+        
+        // Populate global tracker
+        if (trackerContent && stepDef) {
+          trackerContent.innerHTML += `
+            <div class="quest-tracker-item">
+              <strong>${pData.name}</strong><br>
+              ${stepDef.description}<br>
+              <span class="quest-tracker-progress">进度: ${q.progress}/${stepDef.targetCount}</span>
+            </div>
+          `;
+        }
+      }
+
+      card.innerHTML = `
+        <div class="story-quest-info">
+          <h4>${pData.name} - 剧情任务</h4>
+          <p>${q.status === 'completed' ? '本星球的危机已经解除。' : (stepDef ? stepDef.description : '正在探索中...')}</p>
+        </div>
+        <div class="story-quest-status">
+          ${statusHtml}
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    if (trackerContainer) {
+      trackerContainer.style.display = hasActiveStory ? 'block' : 'none';
+    }
+
+  } catch(e) { console.error('Failed to load story quests:', e); }
+}
+
+// Quest tabs logic
+document.querySelectorAll('.pokedex-tabs .pokedex-tab').forEach(tab => {
+  if (tab.id === 'quest-tab-daily' || tab.id === 'quest-tab-story') {
+    tab.addEventListener('click', () => {
+      document.getElementById('quest-tab-daily').classList.remove('active');
+      document.getElementById('quest-tab-story').classList.remove('active');
+      tab.classList.add('active');
+      
+      if (tab.id === 'quest-tab-daily') {
+        document.getElementById('quest-daily-panel').style.display = 'block';
+        document.getElementById('quest-story-panel').style.display = 'none';
+        document.getElementById('quest-reset-hint').style.display = 'block';
+      } else {
+        document.getElementById('quest-daily-panel').style.display = 'none';
+        document.getElementById('quest-story-panel').style.display = 'block';
+        document.getElementById('quest-reset-hint').style.display = 'none';
+      }
+    });
+  }
+});
+
+// ===== DIALOGUE AND STORY PROMPTS =====
+let dialogueQueue = [];
+let isDialoguePlaying = false;
+
+function showDialogue(name, text, spriteUrl, callback) {
+  dialogueQueue.push({ name, text, spriteUrl, callback });
+  if (!isDialoguePlaying) {
+    playNextDialogue();
+  }
+}
+
+function playNextDialogue() {
+  if (dialogueQueue.length === 0) {
+    document.getElementById('dialogue-overlay').classList.remove('active');
+    isDialoguePlaying = false;
+    return;
+  }
+  
+  isDialoguePlaying = true;
+  const dialog = dialogueQueue.shift();
+  
+  const overlay = document.getElementById('dialogue-overlay');
+  const nameEl = document.getElementById('dialogue-name');
+  const textEl = document.getElementById('dialogue-text');
+  const avatarEl = document.getElementById('dialogue-avatar');
+  
+  nameEl.textContent = dialog.name;
+  textEl.innerHTML = dialog.text; // allow basic HTML like <span style="color:red">
+  avatarEl.style.backgroundImage = dialog.spriteUrl ? `url(${dialog.spriteUrl})` : 'none';
+  
+  overlay.classList.add('active');
+  
+  // Click to advance
+  const advance = () => {
+    overlay.removeEventListener('click', advance);
+    if (dialog.callback) dialog.callback();
+    playNextDialogue();
+  };
+  
+  // Slight delay to prevent immediate clicking if triggered by a click
+  setTimeout(() => {
+    overlay.addEventListener('click', advance);
+  }, 200);
+}
+window.showDialogue = showDialogue;
+
+function promptQuestStart(planetId, onAccept, onDecline) {
+  const modal = document.getElementById('modal-story-prompt');
+  
+  const btnAccept = document.getElementById('btn-story-accept');
+  const btnDecline = document.getElementById('btn-story-decline');
+  
+  // Remove old listeners
+  const newAccept = btnAccept.cloneNode(true);
+  const newDecline = btnDecline.cloneNode(true);
+  btnAccept.parentNode.replaceChild(newAccept, btnAccept);
+  btnDecline.parentNode.replaceChild(newDecline, btnDecline);
+  
+  newAccept.addEventListener('click', () => {
+    modal.style.display = 'none';
+    if (onAccept) onAccept();
+  });
+  
+  newDecline.addEventListener('click', () => {
+    modal.style.display = 'none';
+    if (onDecline) onDecline();
+  });
+  
+  modal.style.display = 'flex';
+}
+window.promptQuestStart = promptQuestStart;
 
 // ===== GACHA =====
 async function loadGacha() {

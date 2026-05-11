@@ -369,9 +369,18 @@
 
     <!-- Quests section -->
     <section id="section-quests" class="hub-section">
-      <h2 class="section-title">📋 每日任务</h2>
+      <h2 class="section-title">📋 任务大厅</h2>
+      <div class="pokedex-tabs">
+        <button class="pokedex-tab active" data-quest="daily" id="quest-tab-daily">📅 每日任务</button>
+        <button class="pokedex-tab" data-quest="story" id="quest-tab-story">📖 主线剧情</button>
+      </div>
       <p class="quest-reset-hint" id="quest-reset-hint"></p>
-      <div class="quest-list" id="quest-list"></div>
+      <div id="quest-daily-panel">
+        <div class="quest-list" id="quest-list"></div>
+      </div>
+      <div id="quest-story-panel" style="display:none;">
+        <div class="quest-list" id="story-quest-list"></div>
+      </div>
     </section>
 
     <!-- Bag section -->
@@ -626,6 +635,36 @@
       <div style="display: flex; gap: 10px;">
         <button class="btn btn-secondary" onclick="document.getElementById('modal-expedition-select').classList.remove('active')" style="flex:1;">取消</button>
         <button class="btn btn-primary" id="btn-submit-expedition" style="flex:1;" disabled>确认派遣</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUEST TRACKER (Global Overlay) ===== -->
+  <div id="quest-tracker-container" class="quest-tracker-container glass-card" style="display:none;">
+    <h4 class="quest-tracker-title">📍 当前剧情</h4>
+    <div id="quest-tracker-content"></div>
+  </div>
+
+  <!-- ===== DIALOGUE SYSTEM ===== -->
+  <div id="dialogue-overlay" class="dialogue-overlay">
+    <div class="dialogue-box glass-card">
+      <div class="dialogue-avatar" id="dialogue-avatar"></div>
+      <div class="dialogue-content-area">
+        <h3 class="dialogue-name" id="dialogue-name"></h3>
+        <p class="dialogue-text" id="dialogue-text"></p>
+        <p class="dialogue-hint">点击继续</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STORY PROMPT MODAL ===== -->
+  <div id="modal-story-prompt" class="modal">
+    <div class="modal-content glass-card" style="text-align: center; max-width: 400px;">
+      <h3 style="margin-bottom: 15px; color: var(--neon-cyan);">🌍 探索新星球</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;" id="story-prompt-desc">这里似乎有不寻常的事情发生，是否开始探索本星球的主线剧情？</p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" id="btn-story-decline" style="flex:1;">自由探索</button>
+        <button class="btn btn-primary" id="btn-story-accept" style="flex:1;">开启剧情</button>
       </div>
     </div>
   </div>
