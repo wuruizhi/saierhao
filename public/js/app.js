@@ -1792,7 +1792,12 @@ async function loadExpeditions() {
             <div class="quest-progress-bar"><div class="quest-progress-fill" style="width: ${percent}%"></div></div>
             <div class="quest-progress-text">剩余时间：${hours}小时 ${minutes}分钟</div>
           `;
-          btnHtml = `<button class="quest-claim-btn" disabled>进行中</button>`;
+          btnHtml = `
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-danger btn-sm" onclick="cancelExpedition(${exp.id})" title="中止派遣并召回精灵，但不会获得任何奖励">中止召回</button>
+              <button class="quest-claim-btn" disabled>进行中</button>
+            </div>
+          `;
         }
         
         div.innerHTML = `
@@ -1829,6 +1834,20 @@ window.claimExpedition = async function(id) {
   }
 };
 
+window.cancelExpedition = async function(id) {
+  if (!confirm('确定要提前召回精灵吗？中止任务将无法获得任何奖励！')) return;
+  try {
+    const res = await API.cancelExpedition(id);
+    toast(res.message, 'success');
+    loadExpeditions();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+};
+
+let selectedExpeditionPetId = null;
+let selectedExpeditionDuration = 2;
+
 document.getElementById('btn-new-expedition')?.addEventListener('click', async () => {
   try {
     const me = await API.profile();
@@ -1842,17 +1861,63 @@ document.getElementById('btn-new-expedition')?.addEventListener('click', async (
       return;
     }
     
-    const petIdxStr = prompt(`你想派遣哪只精灵？(输入精灵的序号 1-${availablePets.length})\n\n` + availablePets.map((p,i)=>`${i+1}. ${p.nickname} (Lv.${p.level})`).join('\n'));
-    if (!petIdxStr) return;
-    const petIdx = parseInt(petIdxStr);
-    if (isNaN(petIdx) || petIdx < 1 || petIdx > availablePets.length) return;
+    const grid = document.getElementById('expedition-pet-select-grid');
+    grid.innerHTML = '';
+    selectedExpeditionPetId = null;
+    document.getElementById('btn-submit-expedition').disabled = true;
     
-    const selectedPet = availablePets[petIdx - 1];
-    const duration = prompt('你想派遣多少小时？(例如：2, 4, 8)', '2');
-    if (!duration || isNaN(duration) || duration < 1) return;
+    availablePets.forEach(pet => {
+      const card = document.createElement('div');
+      card.className = 'glass-card pet-select-card';
+      card.style.cssText = 'padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; transition: all 0.2s;';
+      
+      card.innerHTML = `
+        <div style="width:40px; height:40px; background:var(--glass-bg); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;" id="modal-pet-icon-${pet.id}"></div>
+        <div style="flex:1">
+          <div style="font-weight:bold;">${pet.nickname}</div>
+          <div style="font-size:12px; color:var(--text-dim);">Lv.${pet.level}</div>
+        </div>
+      `;
+      
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.pet-select-card').forEach(c => {
+          c.style.borderColor = 'transparent';
+          c.style.background = 'var(--glass-bg)';
+        });
+        card.style.borderColor = 'var(--neon-cyan)';
+        card.style.background = 'rgba(0, 245, 212, 0.1)';
+        selectedExpeditionPetId = pet.id;
+        document.getElementById('btn-submit-expedition').disabled = false;
+      });
+      
+      grid.appendChild(card);
+      renderPetSprite(document.getElementById(`modal-pet-icon-${pet.id}`), pet.pet_id, 40);
+    });
     
-    const res = await API.startExpedition(selectedPet.id, 1, parseInt(duration));
+    document.getElementById('modal-expedition-select').classList.add('active');
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+});
+
+document.querySelectorAll('#expedition-duration-options .duration-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#expedition-duration-options .duration-btn').forEach(b => {
+      b.classList.remove('btn-primary');
+      b.classList.add('btn-secondary');
+    });
+    btn.classList.remove('btn-secondary');
+    btn.classList.add('btn-primary');
+    selectedExpeditionDuration = parseInt(btn.dataset.duration);
+  });
+});
+
+document.getElementById('btn-submit-expedition')?.addEventListener('click', async () => {
+  if (!selectedExpeditionPetId) return;
+  try {
+    const res = await API.startExpedition(selectedExpeditionPetId, 1, selectedExpeditionDuration);
     toast(res.message, 'success');
+    document.getElementById('modal-expedition-select').classList.remove('active');
     loadExpeditions();
   } catch (err) {
     toast(err.message, 'error');

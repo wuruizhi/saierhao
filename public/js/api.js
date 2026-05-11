@@ -70,6 +70,7 @@ const API = {
   getExpeditions() { return this.request('GET', '/player/expeditions'); },
   startExpedition(petId, planetId, durationHours) { return this.request('POST', '/player/expedition/start', { petId, planetId, durationHours }); },
   claimExpedition(expeditionId) { return this.request('POST', '/player/expedition/claim', { expeditionId }); },
+  cancelExpedition(expeditionId) { return this.request('POST', '/player/expedition/cancel', { expeditionId }); },
   // Guilds
   getGuilds() { return this.request('GET', '/player/guilds'); },
   createGuild(name) { return this.request('POST', '/player/guild/create', { name }); },

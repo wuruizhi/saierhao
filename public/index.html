@@ -607,6 +607,29 @@
     </div>
   </div>
 
+  <!-- ===== EXPEDITION SELECT MODAL ===== -->
+  <div id="modal-expedition-select" class="modal">
+    <div class="modal-content glass-card" style="max-width: 500px; padding: 20px;">
+      <button class="modal-close" onclick="document.getElementById('modal-expedition-select').classList.remove('active')">&times;</button>
+      <h3 style="margin-bottom: 15px; color: var(--neon-cyan); text-align: center;">🚀 派遣任务配置</h3>
+      
+      <p style="color: var(--text-secondary); margin-bottom: 10px;">1. 选择要派遣的精灵：</p>
+      <div id="expedition-pet-select-grid" class="pet-grid" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; gap: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));"></div>
+      
+      <p style="color: var(--text-secondary); margin-bottom: 10px;">2. 选择派遣时长：</p>
+      <div style="display: flex; gap: 10px; margin-bottom: 20px;" id="expedition-duration-options">
+        <button class="btn btn-primary duration-btn active" data-duration="2" style="flex:1; padding: 10px;">2小时<br><small style="font-size:11px;">2000金币 + 1000经验<br>经验糖果 M</small></button>
+        <button class="btn btn-secondary duration-btn" data-duration="4" style="flex:1; padding: 10px;">4小时<br><small style="font-size:11px;">4000金币 + 2000经验<br>经验糖果 L + 普通胶囊</small></button>
+        <button class="btn btn-secondary duration-btn" data-duration="8" style="flex:1; padding: 10px;">8小时<br><small style="font-size:11px;">8000金币 + 4000经验<br>经验糖果 XL + 高级胶囊</small></button>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="document.getElementById('modal-expedition-select').classList.remove('active')" style="flex:1;">取消</button>
+        <button class="btn btn-primary" id="btn-submit-expedition" style="flex:1;" disabled>确认派遣</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/pet-sprites.js?v=10"></script>
   <script src="js/api.js?v=10"></script>
   <script src="js/websocket.js?v=10"></script>

@@ -817,16 +817,22 @@ function createPlayerRouter(db) {
     const durationSeconds = (durationHours || 2) * 3600;
     
     // Define rewards based on duration
-    const rewards = {
-      money: durationHours * 1000,
-      exp: durationHours * 500,
-      items: []
-    };
-    if (durationHours >= 8) {
-      rewards.items.push({ id: 'candy_l', quantity: 1 });
-      rewards.items.push({ id: 'capsule_advanced', quantity: 1 });
-    } else {
+    const rewards = { money: 0, exp: 0, items: [] };
+    
+    if (durationHours === 2) {
+      rewards.money = 2000;
+      rewards.exp = 1000;
       rewards.items.push({ id: 'candy_m', quantity: 1 });
+    } else if (durationHours === 4) {
+      rewards.money = 4000;
+      rewards.exp = 2000;
+      rewards.items.push({ id: 'candy_l', quantity: 1 });
+      rewards.items.push({ id: 'capsule_normal', quantity: 1 });
+    } else if (durationHours >= 8) {
+      rewards.money = 8000;
+      rewards.exp = 4000;
+      rewards.items.push({ id: 'candy_xl', quantity: 1 });
+      rewards.items.push({ id: 'capsule_great', quantity: 1 });
     }
 
     db.prepare('INSERT INTO player_expeditions (player_id, pet_id, planet_id, duration, rewards) VALUES (?, ?, ?, ?, ?)')
@@ -868,6 +874,20 @@ function createPlayerRouter(db) {
     db.prepare('UPDATE player_expeditions SET reward_claimed = 1, completed = 1 WHERE id = ?').run(expedition.id);
 
     res.json({ success: true, message: '领取成功！', rewards });
+  });
+
+  router.post('/expedition/cancel', authMiddleware, (req, res) => {
+    const { expeditionId } = req.body;
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    
+    const expedition = db.prepare('SELECT * FROM player_expeditions WHERE id = ? AND player_id = ?').get(expeditionId, player.id);
+    if (!expedition) return res.status(404).json({ error: '找不到该派遣记录' });
+    if (expedition.reward_claimed === 1) return res.status(400).json({ error: '该派遣已结束！' });
+    
+    // Allow cancellation even if completed, but user forfeits rewards.
+    db.prepare('DELETE FROM player_expeditions WHERE id = ?').run(expeditionId);
+
+    res.json({ success: true, message: '已成功中止派遣，精灵已回归！' });
   });
 
   // ===== GUILDS =====
