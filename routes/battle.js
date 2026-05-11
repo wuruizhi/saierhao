@@ -192,7 +192,7 @@ function createBattleRouter(db, sceneManager) {
         
         // Story Quest Hook
         try {
-          const stmt = db.prepare('SELECT * FROM player_story_quests WHERE player_id = ? AND status = "active"');
+          const stmt = db.prepare("SELECT * FROM player_story_quests WHERE player_id = ? AND status = 'active'");
           const activeQuests = stmt.all(battle.playerId);
           
           activeQuests.forEach(quest => {

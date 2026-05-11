@@ -397,7 +397,7 @@ async function showPlanetDetail(mapId) {
   console.log('[showPlanetDetail] START mapId:', mapId);
   try {
     const { maps } = await API.getMaps();
-    const map = maps.find(m => m.id === mapId);
+    const map = maps.find(m => m.id == mapId);
     if (!map) { toast('星球不存在', 'error'); return; }
     const profile = await API.profile();
     const maxLv = Math.max(...(profile.teamPets.length ? profile.teamPets.map(p=>p.level) : [1]));
@@ -430,7 +430,7 @@ async function goToPlanet(mapId) {
       return;
     }
 
-    const quest = res.quests.find(q => q.planet_id === mapId);
+    const quest = res.quests.find(q => q.planet_id == mapId);
     
     if (!quest) {
       // Quest not started yet

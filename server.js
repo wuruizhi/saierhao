@@ -35,6 +35,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // API routes
+app.use('/api', (req, res, next) => {
+  console.log(`[API] ${req.method} ${req.originalUrl}`);
+  next();
+});
 app.use('/api/auth', createAuthRouter(db));
 app.use('/api/player', createPlayerRouter(db));
 app.use('/api/battle', createBattleRouter(db, sceneManager));
