@@ -19,6 +19,7 @@
     <div class="hub-user-info">
       <span class="hub-username" id="hub-username"></span>
       <span class="hub-money" id="hub-money">💰 0</span>
+      <button class="btn btn-sm" id="btn-recharge" style="margin-left: 8px; padding: 4px 10px; font-size: 12px; background: rgba(0,245,212,.15); border-color: var(--neon-cyan); color: var(--neon-cyan);">💎 充值</button>
       <button class="btn-logout" id="btn-logout" title="退出登录">🚪</button>
     </div>
     <nav class="hub-nav">
@@ -42,6 +43,18 @@
       </button>
       <button class="hub-nav-btn" data-section="heal" id="nav-heal">
         <span class="nav-icon">💊</span><span>治疗中心</span>
+      </button>
+      <button class="hub-nav-btn" data-section="social" id="nav-social">
+        <span class="nav-icon">🌟</span><span>社交大厅</span>
+      </button>
+      <button class="hub-nav-btn" data-section="quests" id="nav-quests">
+        <span class="nav-icon">📋</span><span>任务</span><span class="quest-red-dot" id="quest-red-dot" style="display:none"></span>
+      </button>
+      <button class="hub-nav-btn" data-section="bag" id="nav-bag">
+        <span class="nav-icon">🎒</span><span>背包</span>
+      </button>
+      <button class="hub-nav-btn" data-section="gacha" id="nav-gacha">
+        <span class="nav-icon">🎰</span><span>扭蛋</span>
       </button>
       <button class="btn-return-scene" id="btn-return-scene" style="display:none" title="返回当前场景">↩ 返回场景</button>
     </nav>
@@ -108,6 +121,27 @@
     <!-- Team section -->
     <section id="section-team" class="hub-section">
       <h2 class="section-title">精灵背包</h2>
+      <!-- Pet overview stats -->
+      <div class="pet-overview-stats" id="pet-overview-stats"></div>
+      <!-- Search/filter -->
+      <div class="pet-search-bar">
+        <input type="text" id="pet-search-input" placeholder="🔍 搜索精灵名称..." class="pet-search-input">
+        <select id="pet-filter-type" class="pet-filter-select">
+          <option value="all">全部类型</option>
+          <option value="fire">🔥 火</option>
+          <option value="water">💧 水</option>
+          <option value="grass">🌿 草</option>
+          <option value="electric">⚡ 电</option>
+          <option value="light">✨ 光</option>
+          <option value="dark">🌑 暗</option>
+        </select>
+        <select id="pet-sort" class="pet-filter-select">
+          <option value="default">默认排序</option>
+          <option value="level_desc">等级高到低</option>
+          <option value="level_asc">等级低到高</option>
+          <option value="hp_desc">体力高到低</option>
+        </select>
+      </div>
       <div class="team-subsection">
         <h3>战斗队伍 <span id="team-count">0/6</span></h3>
         <div class="pet-grid" id="team-grid"></div>
@@ -207,6 +241,60 @@
         </div>
       </div>
     </section>
+
+    <!-- Social section -->
+    <section id="section-social" class="hub-section">
+      <h2 class="section-title">🌟 社交大厅</h2>
+      <div class="pokedex-tabs">
+        <button class="pokedex-tab active" data-social="friends" id="social-tab-friends">👥 我的好友</button>
+        <button class="pokedex-tab" data-social="leaderboard" id="social-tab-leaderboard">🏆 排行榜</button>
+        <button class="pokedex-tab" data-social="achievements" id="social-tab-achievements">🏅 成就</button>
+      </div>
+      
+      <div id="social-friends" class="social-panel" style="display:block;">
+        <div class="friends-actions" style="margin-bottom: 15px; display:flex; gap:10px;">
+          <input type="text" id="friend-username" placeholder="输入玩家昵称" class="cyber-input" style="flex:1; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff;">
+          <button class="btn btn-primary" id="btn-add-friend">添加好友</button>
+        </div>
+        <div id="friends-list" class="pet-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));"></div>
+      </div>
+      
+      <div id="social-leaderboard" class="social-panel" style="display:none;">
+        <div class="shop-sub-tabs" style="margin-bottom: 15px;">
+          <button class="shop-sub-tab active" data-lb="money">💰 财富榜</button>
+          <button class="shop-sub-tab" data-lb="level">📈 等级榜</button>
+          <button class="shop-sub-tab" data-lb="pets">🐾 收集榜</button>
+          <button class="shop-sub-tab" data-lb="pvp">⚔️ 战神榜</button>
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list glass-card" style="padding: 10px; max-height: 400px; overflow-y: auto;"></div>
+      </div>
+
+      <div id="social-achievements" class="social-panel" style="display:none;">
+        <div class="achievement-header" id="achievement-header"></div>
+        <div class="achievement-grid" id="achievement-grid"></div>
+      </div>
+    </section>
+
+    <!-- Quests section -->
+    <section id="section-quests" class="hub-section">
+      <h2 class="section-title">📋 每日任务</h2>
+      <p class="quest-reset-hint" id="quest-reset-hint"></p>
+      <div class="quest-list" id="quest-list"></div>
+    </section>
+
+    <!-- Bag section -->
+    <section id="section-bag" class="hub-section">
+      <h2 class="section-title">🎒 我的背包</h2>
+      <div id="bag-grid"></div>
+    </section>
+
+    <!-- Gacha section -->
+    <section id="section-gacha" class="hub-section">
+      <h2 class="section-title">🎰 扭蛋抽奖</h2>
+      <p class="section-subtitle">花费金币抽取稀有精灵和道具！每10次保底稀有奖品</p>
+      <div class="gacha-pools" id="gacha-pools"></div>
+      <div class="gacha-result-area" id="gacha-result-area" style="display:none;"></div>
+    </section>
   </div>
 
   <!-- ===== PLANET DETAIL / SCENE SELECT ===== -->
@@ -250,6 +338,7 @@
           <div class="hp-bar" id="enemy-hp-bar"></div>
           <span class="hp-text" id="enemy-hp-text"></span>
         </div>
+        <div class="status-effects-container" id="enemy-status"></div>
         <div class="battle-pet-sprite" id="enemy-sprite"></div>
       </div>
 
@@ -265,6 +354,7 @@
           <div class="hp-bar" id="player-hp-bar"></div>
           <span class="hp-text" id="player-hp-text"></span>
         </div>
+        <div class="status-effects-container" id="player-status"></div>
         <div class="exp-bar-container">
           <div class="exp-bar" id="player-exp-bar"></div>
         </div>
@@ -378,10 +468,57 @@
     </div>
   </div>
 
-  <script src="js/pet-sprites.js?v=7"></script>
-  <script src="js/api.js?v=7"></script>
-  <script src="js/websocket.js?v=7"></script>
-  <script src="js/app.js?v=7"></script>
-  <script src="js/scene.js?v=7"></script>
+  <!-- Floating Chat Panel (visible on any screen) -->
+  <div class="chat-float-toggle" id="chat-float-toggle" title="公共聊天">
+    💬
+    <span class="chat-unread-badge" id="chat-unread-badge" style="display:none"></span>
+  </div>
+  <div class="chat-float-panel" id="chat-float-panel">
+    <div class="chat-float-header">
+      <span>💬 公共聊天</span>
+      <button class="chat-float-close" id="chat-float-close">✕</button>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" placeholder="说点什么..." maxlength="200" autocomplete="off">
+      <button class="btn btn-primary btn-sm" id="chat-send">发送</button>
+    </div>
+  </div>
+
+  <!-- Achievement celebration overlay -->
+  <div id="achievement-celebration" class="achievement-celebration">
+    <div class="achievement-celebration-content">
+      <div class="achievement-celebration-icon" id="achievement-celebration-icon"></div>
+      <h2 class="achievement-celebration-title">🏅 成就解锁！</h2>
+      <p class="achievement-celebration-name" id="achievement-celebration-name"></p>
+      <p class="achievement-celebration-desc" id="achievement-celebration-desc"></p>
+    </div>
+  </div>
+
+  <!-- Gacha animation overlay -->
+  <div id="gacha-overlay" class="gacha-overlay">
+    <div class="gacha-capsule" id="gacha-capsule">
+      <div class="gacha-ball"></div>
+    </div>
+  </div>
+
+  <!-- Recharge / Redeem Modal -->
+  <div class="modal-backdrop" id="modal-recharge">
+    <div class="modal glass-card" style="text-align: center; max-width: 350px;">
+      <h3 style="margin-bottom: 15px; color: var(--neon-cyan);">💎 充值 / 兑换中心</h3>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">请输入您的充值兑换码以获取金币和道具奖励。</p>
+      <input type="text" id="recharge-code-input" placeholder="输入兑换码 (如: VIP888)" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: #fff; font-size: 16px; text-align: center; margin-bottom: 20px; outline: none; text-transform: uppercase;">
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" onclick="document.getElementById('modal-recharge').classList.remove('active')" style="flex:1;">取消</button>
+        <button class="btn" id="btn-submit-recharge" style="flex:1;">立即兑换</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/pet-sprites.js?v=9"></script>
+  <script src="js/api.js?v=9"></script>
+  <script src="js/websocket.js?v=9"></script>
+  <script src="js/app.js?v=9"></script>
+  <script src="js/scene.js?v=9"></script>
 </body>
 </html>

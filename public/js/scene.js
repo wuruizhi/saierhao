@@ -772,3 +772,28 @@ function moveOtherPlayer(userId, targetX, targetY) {
   }
   p.animId = requestAnimationFrame(step);
 }
+
+window.showSceneChatBubble = function(userId, text, myUserId) {
+  let targetEl = null;
+  if (userId === myUserId) {
+    targetEl = document.getElementById('player-avatar');
+  } else if (otherPlayers.has(userId)) {
+    targetEl = otherPlayers.get(userId).el;
+  }
+  
+  if (!targetEl) return;
+  
+  // Remove existing bubble if any
+  const existing = targetEl.querySelector('.chat-bubble');
+  if (existing) existing.remove();
+  
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = window.escapeHtml ? window.escapeHtml(text) : text;
+  
+  targetEl.appendChild(bubble);
+  
+  setTimeout(() => {
+    if (bubble.parentElement) bubble.remove();
+  }, 4000);
+};

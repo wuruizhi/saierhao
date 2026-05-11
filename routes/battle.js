@@ -5,6 +5,7 @@ const { createPetInstance, addExp, healPet } = require('../game/pet-manager');
 const mapsData = require('../data/maps.json');
 const petsData = require('../data/pets.json');
 const itemsData = require('../data/items.json');
+const { incrementQuestProgress } = require('../game/quest-manager');
 
 // Store active battles in memory (per-session, cleared on server restart)
 const activeBattles = new Map();
@@ -133,6 +134,8 @@ function createBattleRouter(db, sceneManager) {
         petDef: petsData.pets.find(p => p.id === firstTeamPet.pet_id)
       }
     });
+    
+    incrementQuestProgress(db, player.id, 'explore', 1);
   });
 
   // Execute a battle action
@@ -184,6 +187,8 @@ function createBattleRouter(db, sceneManager) {
           .run(moneyGain, battle.playerId);
 
         activeBattles.delete(battleId);
+        incrementQuestProgress(db, battle.playerId, 'battle', 1);
+        
         return res.json({
           ...result,
           battleEnd: true,
@@ -302,6 +307,8 @@ function createBattleRouter(db, sceneManager) {
         .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
 
       activeBattles.delete(battleId);
+      incrementQuestProgress(db, player.id, 'capture', 1);
+      
       const petDef = petsData.pets.find(p => p.id === wp.pet_id);
       const capturedPet = db.prepare('SELECT * FROM player_pets WHERE id = ?').get(instanceId);
       res.json({

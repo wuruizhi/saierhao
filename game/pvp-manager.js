@@ -12,6 +12,8 @@ class PvpManager {
     this.scenePlayers = new Map(); // sceneId -> Map<userId, { username, x, y, targetX, targetY }>
     this.pvpRooms = new Map(); // roomId -> { player1, player2, state }
     this.invitations = new Map(); // `${from}_${to}` -> invitation data
+    this.chatHistory = []; // last N chat messages
+    this.MAX_CHAT_HISTORY = 50;
   }
 
   handleConnection(ws, req) {
@@ -44,6 +46,11 @@ class PvpManager {
 
     // Send online players list
     this.broadcastOnlinePlayers();
+
+    // Send chat history to newly connected user
+    if (this.chatHistory.length > 0) {
+      this.sendTo(userId, { type: 'chat_history', messages: this.chatHistory });
+    }
 
     ws.on('message', (data) => {
       try {
@@ -96,6 +103,9 @@ class PvpManager {
         break;
       case 'scene_move':
         this.handleSceneMove(userId, msg.targetX, msg.targetY);
+        break;
+      case 'chat_message':
+        this.handleChatMessage(userId, msg.text);
         break;
     }
   }
@@ -405,6 +415,41 @@ class PvpManager {
     for (const [userId] of sceneMap.entries()) {
       if (userId !== excludeUserId) {
         this.sendTo(userId, msg);
+      }
+    }
+  }
+
+  // --- PUBLIC CHAT ---
+  handleChatMessage(userId, text) {
+    if (!text || typeof text !== 'string') return;
+    const clean = text.trim().slice(0, 200); // limit 200 chars
+    if (clean.length === 0) return;
+
+    const player = this.onlinePlayers.get(userId);
+    if (!player) return;
+
+    const chatMsg = {
+      userId,
+      username: player.username,
+      text: clean,
+      time: Date.now()
+    };
+
+    // Store in history
+    this.chatHistory.push(chatMsg);
+    if (this.chatHistory.length > this.MAX_CHAT_HISTORY) {
+      this.chatHistory.shift();
+    }
+
+    // Broadcast to everyone
+    this.broadcastAll({ type: 'chat_new', message: chatMsg });
+  }
+
+  broadcastAll(msg) {
+    const payload = JSON.stringify(msg);
+    for (const [, { ws }] of this.onlinePlayers) {
+      if (ws.readyState === 1) {
+        ws.send(payload);
       }
     }
   }

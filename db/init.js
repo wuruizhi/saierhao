@@ -89,7 +89,80 @@ function initDB() {
       UNIQUE(player_id, part),
       FOREIGN KEY (player_id) REFERENCES players(id)
     );
+
+    CREATE TABLE IF NOT EXISTS friends (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      friend_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'pending', -- 'pending', 'accepted'
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, friend_id),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (friend_id) REFERENCES users(id)
+    );
   `);
+
+  // New tables for achievements + daily quests
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS player_achievements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      achievement_id TEXT NOT NULL,
+      unlocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(player_id, achievement_id),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS daily_quests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      quest_id TEXT NOT NULL,
+      quest_type TEXT NOT NULL,
+      target INTEGER NOT NULL,
+      progress INTEGER DEFAULT 0,
+      completed INTEGER DEFAULT 0,
+      reward_claimed INTEGER DEFAULT 0,
+      reward_money INTEGER DEFAULT 0,
+      quest_date TEXT NOT NULL,
+      UNIQUE(player_id, quest_id, quest_date),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
+    CREATE TABLE IF NOT EXISTS redemption_codes (
+      code TEXT PRIMARY KEY,
+      reward_money INTEGER DEFAULT 0,
+      reward_items TEXT DEFAULT '{}',
+      max_uses INTEGER DEFAULT 1,
+      uses INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS player_redemptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      code TEXT NOT NULL,
+      redeemed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(player_id, code),
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
+  `);
+
+  // Insert some default test codes if not exist
+  try {
+    db.exec(`
+      INSERT OR IGNORE INTO redemption_codes (code, reward_money, reward_items, max_uses) VALUES 
+      ('SAIERHAO2026', 10000, '{"capsule_legend":1, "candy_xl":5}', 99999),
+      ('VIP666', 5000, '{"capsule_master":3}', 99999),
+      ('VIP888', 8888, '{"hatch_speed":5}', 99999)
+    `);
+  } catch(e) {}
+
+  // Add columns if they don't exist (safe migration)
+  try { db.exec('ALTER TABLE players ADD COLUMN pve_wins INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN pvp_wins INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN pvp_losses INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN total_captures INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN total_battles INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN total_shop_buys INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN gacha_pity INTEGER DEFAULT 0'); } catch(e) {}
 
   return db;
 }

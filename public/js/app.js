@@ -8,6 +8,12 @@ function getSkillName(sid) { const s = SKILLS_MAP[sid]; return s ? s.name : `技
 function getSkillDef(sid) { return SKILLS_MAP[sid] || null; }
 function formatMoney(m) { return m >= 90000000 ? '💰 ∞' : `💰 ${m}`; }
 
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
 // ===== STARS BACKGROUND =====
 (function initStars(){
   const c = document.getElementById('stars-canvas'), ctx = c.getContext('2d');
@@ -157,6 +163,10 @@ async function loadHub(data){
       if(btn.dataset.section === 'shop' && window.loadShop) loadShop();
       if(btn.dataset.section === 'wardrobe' && window.loadWardrobe) loadWardrobe();
       if(btn.dataset.section === 'pokedex') loadPokedex();
+      if(btn.dataset.section === 'social') loadSocial();
+      if(btn.dataset.section === 'quests') loadDailyQuests();
+      if(btn.dataset.section === 'bag') loadBag();
+      if(btn.dataset.section === 'gacha') loadGacha();
     });
   });
 
@@ -226,13 +236,60 @@ async function loadPlanets(){
 }
 
 // ===== TEAM =====
+let _allTeamPets = [], _allStoragePets = [];
 async function loadTeam(data){
   if(!data){ data = await API.profile(); }
-  renderPetGrid('team-grid', data.teamPets, true);
-  renderPetGrid('storage-grid', data.storagePets, false);
+  _allTeamPets = data.teamPets; _allStoragePets = data.storagePets;
+  renderPetOverview(data.teamPets, data.storagePets);
+  renderFilteredPets();
   document.getElementById('team-count').textContent = `${data.teamPets.length}/6`;
 }
 async function refreshTeam(){ await loadTeam(); }
+
+function renderPetOverview(team, storage) {
+  const all = [...team, ...storage];
+  const totalPets = all.length;
+  const maxLv = all.length ? Math.max(...all.map(p=>p.level)) : 0;
+  const totalPower = all.reduce((s,p) => s + (p.max_hp||0) + (p.attack||0) + (p.defense||0) + (p.speed||0) + (p.sp_attack||0) + (p.sp_defense||0), 0);
+  const el = document.getElementById('pet-overview-stats');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="pet-stat-card"><div class="pet-stat-value">${totalPets}</div><div class="pet-stat-label">精灵总数</div></div>
+    <div class="pet-stat-card"><div class="pet-stat-value">${maxLv}</div><div class="pet-stat-label">最高等级</div></div>
+    <div class="pet-stat-card"><div class="pet-stat-value">${totalPower}</div><div class="pet-stat-label">总战力</div></div>
+    <div class="pet-stat-card"><div class="pet-stat-value">${team.length}/6</div><div class="pet-stat-label">队伍</div></div>
+  `;
+}
+
+function renderFilteredPets() {
+  const search = (document.getElementById('pet-search-input')?.value || '').trim().toLowerCase();
+  const typeFilter = document.getElementById('pet-filter-type')?.value || 'all';
+  const sortOption = document.getElementById('pet-sort')?.value || 'default';
+  
+  const filterFn = p => {
+    if (search && !(p.nickname||'').toLowerCase().includes(search) && !(p.petDef?.name||'').toLowerCase().includes(search)) return false;
+    if (typeFilter !== 'all' && p.petDef?.type !== typeFilter) return false;
+    return true;
+  };
+  
+  const sortFn = (a, b) => {
+    if (sortOption === 'level_desc') return b.level - a.level;
+    if (sortOption === 'level_asc') return a.level - b.level;
+    if (sortOption === 'hp_desc') return b.max_hp - a.max_hp;
+    return 0; // Default
+  };
+
+  const filteredTeam = _allTeamPets.filter(filterFn).sort(sortFn);
+  const filteredStorage = _allStoragePets.filter(filterFn).sort(sortFn);
+
+  renderPetGrid('team-grid', filteredTeam, true);
+  renderPetGrid('storage-grid', filteredStorage, false);
+}
+
+// Bind search/filter
+document.getElementById('pet-search-input')?.addEventListener('input', renderFilteredPets);
+document.getElementById('pet-filter-type')?.addEventListener('change', renderFilteredPets);
+document.getElementById('pet-sort')?.addEventListener('change', renderFilteredPets);
 
 function renderPetGrid(containerId, pets, isTeam){
   const grid = document.getElementById(containerId);
@@ -277,8 +334,9 @@ function showPetDetail(pet, isTeam){
   const actions = document.getElementById('pet-detail-actions');
   let actionsHtml = isTeam
     ? `<button class="btn btn-danger btn-sm" onclick="swapPet(${pet.id},false)">移至仓库</button>`
-    : `<button class="btn btn-primary btn-sm" onclick="swapPet(${pet.id},true)">加入队伍</button>`;
-  actionsHtml += ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#facc15,#f59e0b);color:#000" onclick="showCandyPanel(${pet.id})">🍬 喂糖果</button>`;
+    : `<button class="btn btn-primary btn-sm" onclick="swapPet(${pet.id},true)">加入队伍</button>
+       <button class="btn btn-danger btn-sm" style="background:var(--hp-red);margin-left:4px;" onclick="releasePet(${pet.id})">放生</button>`;
+  actionsHtml += ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;margin-left:4px;" onclick="showCandyPanel(${pet.id})">🍬 喂糖果</button>`;
   actions.innerHTML = actionsHtml;
 
   // Candy panel (initially hidden)
@@ -294,6 +352,20 @@ async function swapPet(id, toTeam){
   catch(err){ toast(err.message,'error'); }
 }
 window.swapPet = swapPet;
+
+async function releasePet(id) {
+  if (!confirm('确定要放生这只精灵吗？此操作不可逆转。')) return;
+  try {
+    const res = await API.releasePet(id);
+    toast(res.message);
+    document.getElementById('modal-pet-detail').classList.remove('active');
+    refreshTeam();
+    // Update money display
+    const profile = await API.profile();
+    document.getElementById('hub-money').textContent = formatMoney(profile.player.money);
+  } catch (err) { toast(err.message, 'error'); }
+}
+window.releasePet = releasePet;
 
 // ===== HEAL =====
 document.getElementById('heal-btn').addEventListener('click', async()=>{
@@ -430,6 +502,53 @@ function renderShopTabs() {
     });
     subContainer.appendChild(btn);
   });
+}
+
+// ===== BAG =====
+async function loadBag() {
+  try {
+    const res = await API.inventory();
+    const grid = document.getElementById('bag-grid');
+    grid.innerHTML = '';
+    if (!res.items || res.items.length === 0) {
+      grid.innerHTML = '<p style="color:var(--text-dim);padding:24px;text-align:center">你的背包空空如也，快去商店或者探索吧！</p>';
+      return;
+    }
+    
+    const categories = [
+      { id: 'capsules', name: '🔮 捕捉胶囊', filter: i => i.item_id.startsWith('capsule_') },
+      { id: 'candies', name: '🍬 经验道具', filter: i => i.item_id.startsWith('candy_') },
+      { id: 'boosters', name: '💪 强化道具', filter: i => i.item_id.startsWith('booster_') },
+      { id: 'others', name: '📦 其他道具', filter: i => !i.item_id.startsWith('capsule_') && !i.item_id.startsWith('candy_') && !i.item_id.startsWith('booster_') }
+    ];
+
+    categories.forEach(cat => {
+      const items = res.items.filter(cat.filter);
+      if (items.length > 0) {
+        const title = document.createElement('h3');
+        title.style.cssText = 'margin: 15px 0 10px; font-size: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; color: var(--neon-cyan);';
+        title.textContent = cat.name;
+        grid.appendChild(title);
+        
+        const subGrid = document.createElement('div');
+        subGrid.className = 'shop-grid';
+        items.forEach(item => {
+          const el = document.createElement('div');
+          el.className = 'shop-item';
+          el.innerHTML = `
+            <span class="shop-item-icon">${item.def.icon}</span>
+            <div class="shop-item-info">
+              <div class="shop-item-name">${item.def.name}</div>
+              <div class="shop-item-desc">${item.def.description || ''}</div>
+            </div>
+            <span class="shop-item-owned">拥有: ${item.quantity}</span>
+          `;
+          subGrid.appendChild(el);
+        });
+        grid.appendChild(subGrid);
+      }
+    });
+  } catch(err) { toast(err.message, 'error'); }
 }
 
 function renderShopItems() {
@@ -585,6 +704,7 @@ function setupBattle(pp, wp){
   document.getElementById('player-type').textContent = `${TYPE_ICONS[pp.petDef?.type]||''}`;
   document.getElementById('player-type').className = `battle-pet-type type-${pp.petDef?.type||'normal'}`;
   updateHpBar('player', pp.current_hp, pp.max_hp);
+  renderStatusEffects('player', pp);
   renderPetSprite(document.getElementById('player-sprite'), pp.pet_id, 140);
 
   document.getElementById('enemy-name').textContent = `野生 ${wp.nickname||wp.petDef?.name}`;
@@ -592,6 +712,7 @@ function setupBattle(pp, wp){
   document.getElementById('enemy-type').textContent = `${TYPE_ICONS[wp.petDef?.type]||''}`;
   document.getElementById('enemy-type').className = `battle-pet-type type-${wp.petDef?.type||'normal'}`;
   updateHpBar('enemy', wp.current_hp, wp.max_hp);
+  renderStatusEffects('enemy', wp);
   renderPetSprite(document.getElementById('enemy-sprite'), wp.pet_id, 140);
 
   document.getElementById('battle-log').innerHTML = `<p>野生的 ${wp.petDef?.name} 出现了！</p>`;
@@ -617,6 +738,21 @@ function updateHpBar(side, current, max){
   bar.style.width = pct+'%';
   bar.className = 'hp-bar'+(pct<=25?' low':pct<=50?' medium':'');
   document.getElementById(`${side}-hp-text`).textContent = `${Math.max(0,current)} / ${max}`;
+}
+
+function renderStatusEffects(side, pet) {
+  const container = document.getElementById(`${side}-status`);
+  if (!container) return;
+  container.innerHTML = '';
+  if (!pet.statusEffects || pet.statusEffects.length === 0) return;
+  
+  const labels = { burn: '灼烧', poison: '中毒', freeze: '冰冻', paralyze: '麻痹', stun: '眩晕', debuff: '减益' };
+  pet.statusEffects.forEach(eff => {
+    const el = document.createElement('div');
+    el.className = `status-icon status-${eff.type}`;
+    el.textContent = `${labels[eff.type] || eff.type} (${eff.turns})`;
+    container.appendChild(el);
+  });
 }
 
 async function playBattleAnimationSequence(results, isPvp) {
@@ -725,8 +861,8 @@ async function doBattleAction(skillId){
     
     await playBattleAnimationSequence(r.results, false);
 
-    if(r.playerPet) updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp);
-    if(r.wildPet) updateHpBar('enemy', r.wildPet.current_hp, r.wildPet.max_hp);
+    if(r.playerPet) { updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp); renderStatusEffects('player', r.playerPet); }
+    if(r.wildPet) { updateHpBar('enemy', r.wildPet.current_hp, r.wildPet.max_hp); renderStatusEffects('enemy', r.wildPet); }
 
     const log = document.getElementById('battle-log');
     if(r.battleEnd){
@@ -1063,6 +1199,85 @@ document.getElementById('dex-detail-close').addEventListener('click', () => {
     });
   }
 
+  // ===== CHAT SYSTEM =====
+  let chatOpen = false;
+  let chatUnread = 0;
+  const chatToggle = document.getElementById('chat-float-toggle');
+  const chatPanel = document.getElementById('chat-float-panel');
+  const chatClose = document.getElementById('chat-float-close');
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const chatSend = document.getElementById('chat-send');
+  const chatBadge = document.getElementById('chat-unread-badge');
+
+  function toggleChat() {
+    chatOpen = !chatOpen;
+    chatPanel.classList.toggle('open', chatOpen);
+    if (chatOpen) {
+      chatUnread = 0;
+      chatBadge.style.display = 'none';
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatInput.focus();
+    }
+  }
+
+  if (chatToggle) chatToggle.addEventListener('click', toggleChat);
+  if (chatClose) chatClose.addEventListener('click', () => { chatOpen = true; toggleChat(); });
+
+  function renderChatMsg(msg, prepend = false) {
+    const div = document.createElement('div');
+    const isSelf = msg.userId === currentUserId;
+    div.className = `chat-msg${isSelf ? ' self' : ''}`;
+    const t = new Date(msg.time);
+    const timeStr = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+    div.innerHTML = `
+      <div class="chat-msg-user">${escapeHtml(msg.username)}</div>
+      <div class="chat-msg-text">${escapeHtml(msg.text)}</div>
+      <div class="chat-msg-time">${timeStr}</div>
+    `;
+    if (prepend) chatMessages.prepend(div);
+    else chatMessages.appendChild(div);
+    return div;
+  }
+
+
+
+  function sendChat() {
+    const text = chatInput.value.trim();
+    if (!text || !window.ws) return;
+    window.ws.send({ type: 'chat_message', text });
+    chatInput.value = '';
+  }
+
+  if (chatSend) chatSend.addEventListener('click', sendChat);
+  if (chatInput) chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); sendChat(); }
+  });
+
+  // WebSocket chat handlers
+  if (window.ws) {
+    window.ws.on('chat_history', (msg) => {
+      chatMessages.innerHTML = '';
+      (msg.messages || []).forEach(m => renderChatMsg(m));
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    window.ws.on('chat_new', (msg) => {
+      renderChatMsg(msg.message);
+      if (window.showSceneChatBubble) {
+        window.showSceneChatBubble(msg.message.userId, msg.message.text, currentUserId);
+      }
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      if (!chatOpen) {
+        chatUnread++;
+        chatBadge.textContent = chatUnread > 99 ? '99+' : chatUnread;
+        chatBadge.style.display = 'flex';
+      }
+    });
+  }
+
+  // Hook chat nav button is removed because we now use a floating chat only
+
   if(API.token){
     try { ws.connect(API.token); await loadGame(); } catch(e){ showScreen('auth'); }
   } else { showScreen('auth'); }
@@ -1084,3 +1299,412 @@ document.getElementById('dex-detail-close').addEventListener('click', () => {
     });
   }
 })();
+
+// ===== SOCIAL (Friends & Leaderboard) =====
+async function loadSocial() {
+  // Setup tabs
+  document.querySelectorAll('#section-social .pokedex-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('#section-social .pokedex-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('social-friends').style.display = tab.dataset.social === 'friends' ? 'block' : 'none';
+      document.getElementById('social-leaderboard').style.display = tab.dataset.social === 'leaderboard' ? 'block' : 'none';
+      document.getElementById('social-achievements').style.display = tab.dataset.social === 'achievements' ? 'block' : 'none';
+      if (tab.dataset.social === 'friends') loadFriends();
+      if (tab.dataset.social === 'achievements') loadAchievements();
+      if (tab.dataset.social === 'leaderboard') {
+        const activeLb = document.querySelector('#social-leaderboard .shop-sub-tab.active');
+        if(activeLb) loadLeaderboard(activeLb.dataset.lb);
+        else loadLeaderboard('money');
+      }
+    };
+  });
+
+  // Setup leaderboard sub-tabs
+  document.querySelectorAll('#social-leaderboard .shop-sub-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('#social-leaderboard .shop-sub-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      loadLeaderboard(tab.dataset.lb);
+    };
+  });
+
+  // Setup add friend button
+  const addBtn = document.getElementById('btn-add-friend');
+  if (addBtn) {
+    addBtn.onclick = async () => {
+      const input = document.getElementById('friend-username');
+      const username = input.value.trim();
+      if (!username) return;
+      try {
+        const res = await API.addFriend(username);
+        toast(res.message);
+        input.value = '';
+        loadFriends();
+      } catch(e) { toast(e.message, 'error'); }
+    };
+  }
+
+  // Initial load
+  loadFriends();
+}
+
+async function loadFriends() {
+  const container = document.getElementById('friends-list');
+  if (!container) return;
+  container.innerHTML = '<p style="color:var(--text-dim)">加载中...</p>';
+  try {
+    const res = await API.getFriends();
+    container.innerHTML = '';
+    if (!res.friends || res.friends.length === 0) {
+      container.innerHTML = '<p style="color:var(--text-dim)">暂无好友</p>';
+      return;
+    }
+    res.friends.forEach(f => {
+      const card = document.createElement('div');
+      card.className = 'glass-card';
+      card.style.padding = '12px';
+      card.style.display = 'flex';
+      card.style.justifyContent = 'space-between';
+      card.style.alignItems = 'center';
+      
+      let statusHtml = '';
+      if (f.status === 'accepted') {
+        statusHtml = '<span style="color:var(--hp-green);font-size:12px;">✅ 已添加</span>';
+      } else {
+        if (f.sender_id === currentUserId) {
+          statusHtml = '<span style="color:var(--text-dim);font-size:12px;">⌛ 等待验证</span>';
+        } else {
+          statusHtml = `
+            <button class="btn btn-primary btn-xs" onclick="acceptFriend(${f.friendship_id})">接受</button>
+            <button class="btn btn-danger btn-xs" onclick="removeFriend(${f.friendship_id})">拒绝</button>
+          `;
+        }
+      }
+
+      card.innerHTML = `
+        <div style="font-weight:bold; font-size: 15px;">👤 ${escapeHtml(f.username)}</div>
+        <div style="display:flex; gap:6px; align-items:center;">
+          ${statusHtml}
+          ${f.status === 'accepted' ? `<button class="btn btn-danger btn-xs" onclick="removeFriend(${f.friendship_id})">删除</button>` : ''}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (e) {
+    container.innerHTML = `<p style="color:var(--hp-red)">${e.message}</p>`;
+  }
+}
+
+async function acceptFriend(id) {
+  try { await API.acceptFriend(id); toast('已添加好友'); loadFriends(); } catch(e) { toast(e.message, 'error'); }
+}
+window.acceptFriend = acceptFriend;
+
+async function removeFriend(id) {
+  try { await API.removeFriend(id); toast('已删除'); loadFriends(); } catch(e) { toast(e.message, 'error'); }
+}
+window.removeFriend = removeFriend;
+
+async function loadLeaderboard(type) {
+  const container = document.getElementById('leaderboard-list');
+  if (!container) return;
+  container.innerHTML = '<p style="color:var(--text-dim)">加载中...</p>';
+  try {
+    const res = await API.getLeaderboard(type);
+    container.innerHTML = '';
+    if (!res.topPlayers || res.topPlayers.length === 0) {
+      container.innerHTML = '<p style="color:var(--text-dim)">暂无数据</p>';
+      return;
+    }
+    res.topPlayers.forEach((p, idx) => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.padding = '10px 15px';
+      row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+      row.style.alignItems = 'center';
+
+      let rankColor = 'var(--text-primary)';
+      let rankIcon = `#${idx + 1}`;
+      if (idx === 0) { rankColor = '#ffd700'; rankIcon = '🥇 1'; }
+      if (idx === 1) { rankColor = '#c0c0c0'; rankIcon = '🥈 2'; }
+      if (idx === 2) { rankColor = '#cd7f32'; rankIcon = '🥉 3'; }
+
+      let scoreLabel = '';
+      if (type === 'money') scoreLabel = '💰 ' + p.score;
+      else if (type === 'level') scoreLabel = 'Lv.' + p.score;
+      else if (type === 'pets') scoreLabel = p.score + ' 只';
+      else if (type === 'pvp') scoreLabel = p.score + ' 胜';
+
+      row.innerHTML = `
+        <div style="font-weight:bold; color:${rankColor}; width: 50px;">${rankIcon}</div>
+        <div style="flex:1; font-weight:500;">${escapeHtml(p.username)}</div>
+        <div style="color:var(--neon-cyan); font-weight:bold;">${scoreLabel}</div>
+      `;
+      container.appendChild(row);
+    });
+  } catch (e) {
+    container.innerHTML = `<p style="color:var(--hp-red)">${e.message}</p>`;
+  }
+}
+
+// ===== ACHIEVEMENTS =====
+async function loadAchievements() {
+  try {
+    // Check for new unlocks first
+    const checkRes = await API.checkAchievements();
+    if (checkRes.newUnlocks && checkRes.newUnlocks.length > 0) {
+      showAchievementCelebration(checkRes.newUnlocks[0]);
+    }
+    const res = await API.getAchievements();
+    const header = document.getElementById('achievement-header');
+    const grid = document.getElementById('achievement-grid');
+    if (!header || !grid) return;
+    const pct = res.total > 0 ? (res.unlockedCount / res.total * 100) : 0;
+    header.innerHTML = `
+      <span class="achievement-progress-text">${res.unlockedCount}/${res.total}</span>
+      <div class="achievement-progress-bar"><div class="achievement-progress-fill" style="width:${pct}%"></div></div>
+    `;
+    grid.innerHTML = '';
+    res.achievements.forEach(a => {
+      const card = document.createElement('div');
+      card.className = `achievement-card ${a.unlocked ? 'unlocked' : 'locked'}`;
+      card.innerHTML = `
+        <div class="achievement-icon">${a.icon}</div>
+        <div class="achievement-info">
+          <div class="achievement-name">${a.name}</div>
+          <div class="achievement-desc">${a.desc}</div>
+          ${a.unlocked && a.unlockedAt ? `<div class="achievement-time">✅ ${new Date(a.unlockedAt).toLocaleDateString()}</div>` : ''}
+        </div>
+        <span class="achievement-badge">${a.unlocked ? '已解锁' : '🔒'}</span>
+      `;
+      grid.appendChild(card);
+    });
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function showAchievementCelebration(achievement) {
+  const el = document.getElementById('achievement-celebration');
+  if (!el) return;
+  document.getElementById('achievement-celebration-icon').textContent = achievement.icon;
+  document.getElementById('achievement-celebration-name').textContent = achievement.name;
+  document.getElementById('achievement-celebration-desc').textContent = achievement.desc;
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 3000);
+}
+
+// ===== DAILY QUESTS =====
+async function loadDailyQuests() {
+  try {
+    const res = await API.getDailyQuests();
+    document.getElementById('quest-reset-hint').textContent = `今日任务 (${res.today}) · 每日0点重置`;
+    const list = document.getElementById('quest-list');
+    if (!list) return;
+    list.innerHTML = '';
+    let hasClaimable = false;
+    res.quests.forEach(q => {
+      const done = q.progress >= q.target;
+      const claimed = !!q.reward_claimed;
+      if (done && !claimed) hasClaimable = true;
+      const pct = Math.min(100, q.target > 0 ? q.progress / q.target * 100 : 0);
+      const card = document.createElement('div');
+      card.className = `quest-card ${done ? 'completed' : ''} ${claimed ? 'claimed' : ''}`;
+      card.innerHTML = `
+        <div class="quest-header">
+          <span class="quest-icon">${q.icon}</span>
+          <div class="quest-info"><div class="quest-name">${q.name}</div><div class="quest-desc">${q.desc}</div></div>
+        </div>
+        <div class="quest-progress-bar"><div class="quest-progress-fill" style="width:${pct}%"></div></div>
+        <div class="quest-progress-text">${q.progress}/${q.target}</div>
+        <div class="quest-reward">
+          <span class="quest-reward-amount">奖励: ${q.reward_money} 💰</span>
+          ${claimed ? '<span style="color:var(--text-dim);font-size:13px">✅ 已领取</span>' : (done ? `<button class="quest-claim-btn" data-qid="${q.id}">领取奖励</button>` : '<span style="color:var(--text-dim);font-size:13px">进行中...</span>')}
+        </div>
+      `;
+      if (done && !claimed) {
+        card.querySelector('.quest-claim-btn')?.addEventListener('click', async () => {
+          try {
+            const r = await API.claimQuestReward(q.id);
+            toast(r.message);
+            document.getElementById('hub-money').textContent = formatMoney(r.playerMoney);
+            loadDailyQuests();
+          } catch(e) { toast(e.message, 'error'); }
+        });
+      }
+      list.appendChild(card);
+    });
+    // Red dot
+    const dot = document.getElementById('quest-red-dot');
+    if (dot) dot.style.display = hasClaimable ? 'block' : 'none';
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ===== GACHA =====
+async function loadGacha() {
+  try {
+    const res = await API.getGachaPools();
+    const container = document.getElementById('gacha-pools');
+    if (!container) return;
+    container.innerHTML = '';
+    document.getElementById('gacha-result-area').style.display = 'none';
+    res.pools.forEach(pool => {
+      const card = document.createElement('div');
+      card.className = 'gacha-pool-card glass-card';
+      let tags = '';
+      if (pool.hasRare) tags += '<span class="gacha-tag gacha-tag-rare">含稀有</span>';
+      if (pool.hasLegendary) tags += '<span class="gacha-tag gacha-tag-legendary">含传说</span>';
+      card.innerHTML = `
+        <div class="gacha-pool-icon">${pool.icon}</div>
+        <div class="gacha-pool-name">${pool.name}</div>
+        <div class="gacha-pool-price">${pool.price} 💰</div>
+        <div class="gacha-pool-tags">${tags}<span class="gacha-tag" style="background:rgba(255,255,255,.05);color:var(--text-dim)">${pool.itemCount}种奖品</span></div>
+        <button class="btn gacha-pull-btn">🎲 抽一次</button>
+      `;
+      card.querySelector('.gacha-pull-btn').addEventListener('click', () => pullGacha(pool.key));
+      container.appendChild(card);
+    });
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function pullGacha(poolKey) {
+  // Show spinning animation
+  const overlay = document.getElementById('gacha-overlay');
+  if (overlay) {
+    overlay.classList.add('active');
+    // Reset animation
+    const ball = overlay.querySelector('.gacha-ball');
+    if(ball) { ball.style.animation = 'none'; ball.offsetHeight; ball.style.animation = ''; }
+  }
+  try {
+    const res = await API.pullGacha(poolKey);
+    document.getElementById('hub-money').textContent = formatMoney(res.playerMoney);
+    // Wait for animation
+    await new Promise(r => setTimeout(r, 1800));
+    if (overlay) overlay.classList.remove('active');
+    // Show result
+    const area = document.getElementById('gacha-result-area');
+    area.style.display = 'block';
+    let rarityHtml = '';
+    if (res.result.rarity === 'rare') rarityHtml = '<div class="gacha-result-rarity rare">★ 稀有 ★</div>';
+    if (res.result.rarity === 'legendary') rarityHtml = '<div class="gacha-result-rarity legendary">★★ 传说 ★★</div>';
+    area.innerHTML = `
+      <div class="gacha-result-icon">${res.result.icon}</div>
+      <div class="gacha-result-name">${res.result.name}</div>
+      <div class="gacha-result-type">${res.message}</div>
+      ${rarityHtml}
+      <p style="color:var(--text-dim);font-size:12px;margin-top:10px">保底计数: ${res.pity}/10</p>
+    `;
+    area.style.animation = 'none'; area.offsetHeight; area.style.animation = '';
+    toast(res.message);
+  } catch(e) {
+    if (overlay) overlay.classList.remove('active');
+    toast(e.message, 'error');
+  }
+}
+
+// ===== SOCIAL TAB ENHANCEMENT (achievements tab) =====
+const _origLoadSocial = loadSocial;
+loadSocial = async function() {
+  await _origLoadSocial();
+  // Re-bind tabs to include achievements
+  document.querySelectorAll('#section-social .pokedex-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('#section-social .pokedex-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('social-friends').style.display = tab.dataset.social === 'friends' ? 'block' : 'none';
+      document.getElementById('social-leaderboard').style.display = tab.dataset.social === 'leaderboard' ? 'block' : 'none';
+      document.getElementById('social-achievements').style.display = tab.dataset.social === 'achievements' ? 'block' : 'none';
+      if (tab.dataset.social === 'friends') loadFriends();
+      if (tab.dataset.social === 'leaderboard') {
+        const activeLb = document.querySelector('#social-leaderboard .shop-sub-tab.active');
+        loadLeaderboard(activeLb?.dataset.lb || 'money');
+      }
+      if (tab.dataset.social === 'achievements') loadAchievements();
+    };
+  });
+};
+
+// ===== ENHANCED HEAL =====
+const origHealBtn = document.getElementById('heal-btn');
+if (origHealBtn) {
+  origHealBtn.replaceWith(origHealBtn.cloneNode(true));
+  document.getElementById('heal-btn').addEventListener('click', async () => {
+    const icon = document.querySelector('.heal-icon');
+    if (icon) { icon.classList.add('healing'); setTimeout(() => icon.classList.remove('healing'), 1000); }
+    // Particles
+    const center = document.querySelector('.heal-center');
+    if (center) {
+      for(let i=0;i<6;i++) {
+        const p = document.createElement('span');
+        p.className = 'heal-particle';
+        p.textContent = ['✨','💚','💖','🌟','❤️‍🩹','💫'][i];
+        p.style.left = (20 + Math.random()*60) + '%';
+        p.style.top = (40 + Math.random()*30) + '%';
+        p.style.animationDelay = (i*0.1) + 's';
+        center.appendChild(p);
+        setTimeout(() => p.remove(), 2000);
+      }
+    }
+    try {
+      const r = await API.heal();
+      document.getElementById('heal-result').textContent = r.message;
+      toast('治疗完成！');
+      refreshTeam();
+      // Quest progress
+      try { await API.questProgress('heal'); } catch(e) {}
+    } catch(err) { toast(err.message, 'error'); }
+  });
+}
+
+// Check achievements periodically after battles
+const _origDoBattleAction = doBattleAction;
+// Expose for quest tracking
+window.trackQuestProgress = async function(type) {
+  // Now handled by server
+};
+
+// ===== RECHARGE / REDEEM =====
+const btnRecharge = document.getElementById('btn-recharge');
+const modalRecharge = document.getElementById('modal-recharge');
+const btnSubmitRecharge = document.getElementById('btn-submit-recharge');
+const inputRecharge = document.getElementById('recharge-code-input');
+
+if (btnRecharge && modalRecharge) {
+  btnRecharge.addEventListener('click', () => {
+    inputRecharge.value = '';
+    modalRecharge.classList.add('active');
+  });
+}
+
+if (btnSubmitRecharge && inputRecharge) {
+  btnSubmitRecharge.addEventListener('click', async () => {
+    const code = inputRecharge.value.trim();
+    if (!code) { toast('请输入兑换码', 'error'); return; }
+    
+    btnSubmitRecharge.disabled = true;
+    btnSubmitRecharge.textContent = '兑换中...';
+    try {
+      const res = await API.redeemCode(code);
+      toast(res.message, 'success');
+      modalRecharge.classList.remove('active');
+      
+      // Update money UI immediately
+      const me = await API.profile();
+      if (me && me.player) {
+        document.getElementById('hub-money').textContent = formatMoney(me.player.money);
+      }
+      
+      // Reload bag if we are on the bag tab
+      if (document.getElementById('section-bag').classList.contains('active')) {
+        if (typeof loadBag === 'function') loadBag();
+      }
+      
+    } catch (err) {
+      toast(err.message, 'error');
+    } finally {
+      btnSubmitRecharge.disabled = false;
+      btnSubmitRecharge.textContent = '立即兑换';
+    }
+  });
+}

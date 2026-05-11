@@ -87,6 +87,10 @@ function addExp(db, playerPetId, expGain) {
   const newSkills = getSkillsAtLevel(pet_id, level);
   const petDef = petsData.pets.find(p => p.id === pet_id);
 
+  // Preserve custom nickname
+  const oldPetDef = petsData.pets.find(p => p.id === pet.pet_id);
+  const finalNickname = (pet.nickname === oldPetDef.name) ? petDef.name : pet.nickname;
+
   // Preserve HP ratio
   const hpRatio = pet.current_hp / pet.max_hp;
   const newMaxHp = newStats.hp;
@@ -98,7 +102,7 @@ function addExp(db, playerPetId, expGain) {
       sp_attack = ?, sp_defense = ?, skills = ?
     WHERE id = ?
   `).run(
-    pet_id, petDef.name, level, exp,
+    pet_id, finalNickname, level, exp,
     newCurrentHp, newMaxHp, newStats.attack, newStats.defense, newStats.speed,
     newStats.spAttack, newStats.spDefense, JSON.stringify(newSkills),
     playerPetId

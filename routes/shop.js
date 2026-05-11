@@ -1,6 +1,7 @@
 const express = require('express');
 const { authMiddleware } = require('../middleware/auth');
 const itemsData = require('../data/items.json');
+const { incrementQuestProgress } = require('../game/quest-manager');
 
 function createShopRouter(db) {
   const router = express.Router();
@@ -48,17 +49,21 @@ function createShopRouter(db) {
       return res.status(400).json({ error: `金币不足！需要 ${totalCost}💰，当前 ${player.money}💰` });
     }
 
-    // Deduct money
-    db.prepare('UPDATE players SET money = money - ? WHERE id = ?').run(totalCost, player.id);
+    // Execute as transaction
+    db.transaction(() => {
+      db.prepare('UPDATE players SET money = money - ? WHERE id = ?').run(totalCost, player.id);
+      
+      const existing = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
+      if (existing) {
+        db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(quantity, existing.id);
+      } else {
+        db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(player.id, itemId, quantity);
+      }
+      
+      incrementQuestProgress(db, player.id, 'shop', 1);
+    })();
 
-    // Add to inventory
     const existing = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
-    if (existing) {
-      db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(quantity, existing.id);
-    } else {
-      db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(player.id, itemId, quantity);
-    }
-
     const updatedPlayer = db.prepare('SELECT money FROM players WHERE id = ?').get(player.id);
     res.json({
       success: true,

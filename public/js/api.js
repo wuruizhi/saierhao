@@ -36,6 +36,13 @@ const API = {
   hatchStart(essenceDbId) { return this.request('POST', '/player/hatch-start', { essenceDbId }); },
   hatchComplete(essenceDbId, speedUp) { return this.request('POST', '/player/hatch-complete', { essenceDbId, speedUp }); },
   equipWardrobe(itemId, part) { return this.request('POST', '/player/equip', { itemId, part }); },
+  releasePet(petInstanceId) { return this.request('POST', '/player/release-pet', { petInstanceId }); },
+  // Social
+  getLeaderboard(type) { return this.request('GET', `/player/leaderboard?type=${type}`); },
+  getFriends() { return this.request('GET', '/player/friends'); },
+  addFriend(username) { return this.request('POST', '/player/friends/add', { username }); },
+  acceptFriend(friendshipId) { return this.request('POST', '/player/friends/accept', { friendshipId }); },
+  removeFriend(friendshipId) { return this.request('POST', '/player/friends/remove', { friendshipId }); },
   // Battle
   getScene(mapId, sceneIndex) { return this.request('GET', `/battle/scene/${mapId}/${sceneIndex}`); },
   explore(mapId, sceneIndex, spawnId) { return this.request('POST', '/battle/explore', { mapId, sceneIndex, spawnId }); },
@@ -47,5 +54,18 @@ const API = {
   shopList() { return this.request('GET', '/shop/list'); },
   shopBuy(itemId, quantity) { return this.request('POST', '/shop/buy', { itemId, quantity }); },
   inventory() { return this.request('GET', '/shop/inventory'); },
+  // Achievements
+  getAchievements() { return this.request('GET', '/player/achievements'); },
+  checkAchievements() { return this.request('POST', '/player/check-achievements'); },
+  // Daily Quests
+  getDailyQuests() { return this.request('GET', '/player/daily-quests'); },
+  questProgress(questType) { return this.request('POST', '/player/quest-progress', { questType }); },
+  claimQuestReward(questDbId) { return this.request('POST', '/player/claim-quest-reward', { questDbId }); },
+  // Gacha
+  getGachaPools() { return this.request('GET', '/player/gacha-pools'); },
+  pullGacha(poolKey) { return this.request('POST', '/player/gacha', { poolKey }); },
+  // Redeem
+  redeemCode(code) { return this.request('POST', '/player/redeem', { code }); },
 };
 window.API = API;
+
