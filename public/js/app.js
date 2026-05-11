@@ -1690,16 +1690,10 @@ async function loadStoryQuests() {
     const list = document.getElementById('story-quest-list');
     if (!list) return;
     list.innerHTML = '';
-    
-    // Check if the tracker should be visible globally
-    const trackerContainer = document.getElementById('quest-tracker-container');
-    const trackerContent = document.getElementById('quest-tracker-content');
-    if (trackerContent) trackerContent.innerHTML = '';
     let hasActiveStory = false;
 
     if (!res.quests || res.quests.length === 0) {
       list.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无主线剧情，去各大星球探索吧！</p>';
-      if (trackerContainer) trackerContainer.style.display = 'none';
       return;
     }
 
@@ -1718,22 +1712,11 @@ async function loadStoryQuests() {
       } else {
         hasActiveStory = true;
         statusHtml = `<span style="color:var(--neon-cyan)">进行中 (${q.progress}/${stepDef ? stepDef.targetCount : 0})</span>`;
-        
-        // Populate global tracker
-        if (trackerContent && stepDef) {
-          trackerContent.innerHTML += `
-            <div class="quest-tracker-item">
-              <strong>${pData.planetName}</strong><br>
-              ${stepDef.description}<br>
-              <span class="quest-tracker-progress">进度: ${q.progress}/${stepDef.targetCount}</span>
-            </div>
-          `;
-        }
       }
 
       card.innerHTML = `
         <div class="story-quest-info">
-          <h4>${pData.name} - 剧情任务</h4>
+          <h4>${pData.planetName} - 剧情任务</h4>
           <p>${q.status === 'completed' ? '本星球的危机已经解除。' : (stepDef ? stepDef.description : '正在探索中...')}</p>
         </div>
         <div class="story-quest-status">
@@ -1743,12 +1726,10 @@ async function loadStoryQuests() {
       list.appendChild(card);
     });
 
-    if (trackerContainer) {
-      trackerContainer.style.display = hasActiveStory ? 'block' : 'none';
-    }
-
   } catch(e) { console.error('Failed to load story quests:', e); }
 }
+
+window.loadStoryQuests = loadStoryQuests;
 
 // Quest tabs logic
 document.querySelectorAll('.pokedex-tabs .pokedex-tab').forEach(tab => {

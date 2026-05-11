@@ -4,3 +4,15 @@ nohup: 忽略输入
 ✅ PVP管理器初始化完成
 🚀 赛尔号服务器已启动: http://localhost:3000
 🌐 WebSocket 服务: ws://localhost:3000/ws
+[API] POST /api/auth/register
+[API] POST /api/player/starter
+[API] POST /api/quests/story/advance
+[API] GET /api/battle/scene/1/0
+[API] POST /api/auth/register
+[API] POST /api/player/starter
+[API] POST /api/quests/story/advance
+[API] GET /api/battle/scene/1/0
+[API] POST /api/auth/register
+[API] POST /api/player/starter
+[API] POST /api/quests/story/advance
+[API] GET /api/battle/scene/1/0
