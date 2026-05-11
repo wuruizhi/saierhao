@@ -2059,8 +2059,8 @@ function createBasePlayerAvatar(vp) {
   img.draggable = false;
   imgWrapper.appendChild(img);
   
-  if (window.applyEquipsToWrapper && window.currentEquips) {
-    window.applyEquipsToWrapper(imgWrapper, window.currentEquips);
+  if (typeof applyEquipsToWrapper === 'function' && typeof currentEquips !== 'undefined') {
+    applyEquipsToWrapper(imgWrapper, currentEquips);
   }
   
   const shadow = document.createElement('div');
@@ -2225,11 +2225,9 @@ window.addEventListener('mouseup', () => {
 function renderBaseViewport() {
   const vp = document.getElementById('base-viewport');
   if(!vp) return;
-  const saveBtnNode = vp.querySelector('#btn-save-base')?.parentNode;
-  const expandBtnNode = vp.querySelector('#btn-expand-sidebar');
-  vp.innerHTML = '';
-  if(expandBtnNode) vp.appendChild(expandBtnNode);
-  if(saveBtnNode) vp.appendChild(saveBtnNode);
+  
+  // Safely cleanup old dynamic elements instead of clearing innerHTML
+  vp.querySelectorAll('.base-furniture, .base-pet, .player-avatar, .click-indicator').forEach(el => el.remove());
   
   // Click to move player
   vp.onclick = (e) => {
@@ -2291,6 +2289,7 @@ function renderBaseViewport() {
 
   basePets.forEach(pet => {
     const el = document.createElement('div');
+    el.className = 'base-pet';
     el.style.cssText = `
       position: absolute; left: ${pet.x}px; top: ${pet.y}px;
       width: 100px; height: 100px;
