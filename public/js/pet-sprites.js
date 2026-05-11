@@ -13,18 +13,72 @@ const PET_ELEMENT_COLORS = {
 
 // Get pet type from pets data (cached)
 const PET_TYPE_MAP = {
-  1:'fire',2:'fire',3:'fire',
-  4:'water',5:'water',6:'water',
-  7:'grass',8:'grass',9:'grass',
-  10:'electric',11:'light',12:'dark',
-  13:'electric',14:'electric',
-  15:'light',16:'light',
-  17:'dark',18:'dark',
-  19:'fire',20:'fire',21:'fire',
-  22:'water',23:'water',24:'water',
-  25:'grass',26:'grass',27:'grass',
-  28:'electric',29:'electric',30:'electric',
-  31:'dark',32:'dark',33:'dark'
+  "1": "fire",
+  "2": "fire",
+  "3": "fire",
+  "4": "water",
+  "5": "water",
+  "6": "water",
+  "7": "grass",
+  "8": "grass",
+  "9": "grass",
+  "10": "electric",
+  "11": "light",
+  "12": "dark",
+  "13": "electric",
+  "14": "electric",
+  "15": "light",
+  "16": "light",
+  "17": "dark",
+  "18": "dark",
+  "19": "fire",
+  "20": "fire",
+  "21": "fire",
+  "22": "water",
+  "23": "water",
+  "24": "water",
+  "25": "grass",
+  "26": "grass",
+  "27": "grass",
+  "28": "electric",
+  "29": "electric",
+  "30": "electric",
+  "31": "dark",
+  "32": "dark",
+  "33": "dark",
+  "34": "fire",
+  "35": "fire",
+  "36": "fire",
+  "37": "fire",
+  "38": "fire",
+  "39": "fire",
+  "40": "water",
+  "41": "water",
+  "42": "water",
+  "43": "water",
+  "44": "water",
+  "45": "water",
+  "46": "grass",
+  "47": "grass",
+  "48": "grass",
+  "49": "grass",
+  "50": "grass",
+  "51": "grass",
+  "52": "electric",
+  "53": "electric",
+  "54": "electric",
+  "55": "electric",
+  "56": "electric",
+  "57": "electric",
+  "58": "light",
+  "59": "light",
+  "60": "light",
+  "61": "dark",
+  "62": "dark",
+  "63": "dark",
+  "64": "normal",
+  "65": "normal",
+  "66": "normal"
 };
 
 function renderPetSprite(container, petId, size) {
@@ -56,7 +110,7 @@ function renderPetSprite(container, petId, size) {
 
   // Image
   const img = document.createElement('img');
-  img.src = `/img/pets/${petId}.png`;
+  img.src = `/img/pets/${petId}.png?v=2`;
   img.alt = `Pet ${petId}`;
   img.style.cssText = `
     width:${s*0.88}px;height:${s*0.88}px;object-fit:contain;
