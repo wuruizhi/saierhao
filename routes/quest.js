@@ -9,11 +9,20 @@ const storyQuestsData = JSON.parse(fs.readFileSync(path.join(__dirname, '../data
 function createQuestRouter(db) {
   const router = express.Router();
 
+  // Helper to get player_id from req.userId
+  const getPlayerId = (userId) => {
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(userId);
+    return player ? player.id : null;
+  };
+
   // Get current story quests progress
   router.get('/story', authMiddleware, (req, res) => {
     try {
+      const playerId = getPlayerId(req.userId);
+      if (!playerId) return res.status(404).json({ error: 'Player not found' });
+
       const stmt = db.prepare('SELECT * FROM player_story_quests WHERE player_id = ?');
-      const quests = stmt.all(req.userId);
+      const quests = stmt.all(playerId);
       res.json({ quests, storyData: storyQuestsData.planets });
     } catch (err) {
       console.error('Get story quests error:', err);
@@ -24,6 +33,9 @@ function createQuestRouter(db) {
   // Start or advance a story quest
   router.post('/story/advance', authMiddleware, (req, res) => {
     try {
+      const playerId = getPlayerId(req.userId);
+      if (!playerId) return res.status(404).json({ error: 'Player not found' });
+
       const { planetId } = req.body;
       const planetData = storyQuestsData.planets[planetId];
       if (!planetData) {
@@ -32,12 +44,12 @@ function createQuestRouter(db) {
 
       // Check current progress
       const stmt = db.prepare('SELECT * FROM player_story_quests WHERE player_id = ? AND planet_id = ?');
-      let quest = stmt.get(req.userId, planetId);
+      let quest = stmt.get(playerId, planetId);
 
       if (!quest) {
         // Start the first step
         const insertStmt = db.prepare('INSERT INTO player_story_quests (player_id, planet_id, quest_step, progress, status) VALUES (?, ?, 0, 0, "active")');
-        insertStmt.run(req.userId, planetId);
+        insertStmt.run(playerId, planetId);
         
         return res.json({ success: true, message: 'Quest started', step: 0 });
       }
@@ -51,13 +63,23 @@ function createQuestRouter(db) {
         return res.status(400).json({ error: 'This planet quest is already completed.' });
       }
 
-      // For dialogue/interaction type quests, advancing simply completes the step
-      // Battle/boss type quests are advanced automatically during battle resolution
-      // But we can allow advancing here for dialogue parts
-      
-      // We will handle battle progress in routes/battle.js
-      // If this is called from UI for a dialogue/prompt, we just return success to indicate the dialogue was read
-      
+      // If this is a dialogue step, advancing it means we completed the dialogue.
+      // We should check the target conditions. If it's pure dialogue, we can advance.
+      if (currentStepDef.type === 'dialogue') {
+        // Note: For now, we assume frontend calls advance when a dialogue finishes,
+        // and if it's pure dialogue, we increment the step.
+        // Actually, the battle script handles battle types, so here we can just 
+        // increment step if type is dialogue.
+        const nextStep = quest.quest_step + 1;
+        const nextStepDef = planetData.steps.find(s => s.step === nextStep);
+        
+        if (nextStepDef) {
+          db.prepare('UPDATE player_story_quests SET quest_step = ?, progress = 0 WHERE player_id = ? AND planet_id = ?').run(nextStep, playerId, planetId);
+        } else {
+          db.prepare('UPDATE player_story_quests SET status = "completed" WHERE player_id = ? AND planet_id = ?').run(playerId, planetId);
+        }
+      }
+
       res.json({ success: true, quest });
 
     } catch (err) {
