@@ -352,8 +352,8 @@ function createPlayerAvatar(vp) {
   img.draggable = false;
   imgWrapper.appendChild(img);
   
-  if (window.applyEquipsToWrapper && currentEquips) {
-    window.applyEquipsToWrapper(imgWrapper, currentEquips);
+  if (window.applyEquipsToWrapper && window.currentEquips) {
+    window.applyEquipsToWrapper(imgWrapper, window.currentEquips);
   }
   
   // Player shadow
@@ -366,7 +366,7 @@ function createPlayerAvatar(vp) {
   // Name tag
   const tag = document.createElement('div');
   tag.className = 'player-name-tag';
-  tag.textContent = currentUsername || '我的赛尔';
+  tag.textContent = window.currentUsername || '我的赛尔';
   playerAvatar.appendChild(tag);
   
   vp.appendChild(playerAvatar);

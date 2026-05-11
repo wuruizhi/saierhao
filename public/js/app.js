@@ -2,7 +2,7 @@
 const TYPE_NAMES = { fire:'火',water:'水',grass:'草',electric:'电',light:'光',dark:'暗',normal:'普通' };
 const TYPE_ICONS = { fire:'🔥',water:'💧',grass:'🌿',electric:'⚡',light:'✨',dark:'🌑',normal:'⚪' };
 const PLANET_ICONS = ['','🌋','🌊','🌲','⚡','🌗'];
-let currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null;
+var currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null;
 let SKILLS_MAP = {};
 function getSkillName(sid) { const s = SKILLS_MAP[sid]; return s ? s.name : `技能#${sid}`; }
 function getSkillDef(sid) { return SKILLS_MAP[sid] || null; }
