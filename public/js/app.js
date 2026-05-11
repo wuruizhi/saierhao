@@ -261,7 +261,7 @@ async function loadPlanets(){
       
       const model = document.createElement('div');
       model.className = 'planet-model';
-      model.style.backgroundImage = `url('/img/planets/neutral.png?v=ares')`; // Placeholder for galaxy image
+      model.style.backgroundImage = `url('/img/galaxies/galaxy_${g.id}.png?v=ares2')`;
       model.style.backgroundSize = 'cover';
       
       const info = document.createElement('div');
@@ -329,10 +329,7 @@ function renderPlanets(galaxy, maxLv, planetGrid, galaxyGrid, btnBack, title) {
     
     const model = document.createElement('div');
     model.className = 'planet-model';
-    // Map new themes to existing images if new images aren't ready yet
-    let imgName = m.theme;
-    if (imgName === 'dark' || imgName === 'light') imgName = 'neutral';
-    model.style.backgroundImage = `url('/img/planets/${imgName}.png?v=ares')`;
+    model.style.backgroundImage = `url('/img/planets/planet_${m.id}.png?v=ares2')`;
     
     const info = document.createElement('div');
     info.className = 'planet-info';
