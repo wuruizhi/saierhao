@@ -1830,20 +1830,24 @@ window.claimExpedition = async function(id) {
 };
 
 document.getElementById('btn-new-expedition')?.addEventListener('click', async () => {
-  // Simplistic implementation for selecting a pet and starting an expedition.
-  // We'll just fetch storage pets and let the user pick one.
   try {
     const me = await API.profile();
-    const storage = me.storagePets || [];
-    if (storage.length === 0) {
-      toast('仓库里没有空闲的精灵！', 'error');
+    const expRes = await API.getExpeditions();
+    
+    const busyPetIds = expRes.expeditions.map(e => e.petId);
+    const availablePets = (me.storagePets || []).filter(p => !busyPetIds.includes(p.id));
+
+    if (availablePets.length === 0) {
+      toast('没有可派遣的闲置精灵！（队伍中的精灵和正在派遣中的精灵无法出任务）', 'error');
       return;
     }
     
-    const petId = prompt(`你想派遣哪只精灵？(输入仓库中精灵的序号 1-${storage.length})\n\n` + storage.map((p,i)=>`${i+1}. ${p.nickname}`).join('\n'));
-    if (!petId || isNaN(petId) || petId < 1 || petId > storage.length) return;
+    const petIdxStr = prompt(`你想派遣哪只精灵？(输入精灵的序号 1-${availablePets.length})\n\n` + availablePets.map((p,i)=>`${i+1}. ${p.nickname} (Lv.${p.level})`).join('\n'));
+    if (!petIdxStr) return;
+    const petIdx = parseInt(petIdxStr);
+    if (isNaN(petIdx) || petIdx < 1 || petIdx > availablePets.length) return;
     
-    const selectedPet = storage[petId - 1];
+    const selectedPet = availablePets[petIdx - 1];
     const duration = prompt('你想派遣多少小时？(例如：2, 4, 8)', '2');
     if (!duration || isNaN(duration) || duration < 1) return;
     
