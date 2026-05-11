@@ -268,3 +268,36 @@ SqliteError: no such column: accepted
     at Route.dispatch (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:119:3)
     at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
     at /home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/index.js:284:15
+SqliteError: no such column: accepted
+    at Database.prepare (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+    at /home/ubuntu/data2/vibe_coding/saierhao/routes/player.js:452:8
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at authMiddleware (/home/ubuntu/data2/vibe_coding/saierhao/middleware/auth.js:16:5)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at /home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/index.js:284:15
+SqliteError: no such column: accepted
+    at Database.prepare (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+    at /home/ubuntu/data2/vibe_coding/saierhao/routes/player.js:452:8
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at authMiddleware (/home/ubuntu/data2/vibe_coding/saierhao/middleware/auth.js:16:5)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at /home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/index.js:284:15
+SqliteError: no such column: accepted
+    at Database.prepare (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+    at /home/ubuntu/data2/vibe_coding/saierhao/routes/player.js:452:8
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at authMiddleware (/home/ubuntu/data2/vibe_coding/saierhao/middleware/auth.js:16:5)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/layer.js:95:5)
+    at /home/ubuntu/data2/vibe_coding/saierhao/node_modules/express/lib/router/index.js:284:15

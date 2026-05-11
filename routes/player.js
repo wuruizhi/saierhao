@@ -456,7 +456,7 @@ function createPlayerRouter(db) {
       res.json({ success: true, message: '已接受好友请求' });
     } catch (e) {
       console.error('/friends/accept error:', e);
-      res.status(500).json({ error: '服务器内部错误' });
+      res.status(500).json({ error: '服务器内部错误: ' + e.message });
     }
   });
 
@@ -470,7 +470,7 @@ function createPlayerRouter(db) {
       res.json({ success: true, message: '已删除好友/拒绝请求' });
     } catch (e) {
       console.error('/friends/remove error:', e);
-      res.status(500).json({ error: '服务器内部错误' });
+      res.status(500).json({ error: '服务器内部错误: ' + e.message });
     }
   });
 
