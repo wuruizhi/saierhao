@@ -549,6 +549,7 @@ window.hatchComplete = async function(id, speedUp) {
 
 // Return from battle to scene or hub
 function returnFromBattle() {
+  if (window.loadStoryQuests) window.loadStoryQuests();
   if (window._battleSceneReturn) {
     const {mapId, sceneIndex} = window._battleSceneReturn;
     window._battleSceneReturn = null;

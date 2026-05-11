@@ -201,7 +201,7 @@ function createBattleRouter(db, sceneManager) {
             const stepData = planetData.steps.find(s => s.step === quest.quest_step);
             if (!stepData) return;
             
-            if (quest.planet_id === battle.mapId && (stepData.type === 'battle' || stepData.type === 'boss_battle' || stepData.type === 'npc_battle')) {
+            if (quest.planet_id == battle.mapId && (stepData.type === 'battle' || stepData.type === 'boss_battle' || stepData.type === 'npc_battle')) {
               let validTarget = false;
               if (Array.isArray(stepData.targetId)) {
                 validTarget = stepData.targetId.includes(battle.wildPetOriginal.pet_id);

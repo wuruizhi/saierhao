@@ -1723,7 +1723,7 @@ async function loadStoryQuests() {
         if (trackerContent && stepDef) {
           trackerContent.innerHTML += `
             <div class="quest-tracker-item">
-              <strong>${pData.name}</strong><br>
+              <strong>${pData.planetName}</strong><br>
               ${stepDef.description}<br>
               <span class="quest-tracker-progress">进度: ${q.progress}/${stepDef.targetCount}</span>
             </div>
