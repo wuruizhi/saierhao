@@ -48,7 +48,7 @@ function createQuestRouter(db) {
 
       if (!quest) {
         // Start the first step
-        const insertStmt = db.prepare('INSERT INTO player_story_quests (player_id, planet_id, quest_step, progress, status) VALUES (?, ?, 0, 0, "active")');
+        const insertStmt = db.prepare('INSERT INTO player_story_quests (player_id, planet_id, quest_step, progress, status) VALUES (?, ?, 0, 0, \'active\')');
         insertStmt.run(playerId, planetId);
         
         return res.json({ success: true, message: 'Quest started', step: 0 });
@@ -76,7 +76,7 @@ function createQuestRouter(db) {
         if (nextStepDef) {
           db.prepare('UPDATE player_story_quests SET quest_step = ?, progress = 0 WHERE player_id = ? AND planet_id = ?').run(nextStep, playerId, planetId);
         } else {
-          db.prepare('UPDATE player_story_quests SET status = "completed" WHERE player_id = ? AND planet_id = ?').run(playerId, planetId);
+          db.prepare('UPDATE player_story_quests SET status = \'completed\' WHERE player_id = ? AND planet_id = ?').run(playerId, planetId);
         }
       }
 
