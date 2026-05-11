@@ -261,7 +261,7 @@ async function loadPlanets(){
       
       const model = document.createElement('div');
       model.className = 'planet-model';
-      model.style.backgroundImage = `url('/img/planets/neutral.png')`; // Placeholder for galaxy image
+      model.style.backgroundImage = `url('/img/planets/neutral.png?v=ares')`; // Placeholder for galaxy image
       model.style.backgroundSize = 'cover';
       
       const info = document.createElement('div');
@@ -332,7 +332,7 @@ function renderPlanets(galaxy, maxLv, planetGrid, galaxyGrid, btnBack, title) {
     // Map new themes to existing images if new images aren't ready yet
     let imgName = m.theme;
     if (imgName === 'dark' || imgName === 'light') imgName = 'neutral';
-    model.style.backgroundImage = `url('/img/planets/${imgName}.png')`;
+    model.style.backgroundImage = `url('/img/planets/${imgName}.png?v=ares')`;
     
     const info = document.createElement('div');
     info.className = 'planet-info';
@@ -619,7 +619,7 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
       q.push({
         name: d.character,
         text: d.text,
-        spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null
+        spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null
       });
     });
     
@@ -2517,7 +2517,7 @@ function createBasePlayerAvatar(vp) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png?v=14';
+  img.src = '/img/player.png?v=15';
   img.alt = '赛尔';
   img.className = 'player-sprite';
   img.draggable = false;

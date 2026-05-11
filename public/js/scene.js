@@ -3,12 +3,12 @@ let currentMapId = null, currentSceneIndex = null, sceneRefreshTimer = null, sce
 
 // Scene background map (planet theme -> image)
 const SCENE_BACKGROUNDS = {
-  fire: '/img/scenes/fire.png',
-  water: '/img/scenes/water.png',
-  grass: '/img/scenes/grass.png',
-  electric: '/img/scenes/electric.png',
-  dark: '/img/scenes/dark.png',
-  neutral: '/img/scenes/light-twilight.png'
+  fire: '/img/scenes/fire.png?v=ares',
+  water: '/img/scenes/water.png?v=ares',
+  grass: '/img/scenes/grass.png?v=ares',
+  electric: '/img/scenes/electric.png?v=ares',
+  dark: '/img/scenes/dark.png?v=ares',
+  neutral: '/img/scenes/light-twilight.png?v=ares'
 };
 
 // Planet icons (defined in app.js, accessible globally)
@@ -346,7 +346,7 @@ function createPlayerAvatar(vp) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png?v=14';
+  img.src = '/img/player.png?v=15';
   img.alt = '赛尔';
   img.className = 'player-sprite';
   img.draggable = false;
@@ -508,7 +508,7 @@ async function interactWithNpc(npc) {
            q.push({
              name: d.character,
              text: d.text,
-             spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null
+             spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null
            });
          });
          let idx = 0;
@@ -522,7 +522,7 @@ async function interactWithNpc(npc) {
                if (window.loadStoryQuests) window.loadStoryQuests();
                if (stepDef.endDialogues && stepDef.endDialogues.length > 0) {
                  let eq = [];
-                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null }));
+                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null }));
                  let eidx = 0;
                  const playEndNext = () => {
                    if (eidx < eq.length) {
@@ -806,7 +806,7 @@ function createOtherPlayerAvatar(playerInfo) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png?v=14';
+  img.src = '/img/player.png?v=15';
   img.className = 'player-sprite';
   img.draggable = false;
   imgWrapper.appendChild(img);
