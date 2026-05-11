@@ -452,7 +452,7 @@ function createPlayerRouter(db) {
       if (!friendship) return res.status(404).json({ error: '请求不存在' });
       if (friendship.friend_id !== req.userId) return res.status(403).json({ error: '无权操作' });
 
-      db.prepare('UPDATE friends SET status = "accepted" WHERE id = ?').run(friendshipId);
+      db.prepare("UPDATE friends SET status = 'accepted' WHERE id = ?").run(friendshipId);
       res.json({ success: true, message: '已接受好友请求' });
     } catch (e) {
       console.error('/friends/accept error:', e);
