@@ -79,7 +79,9 @@ const API = {
   donateGuild(amount) { return this.request('POST', '/player/guild/donate', { amount }); },
   // Base
   getBase() { return this.request('GET', '/player/base'); },
-  saveBase(items) { return this.request('POST', '/player/base/save', { items }); }
+  saveBase(items) { return this.request('POST', '/player/base/save', { items }); },
+  getBasePets() { return this.request('GET', '/player/base/pets'); },
+  toggleBasePet(petId, inBase) { return this.request('POST', '/player/base/pets/toggle', { petId, inBase }); }
 };
 window.API = API;
 

@@ -215,6 +215,7 @@ function initDB() {
 
   try { db.exec('ALTER TABLE player_pets ADD COLUMN ivs TEXT DEFAULT "{}"'); } catch(e) {}
   try { db.exec('ALTER TABLE player_pets ADD COLUMN evs TEXT DEFAULT "{}"'); } catch(e) {}
+  try { db.exec('ALTER TABLE player_pets ADD COLUMN in_base INTEGER DEFAULT 0'); } catch(e) {}
 
   return db;
 }

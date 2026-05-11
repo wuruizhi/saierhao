@@ -1008,6 +1008,22 @@ function createPlayerRouter(db) {
     res.json({ success: true, message: '基地保存成功！' });
   });
 
+  router.get('/base/pets', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    const pets = db.prepare('SELECT * FROM player_pets WHERE player_id = ?').all(player.id);
+    res.json({ pets });
+  });
+
+  router.post('/base/pets/toggle', authMiddleware, (req, res) => {
+    const { petId, inBase } = req.body;
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    const pet = db.prepare('SELECT id FROM player_pets WHERE id = ? AND player_id = ?').get(petId, player.id);
+    if (!pet) return res.status(404).json({ error: '宠物不存在' });
+    
+    db.prepare('UPDATE player_pets SET in_base = ? WHERE id = ?').run(inBase ? 1 : 0, pet.id);
+    res.json({ success: true, message: inBase ? '放入基地成功' : '收回精灵成功' });
+  });
+
   router.get('/gacha-pools', authMiddleware, (req, res) => {
     const pools = Object.entries(GACHA_POOLS).map(([key, pool]) => ({
       key, name: pool.name, price: pool.price, icon: pool.icon,

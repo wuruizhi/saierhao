@@ -1960,6 +1960,26 @@ document.getElementById('btn-guild-donate')?.addEventListener('click', async () 
 // ===== BASE SYSTEM =====
 let baseItems = [];
 let baseInventory = [];
+let basePets = [];
+let allPlayerPets = [];
+
+document.getElementById('tab-base-furniture')?.addEventListener('click', () => {
+  document.getElementById('tab-base-furniture').style.borderBottom = '2px solid var(--neon-cyan)';
+  document.getElementById('tab-base-furniture').style.color = 'var(--text-primary)';
+  document.getElementById('tab-base-pets').style.borderBottom = 'none';
+  document.getElementById('tab-base-pets').style.color = 'var(--text-dim)';
+  document.getElementById('base-inventory-list').style.display = 'flex';
+  document.getElementById('base-pets-list').style.display = 'none';
+});
+
+document.getElementById('tab-base-pets')?.addEventListener('click', () => {
+  document.getElementById('tab-base-pets').style.borderBottom = '2px solid var(--neon-cyan)';
+  document.getElementById('tab-base-pets').style.color = 'var(--text-primary)';
+  document.getElementById('tab-base-furniture').style.borderBottom = 'none';
+  document.getElementById('tab-base-furniture').style.color = 'var(--text-dim)';
+  document.getElementById('base-inventory-list').style.display = 'none';
+  document.getElementById('base-pets-list').style.display = 'flex';
+});
 
 async function loadBase() {
   try {
@@ -1975,12 +1995,61 @@ async function loadBase() {
       rotation: i.rotation,
       placed: i.placed === 1
     }));
+
+    const petsData = await API.getBasePets();
+    allPlayerPets = petsData.pets;
+    basePets = allPlayerPets.filter(p => p.in_base === 1).map(p => ({
+      ...p,
+      x: Math.random() * 500 + 100,
+      y: Math.random() * 300 + 100
+    }));
     
     renderBaseInventory();
+    renderBasePetsList();
     renderBaseViewport();
   } catch(e) {
     toast(e.message, 'error');
   }
+}
+
+function renderBasePetsList() {
+  const list = document.getElementById('base-pets-list');
+  if(!list) return;
+  list.innerHTML = '';
+  
+  allPlayerPets.forEach(pet => {
+    const inBase = pet.in_base === 1;
+    
+    const itemEl = document.createElement('div');
+    itemEl.className = `glass-card`;
+    itemEl.style.cssText = `padding:10px; display:flex; align-items:center; gap:10px;`;
+    
+    itemEl.innerHTML = `
+      <div style="width:40px; height:40px; background:var(--glass-bg); border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;" id="base-pet-icon-${pet.id}"></div>
+      <div style="flex:1">
+        <div style="font-weight:bold;">${pet.nickname}</div>
+        <div style="font-size:12px; color:var(--text-dim);">Lv.${pet.level}</div>
+      </div>
+      <button class="btn btn-sm ${inBase ? 'btn-danger' : 'btn-primary'}">${inBase ? '收回' : '放入'}</button>
+    `;
+    
+    itemEl.querySelector('button').addEventListener('click', async () => {
+      try {
+        await API.toggleBasePet(pet.id, !inBase);
+        pet.in_base = inBase ? 0 : 1;
+        if (!inBase) {
+          basePets.push({ ...pet, x: 400, y: 300 });
+        } else {
+          basePets = basePets.filter(bp => bp.id !== pet.id);
+        }
+        renderBasePetsList();
+        renderBaseViewport();
+      } catch(e) { toast(e.message, 'error'); }
+    });
+    
+    list.appendChild(itemEl);
+    renderPetSprite(document.getElementById(`base-pet-icon-${pet.id}`), pet.pet_id, 40);
+  });
 }
 
 function renderBaseInventory() {
@@ -2078,6 +2147,40 @@ function renderBaseViewport() {
     });
     
     vp.appendChild(el);
+  });
+
+  // Render roaming pets
+  let petIntervals = window.basePetIntervals || [];
+  petIntervals.forEach(clearInterval);
+  window.basePetIntervals = [];
+
+  basePets.forEach(pet => {
+    const el = document.createElement('div');
+    el.style.cssText = `
+      position: absolute; left: ${pet.x}px; top: ${pet.y}px;
+      width: 100px; height: 100px;
+      transition: left 2s ease-in-out, top 2s ease-in-out;
+      pointer-events: none;
+      z-index: 10;
+    `;
+    vp.appendChild(el);
+    renderPetSprite(el, pet.pet_id, 100);
+    
+    // Roaming AI
+    const interval = setInterval(() => {
+      if(Math.random() > 0.4 && vp.contains(el)) {
+        pet.x = Math.max(20, Math.min(vp.clientWidth - 120, pet.x + (Math.random() - 0.5) * 200));
+        pet.y = Math.max(100, Math.min(vp.clientHeight - 150, pet.y + (Math.random() - 0.5) * 200));
+        el.style.left = pet.x + 'px';
+        el.style.top = pet.y + 'px';
+        // Flip sprite direction based on movement
+        const img = el.querySelector('img');
+        if (img) {
+          img.style.transform = (Math.random() > 0.5) ? 'scaleX(-1)' : 'scaleX(1)';
+        }
+      }
+    }, 2500);
+    window.basePetIntervals.push(interval);
   });
 }
 
