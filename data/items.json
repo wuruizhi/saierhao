@@ -28,7 +28,8 @@
     { "id": "hatch_speed", "name": "孵化加速剂", "price": 500, "icon": "⏩", "description": "使用后精元立即完成孵化，无需等待。对已开始孵化的精元使用。" },
     { "id": "level_boost", "name": "等级直升卡", "price": 20000, "icon": "📈", "description": "使用后精灵直接提升10个等级！可突破进化等级限制，快速获得更强力的形态。" },
     { "id": "evolve_stone", "name": "进化石", "price": 30000, "icon": "✨", "description": "使精灵直接进化为下一形态。需要精灵具备进化条件（有下一进化形态）。" },
-    { "id": "reset_stats", "name": "属性重置卡", "price": 10000, "icon": "🔄", "description": "重置精灵所有强化属性到基础值。如果强化方向出错可以使用此道具重新培养。" }
+    { "id": "reset_stats", "name": "属性重置卡", "price": 10000, "icon": "🔄", "description": "重置精灵所有强化属性到基础值。如果强化方向出错可以使用此道具重新培养。" },
+    { "id": "gene_resequencer", "name": "基因重组药剂", "price": 25000, "icon": "🧬", "description": "重新随机生成精灵的个体值(IV)，改变其潜能。高风险高回报的终极道具。" }
   ],
   "wardrobe": [
     { "id": "hat_novice", "part": "head", "name": "赛尔头盔", "price": 0, "icon": "🪖", "description": "每一位赛尔的基础配备，保护头部安全。" },
@@ -91,6 +92,13 @@
     "grass": { "name": "古树精元", "icon": "🌿", "hatchPetId": 25, "hatchTime": 300, "skipCost": 500 },
     "electric": { "name": "天雷精元", "icon": "⚡", "hatchPetId": 28, "hatchTime": 600, "skipCost": 1000 },
     "dark": { "name": "虚空精元", "icon": "🌑", "hatchPetId": 31, "hatchTime": 900, "skipCost": 2000 }
-  }
+  },
+  "furniture": [
+    { "id": "base_bed", "name": "太空睡眠舱", "price": 15000, "icon": "🛏️", "description": "赛尔号船员的标准睡眠舱，提供舒适的休息环境。" },
+    { "id": "base_desk", "name": "全息工作台", "price": 10000, "icon": "🖥️", "description": "处理星际数据的高科技工作台。" },
+    { "id": "base_plant", "name": "太空盆栽", "price": 5000, "icon": "🪴", "description": "能在微重力环境下生长的奇特植物。" },
+    { "id": "base_trophy", "name": "黄金奖杯", "price": 30000, "icon": "🏆", "description": "象征荣耀的奖杯，摆在基地里非常气派。" },
+    { "id": "base_lamp", "name": "等离子灯", "price": 8000, "icon": "🏮", "description": "散发着幽蓝光芒的氛围灯。" }
+  ]
 }
 

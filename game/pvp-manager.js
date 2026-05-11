@@ -10,8 +10,9 @@ class PvpManager {
     this.db = db;
     this.onlinePlayers = new Map(); // userId -> { ws, username }
     this.scenePlayers = new Map(); // sceneId -> Map<userId, { username, x, y, targetX, targetY }>
-    this.pvpRooms = new Map(); // roomId -> { player1, player2, state }
+    this.pvpRooms = new Map(); // roomId -> { player1, player2, state, isRanked }
     this.invitations = new Map(); // `${from}_${to}` -> invitation data
+    this.rankedQueue = []; // array of { userId, elo, joinedAt }
     this.chatHistory = []; // last N chat messages
     this.MAX_CHAT_HISTORY = 50;
   }
@@ -106,6 +107,12 @@ class PvpManager {
         break;
       case 'chat_message':
         this.handleChatMessage(userId, msg.text);
+        break;
+      case 'pvp_queue_join':
+        this.handleJoinQueue(userId);
+        break;
+      case 'pvp_queue_leave':
+        this.handleLeaveQueue(userId);
         break;
     }
   }
@@ -213,6 +220,65 @@ class PvpManager {
     this.sendTo(fromId, { type: 'pvp_rejected', byUsername: rejecterName });
   }
 
+  handleJoinQueue(userId) {
+    const player = this.db.prepare('SELECT elo_rating FROM players WHERE user_id = ?').get(userId);
+    if (!player) return;
+    const elo = player.elo_rating || 1000;
+    
+    // Check if already in queue or room
+    if (this.rankedQueue.some(q => q.userId === userId)) return;
+    for (const [roomId, room] of this.pvpRooms) {
+      if (room.player1.userId === userId || room.player2.userId === userId) {
+        this.sendTo(userId, { type: 'pvp_error', message: '你已经在对战中了' });
+        return;
+      }
+    }
+    
+    // Find match
+    const matchIndex = this.rankedQueue.findIndex(q => Math.abs(q.elo - elo) < 400); // 400 diff tolerance
+    if (matchIndex !== -1) {
+      const opponent = this.rankedQueue.splice(matchIndex, 1)[0];
+      this.startRankedMatch(userId, opponent.userId);
+    } else {
+      this.rankedQueue.push({ userId, elo, joinedAt: Date.now() });
+      this.sendTo(userId, { type: 'pvp_queue_joined' });
+    }
+  }
+
+  handleLeaveQueue(userId) {
+    this.rankedQueue = this.rankedQueue.filter(q => q.userId !== userId);
+    this.sendTo(userId, { type: 'pvp_queue_left' });
+  }
+
+  startRankedMatch(p1Id, p2Id) {
+    const roomId = `ranked_${p1Id}_${p2Id}_${Date.now()}`;
+    const p1Player = this.db.prepare('SELECT * FROM players WHERE user_id = ?').get(p1Id);
+    const p2Player = this.db.prepare('SELECT * FROM players WHERE user_id = ?').get(p2Id);
+
+    const p1Team = this.db.prepare('SELECT * FROM player_pets WHERE player_id = ? AND in_team = 1 AND current_hp > 0 ORDER BY team_order').all(p1Player.id);
+    const p2Team = this.db.prepare('SELECT * FROM player_pets WHERE player_id = ? AND in_team = 1 AND current_hp > 0 ORDER BY team_order').all(p2Player.id);
+
+    if (p1Team.length === 0 || p2Team.length === 0) {
+      this.sendTo(p1Id, { type: 'pvp_error', message: '匹配失败，队伍中没有可战斗的精灵' });
+      this.sendTo(p2Id, { type: 'pvp_error', message: '匹配失败，队伍中没有可战斗的精灵' });
+      return;
+    }
+
+    const enrichPet = (p) => ({ ...p, skills: JSON.parse(p.skills), petDef: petsData.pets.find(pd => pd.id === p.pet_id) });
+
+    const room = {
+      isRanked: true,
+      player1: { userId: p1Id, username: this.onlinePlayers.get(p1Id)?.username, team: p1Team.map(enrichPet), activeIndex: 0, action: null },
+      player2: { userId: p2Id, username: this.onlinePlayers.get(p2Id)?.username, team: p2Team.map(enrichPet), activeIndex: 0, action: null },
+      turn: 1
+    };
+    this.pvpRooms.set(roomId, room);
+
+    const battleData = { type: 'pvp_start', isRanked: true, roomId, turn: 1 };
+    this.sendTo(p1Id, { ...battleData, yourPet: room.player1.team[0], opponentPet: this.sanitizePet(room.player2.team[0]), opponentName: room.player2.username });
+    this.sendTo(p2Id, { ...battleData, yourPet: room.player2.team[0], opponentPet: this.sanitizePet(room.player1.team[0]), opponentName: room.player1.username });
+  }
+
   handlePvpAction(userId, roomId, skillId) {
     const room = this.pvpRooms.get(roomId);
     if (!room) return;
@@ -295,8 +361,49 @@ class PvpManager {
     });
 
     if (battleEnd) {
+      if (room.isRanked) {
+        this.updateElo(room.player1.userId, room.player2.userId, winnerId);
+      } else {
+        // Casual PVP achievements
+        const winnerP = this.db.prepare('SELECT * FROM players WHERE user_id = ?').get(winnerId);
+        if (winnerP) {
+          this.db.prepare('UPDATE players SET pvp_wins = pvp_wins + 1 WHERE id = ?').run(winnerP.id);
+          const { incrementQuestProgress } = require('./quest-manager');
+          incrementQuestProgress(this.db, winnerP.id, 'pvp', 1);
+        }
+      }
       this.pvpRooms.delete(roomId);
     }
+  }
+
+  updateElo(p1UserId, p2UserId, winnerId) {
+    const p1Player = this.db.prepare('SELECT id, elo_rating, ranked_wins FROM players WHERE user_id = ?').get(p1UserId);
+    const p2Player = this.db.prepare('SELECT id, elo_rating, ranked_wins FROM players WHERE user_id = ?').get(p2UserId);
+    if (!p1Player || !p2Player) return;
+
+    const r1 = p1Player.elo_rating || 1000;
+    const r2 = p2Player.elo_rating || 1000;
+
+    const k = 32;
+    const e1 = 1 / (1 + Math.pow(10, (r2 - r1) / 400));
+    const e2 = 1 / (1 + Math.pow(10, (r1 - r2) / 400));
+
+    const s1 = winnerId === p1UserId ? 1 : 0;
+    const s2 = winnerId === p2UserId ? 1 : 0;
+
+    const newR1 = Math.round(r1 + k * (s1 - e1));
+    const newR2 = Math.round(r2 + k * (s2 - e2));
+
+    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ? WHERE id = ?').run(newR1, s1, p1Player.id);
+    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ? WHERE id = ?').run(newR2, s2, p2Player.id);
+
+    this.sendTo(p1UserId, { type: 'pvp_ranked_result', oldElo: r1, newElo: newR1, result: s1 === 1 ? 'win' : 'lose' });
+    this.sendTo(p2UserId, { type: 'pvp_ranked_result', oldElo: r2, newElo: newR2, result: s2 === 1 ? 'win' : 'lose' });
+    
+    // Daily quest update
+    const { incrementQuestProgress } = require('./quest-manager');
+    if (s1 === 1) incrementQuestProgress(this.db, p1Player.id, 'pvp', 1);
+    if (s2 === 1) incrementQuestProgress(this.db, p2Player.id, 'pvp', 1);
   }
 
   sanitizePet(pet) {
@@ -324,6 +431,7 @@ class PvpManager {
     if (player) {
       try { player.ws.close(4001, '账户已被管理员删除'); } catch (e) {}
       this.handleLeaveScene(userId);
+      this.handleLeaveQueue(userId);
       this.onlinePlayers.delete(userId);
       // Clean up any active PVP rooms
       for (const [roomId, room] of this.pvpRooms) {

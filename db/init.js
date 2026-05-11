@@ -143,6 +143,53 @@ function initDB() {
       UNIQUE(player_id, code),
       FOREIGN KEY (player_id) REFERENCES players(id)
     );
+
+    CREATE TABLE IF NOT EXISTS player_expeditions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      pet_id INTEGER NOT NULL,
+      planet_id INTEGER NOT NULL,
+      duration INTEGER NOT NULL, -- duration in seconds
+      start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+      completed INTEGER DEFAULT 0,
+      reward_claimed INTEGER DEFAULT 0,
+      rewards TEXT DEFAULT '{}',
+      FOREIGN KEY (player_id) REFERENCES players(id),
+      FOREIGN KEY (pet_id) REFERENCES player_pets(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS guilds (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      creator_id INTEGER NOT NULL,
+      level INTEGER DEFAULT 1,
+      exp INTEGER DEFAULT 0,
+      notice TEXT DEFAULT '欢迎来到本战队！',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (creator_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS guild_members (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      guild_id INTEGER NOT NULL,
+      user_id INTEGER UNIQUE NOT NULL,
+      role TEXT DEFAULT 'member', -- 'leader', 'vice_leader', 'member'
+      contribution INTEGER DEFAULT 0,
+      joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (guild_id) REFERENCES guilds(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS player_base_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      player_id INTEGER NOT NULL,
+      item_id TEXT NOT NULL,
+      x INTEGER DEFAULT 0,
+      y INTEGER DEFAULT 0,
+      rotation INTEGER DEFAULT 0,
+      placed INTEGER DEFAULT 0,
+      FOREIGN KEY (player_id) REFERENCES players(id)
+    );
   `);
 
   // Insert some default test codes if not exist
@@ -163,6 +210,11 @@ function initDB() {
   try { db.exec('ALTER TABLE players ADD COLUMN total_battles INTEGER DEFAULT 0'); } catch(e) {}
   try { db.exec('ALTER TABLE players ADD COLUMN total_shop_buys INTEGER DEFAULT 0'); } catch(e) {}
   try { db.exec('ALTER TABLE players ADD COLUMN gacha_pity INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN elo_rating INTEGER DEFAULT 1000'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN ranked_wins INTEGER DEFAULT 0'); } catch(e) {}
+
+  try { db.exec('ALTER TABLE player_pets ADD COLUMN ivs TEXT DEFAULT "{}"'); } catch(e) {}
+  try { db.exec('ALTER TABLE player_pets ADD COLUMN evs TEXT DEFAULT "{}"'); } catch(e) {}
 
   return db;
 }

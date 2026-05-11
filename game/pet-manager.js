@@ -4,13 +4,19 @@ const skillsData = require('../data/skills.json');
 /**
  * Calculate stats for a pet at a given level
  */
-function calculateStats(petId, level) {
+function calculateStats(petId, level, ivs = {}, evs = {}) {
   const petDef = petsData.pets.find(p => p.id === petId);
   if (!petDef) return null;
 
   const stats = {};
   for (const stat of ['hp', 'attack', 'defense', 'speed', 'spAttack', 'spDefense']) {
-    stats[stat] = Math.floor(petDef.baseStats[stat] + petDef.growthRate[stat] * level);
+    const baseVal = petDef.baseStats[stat] || 50;
+    const growth = petDef.growthRate[stat] || 2;
+    const iv = ivs[stat] !== undefined ? ivs[stat] : 15; // default to 15 if missing
+    const ev = evs[stat] || 0;
+    const ivBonus = Math.floor((iv / 31) * (level / 2));
+    const evBonus = Math.floor((ev / 255) * (level / 2));
+    stats[stat] = Math.floor(baseVal + growth * level) + ivBonus + evBonus;
   }
   return stats;
 }
@@ -34,7 +40,17 @@ function getSkillsAtLevel(petId, level) {
  * Create a new pet instance for a player
  */
 function createPetInstance(db, playerId, petId, level = 5, inTeam = false, teamOrder = -1) {
-  const stats = calculateStats(petId, level);
+  const ivs = {
+    hp: Math.floor(Math.random() * 32),
+    attack: Math.floor(Math.random() * 32),
+    defense: Math.floor(Math.random() * 32),
+    speed: Math.floor(Math.random() * 32),
+    spAttack: Math.floor(Math.random() * 32),
+    spDefense: Math.floor(Math.random() * 32)
+  };
+  const evs = { hp: 0, attack: 0, defense: 0, speed: 0, spAttack: 0, spDefense: 0 };
+  
+  const stats = calculateStats(petId, level, ivs, evs);
   if (!stats) return null;
 
   const skills = getSkillsAtLevel(petId, level);
@@ -42,12 +58,12 @@ function createPetInstance(db, playerId, petId, level = 5, inTeam = false, teamO
 
   const result = db.prepare(`
     INSERT INTO player_pets (player_id, pet_id, nickname, level, exp, current_hp, max_hp,
-      attack, defense, speed, sp_attack, sp_defense, skills, in_team, team_order)
-    VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      attack, defense, speed, sp_attack, sp_defense, skills, in_team, team_order, ivs, evs)
+    VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     playerId, petId, petDef.name, level, stats.hp, stats.hp,
     stats.attack, stats.defense, stats.speed, stats.spAttack, stats.spDefense,
-    JSON.stringify(skills), inTeam ? 1 : 0, teamOrder
+    JSON.stringify(skills), inTeam ? 1 : 0, teamOrder, JSON.stringify(ivs), JSON.stringify(evs)
   );
 
   return result.lastInsertRowid;
@@ -83,7 +99,9 @@ function addExp(db, playerPetId, expGain) {
   }
 
   // Recalculate stats
-  const newStats = calculateStats(pet_id, level);
+  const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
+  const evs = pet.evs ? JSON.parse(pet.evs) : {};
+  const newStats = calculateStats(pet_id, level, ivs, evs);
   const newSkills = getSkillsAtLevel(pet_id, level);
   const petDef = petsData.pets.find(p => p.id === pet_id);
 

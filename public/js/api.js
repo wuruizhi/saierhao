@@ -66,6 +66,20 @@ const API = {
   pullGacha(poolKey) { return this.request('POST', '/player/gacha', { poolKey }); },
   // Redeem
   redeemCode(code) { return this.request('POST', '/player/redeem', { code }); },
+  // Expeditions
+  getExpeditions() { return this.request('GET', '/player/expeditions'); },
+  startExpedition(petId, planetId, durationHours) { return this.request('POST', '/player/expedition/start', { petId, planetId, durationHours }); },
+  claimExpedition(expeditionId) { return this.request('POST', '/player/expedition/claim', { expeditionId }); },
+  // Guilds
+  getGuilds() { return this.request('GET', '/player/guilds'); },
+  createGuild(name) { return this.request('POST', '/player/guild/create', { name }); },
+  joinGuild(guildId) { return this.request('POST', '/player/guild/join', { guildId }); },
+  getMyGuild() { return this.request('GET', '/player/guild/my'); },
+  leaveGuild() { return this.request('POST', '/player/guild/leave'); },
+  donateGuild(amount) { return this.request('POST', '/player/guild/donate', { amount }); },
+  // Base
+  getBase() { return this.request('GET', '/player/base'); },
+  saveBase(items) { return this.request('POST', '/player/base/save', { items }); }
 };
 window.API = API;
 

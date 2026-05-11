@@ -22,6 +22,7 @@ function createShopRouter(db) {
       boosters: itemsData.boosters || [],
       others: itemsData.others,
       wardrobe: itemsData.wardrobe || [],
+      furniture: itemsData.furniture || [],
       playerMoney: player.money,
       inventory: inventoryMap
     });
@@ -39,7 +40,8 @@ function createShopRouter(db) {
       ...itemsData.candies, 
       ...(itemsData.boosters || []), 
       ...itemsData.others, 
-      ...(itemsData.wardrobe || [])
+      ...(itemsData.wardrobe || []),
+      ...(itemsData.furniture || [])
     ];
     const item = allItems.find(i => i.id === itemId);
     if (!item) return res.status(400).json({ error: '商品不存在' });
@@ -85,7 +87,8 @@ function createShopRouter(db) {
       ...itemsData.candies, 
       ...(itemsData.boosters || []), 
       ...itemsData.others,
-      ...(itemsData.wardrobe || [])
+      ...(itemsData.wardrobe || []),
+      ...(itemsData.furniture || [])
     ];
 
     const items = inventory.map(inv => {

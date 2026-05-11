@@ -142,6 +142,9 @@ async function loadHub(data){
   currentEquips = data.player.equips || {};
   document.getElementById('hub-username').textContent = me.username;
   document.getElementById('hub-money').textContent = formatMoney(data.player.money);
+  if (document.getElementById('my-elo-rating')) {
+    document.getElementById('my-elo-rating').textContent = `积分: ${data.player.elo_rating || 1000}`;
+  }
   loadPlanets();
   
   // Preload shop data for wardrobe rendering in scenes
@@ -167,6 +170,8 @@ async function loadHub(data){
       if(btn.dataset.section === 'quests') loadDailyQuests();
       if(btn.dataset.section === 'bag') loadBag();
       if(btn.dataset.section === 'gacha') loadGacha();
+      if(btn.dataset.section === 'expedition') loadExpeditions();
+      if(btn.dataset.section === 'base') loadBase();
     });
   });
 
@@ -312,16 +317,30 @@ function showPetDetail(pet, isTeam){
   const modal = document.getElementById('modal-pet-detail');
   modal.classList.add('active');
   const header = document.getElementById('pet-detail-header');
-  header.innerHTML = `<div class="pet-sprite-container" id="pd-sprite"></div><div class="pet-name">${pet.nickname}</div><div>Lv.${pet.level} · <span class="pet-type-badge type-${pet.petDef?.type||'normal'}">${TYPE_ICONS[pet.petDef?.type]||''} ${TYPE_NAMES[pet.petDef?.type]||''}系</span></div><div style="margin-top:4px;font-size:13px;color:var(--text-secondary)">HP: ${pet.current_hp}/${pet.max_hp}</div>`;
+  
+  const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
+  const evs = pet.evs ? JSON.parse(pet.evs) : {};
+  const totalIV = Object.values(ivs).reduce((a,b)=>a+(b||15), 0);
+  let potential = 'D';
+  let potColor = 'var(--text-dim)';
+  if (totalIV >= 170) { potential = 'S'; potColor = '#f59e0b'; }
+  else if (totalIV >= 140) { potential = 'A'; potColor = '#a855f7'; }
+  else if (totalIV >= 100) { potential = 'B'; potColor = '#3b82f6'; }
+  else if (totalIV >= 60) { potential = 'C'; potColor = '#22c55e'; }
+
+  header.innerHTML = `<div class="pet-sprite-container" id="pd-sprite"></div><div class="pet-name">${pet.nickname} <span style="font-size:14px;color:${potColor};border:1px solid ${potColor};border-radius:4px;padding:0 4px;">${potential}级</span></div><div>Lv.${pet.level} · <span class="pet-type-badge type-${pet.petDef?.type||'normal'}">${TYPE_ICONS[pet.petDef?.type]||''} ${TYPE_NAMES[pet.petDef?.type]||''}系</span></div><div style="margin-top:4px;font-size:13px;color:var(--text-secondary)">HP: ${pet.current_hp}/${pet.max_hp}</div>`;
   renderPetSprite(document.getElementById('pd-sprite'), pet.pet_id, 120);
 
   const stats = document.getElementById('pet-detail-stats');
   const statNames = {attack:'物攻',defense:'物防',sp_attack:'法攻',sp_defense:'法防',speed:'速度',hp:'生命'};
-  const maxStat = 200;
+  const maxStat = 300;
   stats.innerHTML = Object.entries(statNames).map(([k,n])=>{
-    const v = k==='hp' ? pet.max_hp : (pet[k]||0); const pct = Math.min(100,v/maxStat*100);
+    const statKey = k === 'sp_attack' ? 'spAttack' : k === 'sp_defense' ? 'spDefense' : k;
+    const v = k==='hp' ? pet.max_hp : (pet[k]||0); 
+    const pct = Math.min(100,v/maxStat*100);
     const color = pct>60?'var(--hp-green)':pct>35?'var(--hp-yellow)':'var(--hp-red)';
-    return `<div class="stat-bar-row"><span class="stat-label">${n}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="stat-value">${v}</span></div>`;
+    const iv = ivs[statKey] !== undefined ? ivs[statKey] : 15;
+    return `<div class="stat-bar-row" title="潜力值(IV): ${iv}/31"><span class="stat-label">${n}</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="stat-value">${v} <span style="font-size:10px;color:var(--text-dim);">(${iv})</span></span></div>`;
   }).join('');
 
   const skillsDiv = document.getElementById('pet-detail-skills');
@@ -974,6 +993,31 @@ ws.on('pvp_start', (msg) => {
 
 ws.on('pvp_waiting', (msg)=>{ const log=document.getElementById('pvp-battle-log'); const p=document.createElement('p'); p.textContent=msg.message; p.style.color='var(--text-secondary)'; log.appendChild(p); });
 
+// Ranked Matchmaking handlers
+document.getElementById('btn-ranked-match')?.addEventListener('click', () => {
+  ws.send({ type: 'pvp_queue_join' });
+});
+document.getElementById('btn-ranked-cancel')?.addEventListener('click', () => {
+  ws.send({ type: 'pvp_queue_leave' });
+});
+
+ws.on('pvp_queue_joined', () => {
+  document.getElementById('btn-ranked-match').style.display = 'none';
+  document.getElementById('btn-ranked-cancel').style.display = 'block';
+  toast('已加入天梯排位队列，正在寻找对手...', 'success');
+});
+
+ws.on('pvp_queue_left', () => {
+  document.getElementById('btn-ranked-match').style.display = 'block';
+  document.getElementById('btn-ranked-cancel').style.display = 'none';
+  toast('已取消匹配');
+});
+
+ws.on('pvp_ranked_result', (msg) => {
+  toast(`排位赛结算：${msg.result === 'win' ? '胜利' : '失败'}！积分: ${msg.oldElo} -> ${msg.newElo}`, msg.result === 'win' ? 'success' : 'error');
+  document.getElementById('my-elo-rating').textContent = `积分: ${msg.newElo}`;
+});
+
 ws.on('pvp_turn_result', async (msg) => {
   document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=true);
   
@@ -986,7 +1030,12 @@ ws.on('pvp_turn_result', async (msg) => {
     const won=msg.winnerId===currentUserId;
     const p=document.createElement('p'); p.textContent=won?'🎉 你赢了！':'😢 你输了...'; p.style.color=won?'var(--neon-cyan)':'var(--hp-red)'; log.appendChild(p);
     log.scrollTop=log.scrollHeight;
-    setTimeout(()=>{ showScreen('hub'); refreshTeam(); },3000);
+    setTimeout(()=>{ 
+      showScreen('hub'); 
+      refreshTeam(); 
+      document.getElementById('btn-ranked-match').style.display = 'block';
+      document.getElementById('btn-ranked-cancel').style.display = 'none';
+    },3000);
   } else {
     document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
   }
@@ -1603,11 +1652,11 @@ async function pullGacha(poolKey) {
   }
 }
 
-// ===== SOCIAL TAB ENHANCEMENT (achievements tab) =====
+// ===== SOCIAL TAB ENHANCEMENT (achievements & guild tab) =====
 const _origLoadSocial = loadSocial;
 loadSocial = async function() {
   await _origLoadSocial();
-  // Re-bind tabs to include achievements
+  // Re-bind tabs to include achievements and guild
   document.querySelectorAll('#section-social .pokedex-tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('#section-social .pokedex-tab').forEach(t => t.classList.remove('active'));
@@ -1615,12 +1664,15 @@ loadSocial = async function() {
       document.getElementById('social-friends').style.display = tab.dataset.social === 'friends' ? 'block' : 'none';
       document.getElementById('social-leaderboard').style.display = tab.dataset.social === 'leaderboard' ? 'block' : 'none';
       document.getElementById('social-achievements').style.display = tab.dataset.social === 'achievements' ? 'block' : 'none';
+      document.getElementById('social-guild').style.display = tab.dataset.social === 'guild' ? 'block' : 'none';
+      
       if (tab.dataset.social === 'friends') loadFriends();
       if (tab.dataset.social === 'leaderboard') {
         const activeLb = document.querySelector('#social-leaderboard .shop-sub-tab.active');
         loadLeaderboard(activeLb?.dataset.lb || 'money');
       }
       if (tab.dataset.social === 'achievements') loadAchievements();
+      if (tab.dataset.social === 'guild') loadGuild();
     };
   });
 };
@@ -1708,3 +1760,330 @@ if (btnSubmitRecharge && inputRecharge) {
     }
   });
 }
+
+// ===== EXPEDITION LOGIC =====
+async function loadExpeditions() {
+  try {
+    const res = await API.getExpeditions();
+    const list = document.getElementById('expedition-list');
+    list.innerHTML = '';
+    
+    if (res.expeditions.length === 0) {
+      list.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--text-dim);">当前没有进行中的派遣任务。</div>';
+    } else {
+      res.expeditions.forEach(exp => {
+        const div = document.createElement('div');
+        div.className = `quest-card ${exp.completed ? 'completed' : ''}`;
+        
+        let progressHtml = '';
+        let btnHtml = '';
+        
+        if (exp.completed) {
+          progressHtml = `<div class="quest-progress-text" style="color: var(--neon-cyan);">任务已完成！</div>`;
+          btnHtml = `<button class="quest-claim-btn" onclick="claimExpedition(${exp.id})">领取奖励</button>`;
+        } else {
+          const hours = Math.floor(exp.remainingTime / 3600);
+          const minutes = Math.floor((exp.remainingTime % 3600) / 60);
+          const percent = Math.min(100, Math.floor(((exp.duration - exp.remainingTime) / exp.duration) * 100));
+          progressHtml = `
+            <div class="quest-progress-bar"><div class="quest-progress-fill" style="width: ${percent}%"></div></div>
+            <div class="quest-progress-text">剩余时间：${hours}小时 ${minutes}分钟</div>
+          `;
+          btnHtml = `<button class="quest-claim-btn" disabled>进行中</button>`;
+        }
+        
+        div.innerHTML = `
+          <div class="quest-header">
+            <div class="quest-icon">🚀</div>
+            <div class="quest-info">
+              <div class="quest-name">${exp.petName} 的派遣任务</div>
+              <div class="quest-desc">目标星球：星系边缘 · 预计时长：${exp.duration / 3600}小时</div>
+            </div>
+            ${btnHtml}
+          </div>
+          ${progressHtml}
+        `;
+        list.appendChild(div);
+      });
+    }
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+window.claimExpedition = async function(id) {
+  try {
+    const res = await API.claimExpedition(id);
+    toast(res.message, 'success');
+    loadExpeditions();
+    
+    const me = await API.profile();
+    if (me && me.player) {
+      document.getElementById('hub-money').textContent = formatMoney(me.player.money);
+    }
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+};
+
+document.getElementById('btn-new-expedition')?.addEventListener('click', async () => {
+  // Simplistic implementation for selecting a pet and starting an expedition.
+  // We'll just fetch storage pets and let the user pick one.
+  try {
+    const data = await API.getTeam();
+    const storage = data.storage || [];
+    if (storage.length === 0) {
+      toast('仓库里没有空闲的精灵！', 'error');
+      return;
+    }
+    
+    const petId = prompt(`你想派遣哪只精灵？(输入仓库中精灵的序号 1-${storage.length})\n\n` + storage.map((p,i)=>`${i+1}. ${p.nickname}`).join('\n'));
+    if (!petId || isNaN(petId) || petId < 1 || petId > storage.length) return;
+    
+    const selectedPet = storage[petId - 1];
+    const duration = prompt('你想派遣多少小时？(例如：2, 4, 8)', '2');
+    if (!duration || isNaN(duration) || duration < 1) return;
+    
+    const res = await API.startExpedition(selectedPet.id, 1, parseInt(duration));
+    toast(res.message, 'success');
+    loadExpeditions();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+});
+
+// ===== GUILD LOGIC =====
+async function loadGuild() {
+  try {
+    const res = await API.getGuilds();
+    if (res.myGuildId) {
+      document.getElementById('guild-unjoined').style.display = 'none';
+      document.getElementById('guild-joined').style.display = 'block';
+      loadMyGuild();
+    } else {
+      document.getElementById('guild-unjoined').style.display = 'block';
+      document.getElementById('guild-joined').style.display = 'none';
+      
+      const list = document.getElementById('guild-list');
+      list.innerHTML = '';
+      if(res.guilds.length === 0) {
+        list.innerHTML = '<div style="color:var(--text-dim); text-align:center;">暂无战队，你可以创建一个！</div>';
+      } else {
+        res.guilds.forEach(g => {
+          const div = document.createElement('div');
+          div.className = 'player-list-item glass-card';
+          div.innerHTML = `
+            <div>
+              <div class="player-name">${g.name} <span style="font-size:11px; color:var(--text-dim);">(Lv.${g.level})</span></div>
+              <div style="font-size:11px; color:var(--text-secondary);">队长: ${g.creator_name} | 人数: ${g.member_count}/50</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="joinGuild(${g.id})">申请加入</button>
+          `;
+          list.appendChild(div);
+        });
+      }
+    }
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function loadMyGuild() {
+  try {
+    const res = await API.getMyGuild();
+    document.getElementById('my-guild-name').textContent = res.guild.name + ' (Lv.' + res.guild.level + ')';
+    document.getElementById('my-guild-info').textContent = `经验: ${res.guild.exp} / ${res.guild.level * 10000} | 公告: ${res.guild.notice}`;
+    
+    const list = document.getElementById('guild-members-list');
+    list.innerHTML = '';
+    res.members.forEach(m => {
+      const div = document.createElement('div');
+      div.className = `leaderboard-row ${m.user_id === res.myMembership.user_id ? 'leaderboard-row-self' : ''}`;
+      div.innerHTML = `
+        <div class="lb-rank" style="font-size: 14px; width: 40px; color:var(--text-dim);">${m.role === 'leader'?'队长':'队员'}</div>
+        <div class="lb-name">${m.username}</div>
+        <div class="lb-score">贡献: ${m.contribution}</div>
+      `;
+      list.appendChild(div);
+    });
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+document.getElementById('btn-create-guild')?.addEventListener('click', async () => {
+  const name = document.getElementById('guild-create-name').value;
+  if (!name) return toast('请输入战队名称', 'error');
+  try {
+    const res = await API.createGuild(name);
+    toast(res.message, 'success');
+    loadGuild();
+    // Update money UI immediately
+    const me = await API.profile();
+    if (me && me.player) {
+      document.getElementById('hub-money').textContent = formatMoney(me.player.money);
+    }
+  } catch(e) { toast(e.message, 'error'); }
+});
+
+window.joinGuild = async function(id) {
+  try {
+    const res = await API.joinGuild(id);
+    toast(res.message, 'success');
+    loadGuild();
+  } catch(e) { toast(e.message, 'error'); }
+};
+
+document.getElementById('btn-guild-leave')?.addEventListener('click', async () => {
+  if(!confirm('确定要退出当前战队吗？')) return;
+  try {
+    const res = await API.leaveGuild();
+    toast(res.message, 'success');
+    loadGuild();
+  } catch(e) { toast(e.message, 'error'); }
+});
+
+document.getElementById('btn-guild-donate')?.addEventListener('click', async () => {
+  try {
+    const res = await API.donateGuild(10000);
+    toast(res.message, 'success');
+    loadMyGuild();
+    // Update money UI immediately
+    const me = await API.profile();
+    if (me && me.player) {
+      document.getElementById('hub-money').textContent = formatMoney(me.player.money);
+    }
+  } catch(e) { toast(e.message, 'error'); }
+});
+
+
+// ===== BASE SYSTEM =====
+let baseItems = [];
+let baseInventory = [];
+
+async function loadBase() {
+  try {
+    const invData = await API.getInventory();
+    baseInventory = invData.items.filter(i => i.item_id.startsWith('base_'));
+    
+    const baseData = await API.getBase();
+    baseItems = baseData.items.map(i => ({
+      id: i.id,
+      itemId: i.item_id,
+      x: i.x,
+      y: i.y,
+      rotation: i.rotation,
+      placed: i.placed === 1
+    }));
+    
+    renderBaseInventory();
+    renderBaseViewport();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+function renderBaseInventory() {
+  const list = document.getElementById('base-inventory-list');
+  list.innerHTML = '';
+  
+  baseInventory.forEach(inv => {
+    const placedCount = baseItems.filter(bi => bi.itemId === inv.item_id && bi.placed).length;
+    const available = inv.quantity - placedCount;
+    
+    const itemEl = document.createElement('div');
+    itemEl.className = `glass-card ${available <= 0 ? 'locked' : ''}`;
+    itemEl.style.cssText = `padding:10px; cursor:pointer; display:flex; align-items:center; gap:10px; user-select:none;`;
+    itemEl.innerHTML = `
+      <div style="font-size:24px;">${inv.def.icon}</div>
+      <div style="flex:1">
+        <div style="font-weight:bold;">${inv.def.name}</div>
+        <div style="font-size:12px; color:var(--text-dim);">拥有: ${inv.quantity} / 可用: ${available}</div>
+      </div>
+    `;
+    
+    if (available > 0) {
+      itemEl.addEventListener('click', () => {
+        baseItems.push({
+          itemId: inv.item_id,
+          x: 100, y: 100, rotation: 0, placed: true,
+          def: inv.def
+        });
+        renderBaseInventory();
+        renderBaseViewport();
+      });
+    }
+    list.appendChild(itemEl);
+  });
+}
+
+let activeDragItem = null;
+let dragStartX, dragStartY, dragInitialX, dragInitialY;
+
+window.addEventListener('mousemove', e => {
+  if(!activeDragItem) return;
+  activeDragItem.item.x = dragInitialX + (e.clientX - dragStartX);
+  activeDragItem.item.y = dragInitialY + (e.clientY - dragStartY);
+  activeDragItem.el.style.left = activeDragItem.item.x + 'px';
+  activeDragItem.el.style.top = activeDragItem.item.y + 'px';
+});
+
+window.addEventListener('mouseup', () => {
+  if(activeDragItem) {
+    activeDragItem.el.style.zIndex = '';
+    activeDragItem = null;
+  }
+});
+
+function renderBaseViewport() {
+  const vp = document.getElementById('base-viewport');
+  if(!vp) return;
+  const saveBtnNode = vp.querySelector('#btn-save-base')?.parentNode;
+  vp.innerHTML = '';
+  if(saveBtnNode) vp.appendChild(saveBtnNode);
+  
+  const getDef = id => baseInventory.find(i => i.item_id === id)?.def || { icon:'📦', name:'未知' };
+  
+  baseItems.filter(i => i.placed).forEach((item) => {
+    const def = item.def || getDef(item.itemId);
+    const el = document.createElement('div');
+    el.style.cssText = `
+      position: absolute; left: ${item.x}px; top: ${item.y}px;
+      font-size: 48px; cursor: move; user-select: none;
+      transform: rotate(${item.rotation}deg);
+      transition: transform 0.2s;
+    `;
+    el.innerHTML = def.icon;
+    el.title = "拖拽移动，右键收起，双击旋转";
+    
+    el.addEventListener('mousedown', e => {
+      if(e.button !== 0) return; 
+      activeDragItem = { item, el };
+      dragStartX = e.clientX; dragStartY = e.clientY;
+      dragInitialX = item.x; dragInitialY = item.y;
+      el.style.zIndex = 100;
+      e.stopPropagation();
+    });
+    
+    el.addEventListener('dblclick', () => {
+      item.rotation = (item.rotation + 90) % 360;
+      el.style.transform = `rotate(${item.rotation}deg)`;
+    });
+    
+    el.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      item.placed = false;
+      renderBaseInventory();
+      renderBaseViewport();
+    });
+    
+    vp.appendChild(el);
+  });
+}
+
+document.getElementById('btn-save-base')?.addEventListener('click', async () => {
+  try {
+    const res = await API.saveBase(baseItems.filter(i => i.placed));
+    toast(res.message, 'success');
+  } catch(e) { toast(e.message, 'error'); }
+});

@@ -207,17 +207,40 @@ function createPlayerRouter(db) {
     } else if (itemId === 'reset_stats') {
       const petDef = petsData.pets.find(p => p.id === pet.pet_id);
       if (petDef) {
-        const baseStats = calculateStats(pet.pet_id, parseInt(pet.level));
+        const { calculateStats } = require('../game/pet-manager');
+        const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
+        const baseStats = calculateStats(pet.pet_id, parseInt(pet.level), ivs, {});
         db.prepare(`UPDATE player_pets SET
-          max_hp = ?, current_hp = ?, attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?
+          max_hp = ?, current_hp = ?, attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?, evs = ?
           WHERE id = ?`).run(
           baseStats.hp, Math.min(pet.current_hp, baseStats.hp),
           baseStats.attack, baseStats.defense, baseStats.speed,
-          baseStats.spAttack, baseStats.spDefense,
+          baseStats.spAttack, baseStats.spDefense, '{}',
           petInstanceId
         );
       }
-      message = `${pet.nickname}的属性已重置为基础值！`;
+      message = `${pet.nickname}的属性已重置为基础值（含学习力重置）！`;
+    } else if (itemId === 'gene_resequencer') {
+      const { calculateStats } = require('../game/pet-manager');
+      const ivs = {
+        hp: Math.floor(Math.random() * 32),
+        attack: Math.floor(Math.random() * 32),
+        defense: Math.floor(Math.random() * 32),
+        speed: Math.floor(Math.random() * 32),
+        spAttack: Math.floor(Math.random() * 32),
+        spDefense: Math.floor(Math.random() * 32)
+      };
+      const evs = pet.evs ? JSON.parse(pet.evs) : {};
+      const baseStats = calculateStats(pet.pet_id, parseInt(pet.level), ivs, evs);
+      db.prepare(`UPDATE player_pets SET
+        max_hp = ?, current_hp = ?, attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?, ivs = ?
+        WHERE id = ?`).run(
+        baseStats.hp, Math.min(pet.current_hp, baseStats.hp),
+        baseStats.attack, baseStats.defense, baseStats.speed,
+        baseStats.spAttack, baseStats.spDefense, JSON.stringify(ivs),
+        petInstanceId
+      );
+      message = `${pet.nickname}的基因重组成功，个体值已重新洗牌！`;
     }
 
     res.json({ success: true, message, levelResult });
@@ -723,6 +746,267 @@ function createPlayerRouter(db) {
     }
     return items[items.length - 1];
   }
+
+  // ===== EXPEDITIONS =====
+  router.get('/expeditions', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    // Check completion
+    db.prepare(`
+      UPDATE player_expeditions 
+      SET completed = 1 
+      WHERE player_id = ? AND completed = 0 AND strftime('%s', 'now') - strftime('%s', start_time) >= duration
+    `).run(player.id);
+
+    const expeditions = db.prepare(`
+      SELECT e.*, p.nickname as pet_name, p.level as pet_level, p.pet_id as pet_sprite_id
+      FROM player_expeditions e
+      JOIN player_pets p ON e.pet_id = p.id
+      WHERE e.player_id = ? AND e.reward_claimed = 0
+    `).all(player.id);
+
+    // Calculate remaining time for each
+    const list = expeditions.map(e => {
+      const start = new Date(e.start_time + 'Z'); // UTC
+      const elapsed = Math.floor((Date.now() - start.getTime()) / 1000);
+      const remaining = Math.max(0, e.duration - elapsed);
+      return {
+        id: e.id,
+        petId: e.pet_id,
+        petName: e.pet_name,
+        petSpriteId: e.pet_sprite_id,
+        planetId: e.planet_id,
+        duration: e.duration,
+        remainingTime: remaining,
+        completed: remaining === 0 || e.completed === 1
+      };
+    });
+
+    res.json({ expeditions: list });
+  });
+
+  router.post('/expedition/start', authMiddleware, (req, res) => {
+    const { petId, planetId, durationHours } = req.body;
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: 'Player not found' });
+
+    // Validate pet
+    const pet = db.prepare('SELECT id, in_team FROM player_pets WHERE id = ? AND player_id = ?').get(petId, player.id);
+    if (!pet) return res.status(400).json({ error: 'Pet not found' });
+    if (pet.in_team === 1) return res.status(400).json({ error: '不能派遣在队伍中的精灵！' });
+
+    // Check if pet is already on expedition
+    const existing = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(pet.id);
+    if (existing) return res.status(400).json({ error: '这只精灵已经在派遣中了！' });
+
+    const durationSeconds = (durationHours || 2) * 3600;
+    
+    // Define rewards based on duration
+    const rewards = {
+      money: durationHours * 1000,
+      exp: durationHours * 500,
+      items: []
+    };
+    if (durationHours >= 8) {
+      rewards.items.push({ id: 'candy_l', quantity: 1 });
+      rewards.items.push({ id: 'capsule_advanced', quantity: 1 });
+    } else {
+      rewards.items.push({ id: 'candy_m', quantity: 1 });
+    }
+
+    db.prepare('INSERT INTO player_expeditions (player_id, pet_id, planet_id, duration, rewards) VALUES (?, ?, ?, ?, ?)')
+      .run(player.id, pet.id, planetId || 1, durationSeconds, JSON.stringify(rewards));
+
+    res.json({ success: true, message: '派遣成功！' });
+  });
+
+  router.post('/expedition/claim', authMiddleware, (req, res) => {
+    const { expeditionId } = req.body;
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    
+    const expedition = db.prepare('SELECT * FROM player_expeditions WHERE id = ? AND player_id = ?').get(expeditionId, player.id);
+    if (!expedition) return res.status(404).json({ error: 'Expedition not found' });
+    if (expedition.reward_claimed === 1) return res.status(400).json({ error: '奖励已领取' });
+
+    // Check completion again
+    const start = new Date(expedition.start_time + 'Z');
+    const elapsed = Math.floor((Date.now() - start.getTime()) / 1000);
+    if (elapsed < expedition.duration && expedition.completed === 0) {
+      return res.status(400).json({ error: '派遣尚未完成！' });
+    }
+
+    const rewards = JSON.parse(expedition.rewards || '{}');
+    
+    // Give rewards
+    db.prepare('UPDATE players SET money = money + ? WHERE id = ?').run(rewards.money || 0, player.id);
+    
+    const pm = require('../game/pet-manager');
+    pm.addExp(db, expedition.pet_id, rewards.exp || 0);
+
+    if (rewards.items) {
+      const stmt = db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?) ON CONFLICT(player_id, item_id) DO UPDATE SET quantity = quantity + ?');
+      for (const item of rewards.items) {
+        stmt.run(player.id, item.id, item.quantity, item.quantity);
+      }
+    }
+
+    db.prepare('UPDATE player_expeditions SET reward_claimed = 1, completed = 1 WHERE id = ?').run(expedition.id);
+
+    res.json({ success: true, message: '领取成功！', rewards });
+  });
+
+  // ===== GUILDS =====
+  router.get('/guilds', authMiddleware, (req, res) => {
+    const guilds = db.prepare(`
+      SELECT g.*, u.username as creator_name, 
+        (SELECT COUNT(*) FROM guild_members WHERE guild_id = g.id) as member_count
+      FROM guilds g
+      JOIN users u ON g.creator_id = u.id
+      ORDER BY g.level DESC, g.exp DESC
+      LIMIT 50
+    `).all();
+    
+    // Check if player is in a guild
+    const myMembership = db.prepare('SELECT guild_id FROM guild_members WHERE user_id = ?').get(req.userId);
+    
+    res.json({ guilds, myGuildId: myMembership ? myMembership.guild_id : null });
+  });
+
+  router.post('/guild/create', authMiddleware, (req, res) => {
+    const { name } = req.body;
+    if (!name || name.trim().length < 2 || name.trim().length > 12) {
+      return res.status(400).json({ error: '战队名称长度必须在2-12个字符之间' });
+    }
+    
+    const player = db.prepare('SELECT id, money FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+    if (player.money < 50000) return res.status(400).json({ error: '创建战队需要 50000 💰' });
+
+    const existingMembership = db.prepare('SELECT id FROM guild_members WHERE user_id = ?').get(req.userId);
+    if (existingMembership) return res.status(400).json({ error: '你已经在一个战队中了！' });
+
+    try {
+      db.transaction(() => {
+        db.prepare('UPDATE players SET money = money - 50000 WHERE id = ?').run(player.id);
+        const result = db.prepare('INSERT INTO guilds (name, creator_id) VALUES (?, ?)').run(name.trim(), req.userId);
+        const guildId = result.lastInsertRowid;
+        db.prepare('INSERT INTO guild_members (guild_id, user_id, role) VALUES (?, ?, ?)')
+          .run(guildId, req.userId, 'leader');
+      })();
+      res.json({ success: true, message: '战队创建成功！' });
+    } catch (e) {
+      if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        res.status(400).json({ error: '该战队名称已被使用' });
+      } else {
+        res.status(500).json({ error: '创建失败: ' + e.message });
+      }
+    }
+  });
+
+  router.post('/guild/join', authMiddleware, (req, res) => {
+    const { guildId } = req.body;
+    
+    const existingMembership = db.prepare('SELECT id FROM guild_members WHERE user_id = ?').get(req.userId);
+    if (existingMembership) return res.status(400).json({ error: '你已经在一个战队中了！' });
+
+    const guild = db.prepare('SELECT id FROM guilds WHERE id = ?').get(guildId);
+    if (!guild) return res.status(404).json({ error: '战队不存在' });
+
+    const memberCount = db.prepare('SELECT COUNT(*) as c FROM guild_members WHERE guild_id = ?').get(guildId).c;
+    if (memberCount >= 50) return res.status(400).json({ error: '战队人数已满' });
+
+    db.prepare('INSERT INTO guild_members (guild_id, user_id) VALUES (?, ?)').run(guildId, req.userId);
+    res.json({ success: true, message: '加入战队成功！' });
+  });
+
+  router.get('/guild/my', authMiddleware, (req, res) => {
+    const membership = db.prepare('SELECT * FROM guild_members WHERE user_id = ?').get(req.userId);
+    if (!membership) return res.status(404).json({ error: '你还没有加入战队' });
+
+    const guild = db.prepare('SELECT * FROM guilds WHERE id = ?').get(membership.guild_id);
+    const members = db.prepare(`
+      SELECT gm.*, u.username, p.money,
+        (SELECT COUNT(*) FROM player_pets WHERE player_id = p.id) as pet_count
+      FROM guild_members gm
+      JOIN users u ON gm.user_id = u.id
+      JOIN players p ON p.user_id = u.id
+      WHERE gm.guild_id = ?
+      ORDER BY gm.contribution DESC
+    `).all(guild.id);
+
+    res.json({ guild, members, myMembership: membership });
+  });
+
+  router.post('/guild/leave', authMiddleware, (req, res) => {
+    const membership = db.prepare('SELECT * FROM guild_members WHERE user_id = ?').get(req.userId);
+    if (!membership) return res.status(400).json({ error: '你还没有加入战队' });
+
+    if (membership.role === 'leader') {
+      const memberCount = db.prepare('SELECT COUNT(*) as c FROM guild_members WHERE guild_id = ?').get(membership.guild_id).c;
+      if (memberCount > 1) {
+        return res.status(400).json({ error: '队长不能直接退出，请先转让队长或解散战队' });
+      } else {
+        // Last member, dissolve guild
+        db.transaction(() => {
+          db.prepare('DELETE FROM guild_members WHERE guild_id = ?').run(membership.guild_id);
+          db.prepare('DELETE FROM guilds WHERE id = ?').run(membership.guild_id);
+        })();
+        return res.json({ success: true, message: '战队已解散' });
+      }
+    }
+
+    db.prepare('DELETE FROM guild_members WHERE id = ?').run(membership.id);
+    res.json({ success: true, message: '已退出战队' });
+  });
+
+  router.post('/guild/donate', authMiddleware, (req, res) => {
+    const { amount } = req.body;
+    const player = db.prepare('SELECT id, money FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    if (player.money < amount) return res.status(400).json({ error: '金币不足' });
+
+    const membership = db.prepare('SELECT * FROM guild_members WHERE user_id = ?').get(req.userId);
+    if (!membership) return res.status(400).json({ error: '你还没有加入战队' });
+
+    db.transaction(() => {
+      db.prepare('UPDATE players SET money = money - ? WHERE id = ?').run(amount, player.id);
+      db.prepare('UPDATE guild_members SET contribution = contribution + ? WHERE id = ?').run(amount, membership.id);
+      
+      const guild = db.prepare('SELECT * FROM guilds WHERE id = ?').get(membership.guild_id);
+      let newExp = guild.exp + amount;
+      let newLevel = guild.level;
+      while (newExp >= newLevel * 10000) {
+        newExp -= newLevel * 10000;
+        newLevel++;
+      }
+      db.prepare('UPDATE guilds SET exp = ?, level = ? WHERE id = ?').run(newExp, newLevel, guild.id);
+    })();
+
+    res.json({ success: true, message: '捐献成功！' });
+  });
+
+  // ===== BASE SYSTEM =====
+  router.get('/base', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    const items = db.prepare('SELECT * FROM player_base_items WHERE player_id = ?').all(player.id);
+    res.json({ items });
+  });
+
+  router.post('/base/save', authMiddleware, (req, res) => {
+    const { items } = req.body;
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    
+    db.transaction(() => {
+      db.prepare('DELETE FROM player_base_items WHERE player_id = ?').run(player.id);
+      const stmt = db.prepare('INSERT INTO player_base_items (player_id, item_id, x, y, rotation, placed) VALUES (?, ?, ?, ?, ?, ?)');
+      for (const item of items) {
+        stmt.run(player.id, item.itemId, item.x || 0, item.y || 0, item.rotation || 0, item.placed ? 1 : 0);
+      }
+    })();
+    res.json({ success: true, message: '基地保存成功！' });
+  });
 
   router.get('/gacha-pools', authMiddleware, (req, res) => {
     const pools = Object.entries(GACHA_POOLS).map(([key, pool]) => ({
