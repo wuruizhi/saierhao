@@ -2012,6 +2012,124 @@ async function loadBase() {
   }
 }
 
+// Sidebar toggle logic
+document.getElementById('btn-collapse-sidebar')?.addEventListener('click', () => {
+  const sidebar = document.getElementById('base-sidebar');
+  if(sidebar) {
+    sidebar.style.width = '0px';
+    sidebar.style.padding = '0px';
+    sidebar.style.opacity = '0';
+  }
+  const btnExp = document.getElementById('btn-expand-sidebar');
+  if(btnExp) btnExp.style.display = 'block';
+});
+
+document.getElementById('btn-expand-sidebar')?.addEventListener('click', () => {
+  const sidebar = document.getElementById('base-sidebar');
+  if(sidebar) {
+    sidebar.style.width = '250px';
+    sidebar.style.padding = '15px';
+    sidebar.style.opacity = '1';
+  }
+  const btnExp = document.getElementById('btn-expand-sidebar');
+  if(btnExp) btnExp.style.display = 'none';
+});
+
+let basePlayerPos = { x: 300, y: 300 }; // px
+let basePlayerMoving = false;
+let basePlayerMoveAnim = null;
+let basePlayerAvatar = null;
+
+function createBasePlayerAvatar(vp) {
+  basePlayerAvatar = document.createElement('div');
+  basePlayerAvatar.id = 'base-player-avatar';
+  basePlayerAvatar.className = 'player-avatar';
+  basePlayerAvatar.style.left = basePlayerPos.x + 'px';
+  basePlayerAvatar.style.top = basePlayerPos.y + 'px';
+  basePlayerAvatar.style.zIndex = '40';
+  basePlayerAvatar.style.pointerEvents = 'none';
+  
+  const imgWrapper = document.createElement('div');
+  imgWrapper.className = 'player-img-wrapper';
+  
+  const img = document.createElement('img');
+  img.src = '/img/player.png';
+  img.alt = '赛尔';
+  img.className = 'player-sprite';
+  img.draggable = false;
+  imgWrapper.appendChild(img);
+  
+  if (window.applyEquipsToWrapper && window.currentEquips) {
+    window.applyEquipsToWrapper(imgWrapper, window.currentEquips);
+  }
+  
+  const shadow = document.createElement('div');
+  shadow.className = 'player-ground-shadow';
+  imgWrapper.appendChild(shadow);
+  
+  basePlayerAvatar.appendChild(imgWrapper);
+  
+  const tag = document.createElement('div');
+  tag.className = 'player-name-tag';
+  tag.textContent = window.currentUsername || '我的赛尔';
+  basePlayerAvatar.appendChild(tag);
+  
+  vp.appendChild(basePlayerAvatar);
+}
+
+function moveBasePlayerTo(targetX, targetY) {
+  if (!basePlayerAvatar || basePlayerMoving) return;
+  basePlayerMoving = true;
+
+  const startX = basePlayerPos.x;
+  const startY = basePlayerPos.y;
+  const dx = targetX - startX;
+  const dy = targetY - startY;
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const duration = Math.min(2000, Math.max(300, distance * 5)); // faster speed
+  
+  const imgWrapper = basePlayerAvatar.querySelector('.player-img-wrapper');
+  if (dx < -2) imgWrapper.style.transform = 'scaleX(-1)';
+  else if (dx > 2) imgWrapper.style.transform = 'scaleX(1)';
+  
+  basePlayerAvatar.classList.add('walking');
+  
+  const vp = document.getElementById('base-viewport');
+  const indicator = document.createElement('div');
+  indicator.className = 'click-indicator';
+  indicator.style.left = targetX + 'px';
+  indicator.style.top = targetY + 'px';
+  vp.appendChild(indicator);
+  setTimeout(() => indicator.remove(), 600);
+  
+  const startTime = performance.now();
+  
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1, elapsed / duration);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    
+    basePlayerPos.x = startX + dx * ease;
+    basePlayerPos.y = startY + dy * ease;
+    basePlayerAvatar.style.left = basePlayerPos.x + 'px';
+    basePlayerAvatar.style.top = basePlayerPos.y + 'px';
+    
+    const bob = Math.sin(elapsed * 0.01) * 3;
+    basePlayerAvatar.querySelector('.player-sprite').style.transform = `translateY(${bob}px)`;
+    
+    if (progress < 1) {
+      basePlayerMoveAnim = requestAnimationFrame(step);
+    } else {
+      basePlayerMoving = false;
+      basePlayerAvatar.classList.remove('walking');
+      basePlayerAvatar.querySelector('.player-sprite').style.transform = '';
+    }
+  }
+  
+  if (basePlayerMoveAnim) cancelAnimationFrame(basePlayerMoveAnim);
+  basePlayerMoveAnim = requestAnimationFrame(step);
+}
+
 function renderBasePetsList() {
   const list = document.getElementById('base-pets-list');
   if(!list) return;
@@ -2108,14 +2226,31 @@ function renderBaseViewport() {
   const vp = document.getElementById('base-viewport');
   if(!vp) return;
   const saveBtnNode = vp.querySelector('#btn-save-base')?.parentNode;
+  const expandBtnNode = vp.querySelector('#btn-expand-sidebar');
   vp.innerHTML = '';
+  if(expandBtnNode) vp.appendChild(expandBtnNode);
   if(saveBtnNode) vp.appendChild(saveBtnNode);
+  
+  // Click to move player
+  vp.onclick = (e) => {
+    if(e.target.closest('button') || e.target.closest('.base-furniture')) return;
+    const rect = vp.getBoundingClientRect();
+    const targetX = e.clientX - rect.left;
+    const targetY = e.clientY - rect.top;
+    const clampedX = Math.max(20, Math.min(rect.width - 20, targetX));
+    const clampedY = Math.max(50, Math.min(rect.height - 20, targetY));
+    moveBasePlayerTo(clampedX, clampedY);
+  };
+  
+  // Render player avatar
+  createBasePlayerAvatar(vp);
   
   const getDef = id => baseInventory.find(i => i.item_id === id)?.def || { icon:'📦', name:'未知' };
   
   baseItems.filter(i => i.placed).forEach((item) => {
     const def = item.def || getDef(item.itemId);
     const el = document.createElement('div');
+    el.className = 'base-furniture';
     el.style.cssText = `
       position: absolute; left: ${item.x}px; top: ${item.y}px;
       font-size: 48px; cursor: move; user-select: none;

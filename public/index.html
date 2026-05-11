@@ -340,10 +340,13 @@
       
       <div style="display: flex; gap: 20px; height: 500px;">
         <!-- Base Sidebar -->
-        <div class="glass-card" style="width: 250px; display:flex; flex-direction:column; padding: 15px;">
-          <div style="display:flex; border-bottom:1px solid var(--glass-border); margin-bottom:10px;">
-            <button id="tab-base-furniture" style="flex:1; background:none; border:none; color:var(--text-primary); padding:8px; cursor:pointer; font-weight:bold; border-bottom:2px solid var(--neon-cyan);">🛋️ 家具</button>
-            <button id="tab-base-pets" style="flex:1; background:none; border:none; color:var(--text-dim); padding:8px; cursor:pointer; font-weight:bold;">🐾 精灵</button>
+        <div id="base-sidebar" class="glass-card" style="width: 250px; display:flex; flex-direction:column; padding: 15px; transition: width 0.3s, opacity 0.3s; overflow:hidden;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--glass-border); margin-bottom:10px;">
+            <div style="display:flex; flex:1;">
+              <button id="tab-base-furniture" style="flex:1; background:none; border:none; color:var(--text-primary); padding:8px; cursor:pointer; font-weight:bold; border-bottom:2px solid var(--neon-cyan);">🛋️</button>
+              <button id="tab-base-pets" style="flex:1; background:none; border:none; color:var(--text-dim); padding:8px; cursor:pointer; font-weight:bold;">🐾</button>
+            </div>
+            <button id="btn-collapse-sidebar" style="background:none; border:none; color:var(--text-primary); cursor:pointer; padding:5px; margin-left:5px;">◀</button>
           </div>
           <p style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">点击放入基地</p>
           <div id="base-inventory-list" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
@@ -352,7 +355,8 @@
         
         <!-- Base Room Viewport -->
         <div class="glass-card" style="flex: 1; position: relative; overflow: hidden; border: 2px solid var(--glass-border); background-image: url('img/scenes/base_bg.png'); background-size: cover; background-position: center;">
-          <div id="base-viewport" style="width:100%; height:100%; position:relative;">
+          <div id="base-viewport" style="width:100%; height:100%; position:relative; cursor: crosshair;">
+            <button id="btn-expand-sidebar" class="btn btn-primary btn-sm" style="position:absolute; top:10px; left:10px; display:none; z-index:50;">▶ 展开仓库</button>
             <!-- Render furniture and pets here -->
             <div style="position:absolute; bottom:20px; right:20px;">
               <button class="btn btn-primary" id="btn-save-base">💾 保存基地</button>
