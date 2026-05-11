@@ -15,7 +15,11 @@ class SceneManager {
   }
 
   getScene(mapId, sceneIndex) {
-    const map = mapsData.maps.find(m => m.id === mapId);
+    let map = null;
+    for (const g of (mapsData.galaxies || [])) {
+      map = g.planets.find(m => m.id === mapId);
+      if (map) break;
+    }
     if (!map || !map.scenes || !map.scenes[sceneIndex]) return null;
     return map.scenes[sceneIndex];
   }
@@ -164,18 +168,20 @@ class SceneManager {
    */
   startRefreshLoop() {
     setInterval(() => {
-      for (const map of mapsData.maps) {
-        if (!map.scenes) continue;
-        for (let i = 0; i < map.scenes.length; i++) {
-          const key = this.getKey(map.id, i);
-          const scene = map.scenes[i];
-          const last = this.lastRefresh.get(key) || 0;
-          const interval = (scene.refreshInterval || 30) * 1000;
+      for (const g of (mapsData.galaxies || [])) {
+        for (const map of (g.planets || [])) {
+          if (!map.scenes) continue;
+          for (let i = 0; i < map.scenes.length; i++) {
+            const key = this.getKey(map.id, i);
+            const scene = map.scenes[i];
+            const last = this.lastRefresh.get(key) || 0;
+            const interval = (scene.refreshInterval || 30) * 1000;
 
-          if (Date.now() - last >= interval) {
-            this.spawnPets(map.id, i);
-            // Always ensure boss
-            this.ensureBossSpawn(map.id, i);
+            if (Date.now() - last >= interval) {
+              this.spawnPets(map.id, i);
+              // Always ensure boss
+              this.ensureBossSpawn(map.id, i);
+            }
           }
         }
       }

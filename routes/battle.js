@@ -24,7 +24,11 @@ function createBattleRouter(db, sceneManager) {
     const mapId = parseInt(req.params.mapId);
     const sceneIndex = parseInt(req.params.sceneIndex);
 
-    const map = mapsData.maps.find(m => m.id === mapId);
+    let map = null;
+    for (const g of (mapsData.galaxies || [])) {
+      map = g.planets.find(m => m.id === mapId);
+      if (map) break;
+    }
     if (!map) return res.status(400).json({ error: '地图不存在' });
     if (!map.scenes || !map.scenes[sceneIndex]) {
       return res.status(400).json({ error: '场景不存在' });
@@ -50,7 +54,11 @@ function createBattleRouter(db, sceneManager) {
   // Start battle with a specific spawn in a scene
   router.post('/explore', authMiddleware, (req, res) => {
     const { mapId, sceneIndex = 0, spawnId } = req.body;
-    const map = mapsData.maps.find(m => m.id === mapId);
+    let map = null;
+    for (const g of (mapsData.galaxies || [])) {
+      map = g.planets.find(m => m.id === mapId);
+      if (map) break;
+    }
     if (!map) return res.status(400).json({ error: '地图不存在' });
 
     const scene = map.scenes && map.scenes[sceneIndex];
