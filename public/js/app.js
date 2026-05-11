@@ -1833,8 +1833,8 @@ document.getElementById('btn-new-expedition')?.addEventListener('click', async (
   // Simplistic implementation for selecting a pet and starting an expedition.
   // We'll just fetch storage pets and let the user pick one.
   try {
-    const data = await API.getTeam();
-    const storage = data.storage || [];
+    const me = await API.profile();
+    const storage = me.storagePets || [];
     if (storage.length === 0) {
       toast('仓库里没有空闲的精灵！', 'error');
       return;

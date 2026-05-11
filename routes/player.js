@@ -98,12 +98,12 @@ function createPlayerRouter(db) {
     res.json({ success: true });
   });
 
-  // Heal all team pets
+  // Heal all pets
   router.post('/heal', authMiddleware, (req, res) => {
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
-    db.prepare('UPDATE player_pets SET current_hp = max_hp WHERE player_id = ? AND in_team = 1').run(player.id);
+    db.prepare('UPDATE player_pets SET current_hp = max_hp WHERE player_id = ?').run(player.id);
     
     incrementQuestProgress(db, player.id, 'heal', 1);
 
