@@ -1152,6 +1152,12 @@ ws.on('pvp_opponent_disconnected', ()=>{ toast('对手已断开连接','error');
 // ===== POKEDEX =====
 let _pokedexData = null;
 let _pokedexMode = 'pets'; // 'pets' or 'boss'
+let _pokedexSearchTerm = '';
+
+document.getElementById('pokedex-search-input')?.addEventListener('input', (e) => {
+  _pokedexSearchTerm = e.target.value.trim().toLowerCase();
+  renderPokedex();
+});
 
 document.querySelectorAll('.pokedex-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1174,7 +1180,16 @@ function renderPokedex() {
   if (!_pokedexData) return;
   const container = document.getElementById('pokedex-container');
   container.innerHTML = '';
-  const pets = _pokedexData.pets || [];
+  let pets = _pokedexData.pets || [];
+  
+  const typeLabels = {fire:'🔥 火系',water:'💧 水系',grass:'🌿 草系',electric:'⚡ 电系',light:'✨ 光系',dark:'🌑 暗系',normal:'⚪ 普通系'};
+  
+  if (_pokedexSearchTerm) {
+    pets = pets.filter(p => {
+      const typeStr = typeLabels[p.type] || p.type;
+      return p.name.toLowerCase().includes(_pokedexSearchTerm) || typeStr.toLowerCase().includes(_pokedexSearchTerm);
+    });
+  }
   
   if (_pokedexMode === 'boss') {
     // Boss pokedex: show Boss evolution lines
@@ -1213,8 +1228,7 @@ function renderPokedex() {
   } else {
     // Normal pet pokedex: group by type
     const normalPets = pets.filter(p => !p.isBossLine);
-    const types = ['fire','water','grass','electric','light','dark'];
-    const typeLabels = {fire:'🔥 火系',water:'💧 水系',grass:'🌿 草系',electric:'⚡ 电系',light:'✨ 光系',dark:'🌑 暗系'};
+    const types = ['fire','water','grass','electric','light','dark','normal'];
     types.forEach(type => {
       const typePets = normalPets.filter(p => p.type === type);
       if (typePets.length === 0) return;
