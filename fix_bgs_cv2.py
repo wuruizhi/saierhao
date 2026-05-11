@@ -53,7 +53,7 @@ def process_image(img_path):
     cv2.imwrite(img_path, img)
     return True
 
-for i in range(1, 34):
+for i in range(34, 67):
     path = os.path.join(pet_dir, f"{i}.png")
     if os.path.exists(path):
         try:

@@ -67,7 +67,8 @@ function renderPetSprite(container, petId, size) {
   `;
   img.draggable = false;
   img.onerror = function() {
-    wrapper.innerHTML = `<div style="width:${s}px;height:${s}px;display:flex;align-items:center;justify-content:center;font-size:${s*0.5}px">❓</div>`;
+    const icon = typeof PET_ICON_MAP !== 'undefined' && PET_ICON_MAP[petId] ? PET_ICON_MAP[petId] : '❓';
+    wrapper.innerHTML = `<div style="width:${s}px;height:${s}px;display:flex;align-items:center;justify-content:center;font-size:${s*0.5}px;animation:pet-breathe 3s ease-in-out infinite, pet-float ${2.5+Math.random()}s ease-in-out infinite;">${icon}</div>`;
   };
   wrapper.appendChild(img);
 
