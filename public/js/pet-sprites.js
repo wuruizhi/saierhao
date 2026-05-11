@@ -110,7 +110,7 @@ function renderPetSprite(container, petId, size) {
 
   // Image
   const img = document.createElement('img');
-  img.src = `/img/pets/${petId}.png?v=13`;
+  img.src = `/img/pets/${petId}.png?v=14`;
   img.alt = `Pet ${petId}`;
   img.style.cssText = `
     width:${s*0.88}px;height:${s*0.88}px;object-fit:contain;

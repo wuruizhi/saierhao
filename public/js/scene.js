@@ -342,7 +342,7 @@ function createPlayerAvatar(vp) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png';
+  img.src = '/img/player.png?v=14';
   img.alt = '赛尔';
   img.className = 'player-sprite';
   img.draggable = false;
@@ -504,7 +504,7 @@ async function interactWithNpc(npc) {
            q.push({
              name: d.character,
              text: d.text,
-             spriteUrl: d.avatar === 'player' ? '/img/player.png' : null
+             spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null
            });
          });
          let idx = 0;
@@ -518,7 +518,7 @@ async function interactWithNpc(npc) {
                if (window.loadStoryQuests) window.loadStoryQuests();
                if (stepDef.endDialogues && stepDef.endDialogues.length > 0) {
                  let eq = [];
-                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png' : null }));
+                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null }));
                  let eidx = 0;
                  const playEndNext = () => {
                    if (eidx < eq.length) {
@@ -802,7 +802,7 @@ function createOtherPlayerAvatar(playerInfo) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png';
+  img.src = '/img/player.png?v=14';
   img.className = 'player-sprite';
   img.draggable = false;
   imgWrapper.appendChild(img);

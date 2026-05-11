@@ -500,7 +500,7 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
       q.push({
         name: d.character,
         text: d.text,
-        spriteUrl: d.avatar === 'player' ? '/img/player.png' : null
+        spriteUrl: d.avatar === 'player' ? '/img/player.png?v=14' : null
       });
     });
     
@@ -2398,7 +2398,7 @@ function createBasePlayerAvatar(vp) {
   imgWrapper.className = 'player-img-wrapper';
   
   const img = document.createElement('img');
-  img.src = '/img/player.png';
+  img.src = '/img/player.png?v=14';
   img.alt = '赛尔';
   img.className = 'player-sprite';
   img.draggable = false;
