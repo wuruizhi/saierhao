@@ -1,892 +1,1143 @@
 {
-  "maps": [
+  "galaxies": [
     {
       "id": 1,
-      "name": "火焰星",
-      "description": "一颗被熔岩覆盖的炽热星球，到处是喷涌的火山和流淌的岩浆。",
-      "theme": "fire",
-      "bgColor": "#1a0a00",
+      "name": "赫尔墨斯星系",
+      "description": "赛尔号最初探索的星系，适合新手起步。",
       "requiredLevel": 1,
-      "scenes": [
-        {
-          "id": 0,
-          "name": "熔岩入口",
-          "icon": "🌋",
-          "description": "火焰星的入口区域，地面散发着灼热的气息。",
-          "bgGradient": "linear-gradient(180deg, #1a0a00 0%, #3d1200 40%, #6b2000 100%)",
-          "backgroundImage": "/img/scenes/fire-entrance.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 1,
-              "minLevel": 3,
-              "maxLevel": 8,
-              "rate": 48
-            },
-            {
-              "petId": 10,
-              "minLevel": 3,
-              "maxLevel": 6,
-              "rate": 14
-            },
-            {
-              "petId": 17,
-              "minLevel": 3,
-              "maxLevel": 5,
-              "rate": 7
-            },
-            {
-              "petId": 34,
-              "minLevel": 4,
-              "maxLevel": 9,
-              "rate": 28
-            },
-            {
-              "petId": 37,
-              "minLevel": 5,
-              "maxLevel": 10,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_elder_fire",
-              "name": "烈焰智者",
-              "x": 20,
-              "y": 55,
-              "sprite": "🧙‍♂️",
-              "defaultText": "火山深处的封印似乎松动了……"
-            }
-          ]
-        },
+      "planets": [
         {
           "id": 1,
-          "name": "烈焰峡谷",
-          "icon": "🔥",
-          "description": "峡谷两侧的岩壁不断喷射着火焰，只有勇者才敢深入。",
-          "bgGradient": "linear-gradient(180deg, #2d0800 0%, #6b1a00 40%, #a03000 100%)",
-          "backgroundImage": "/img/scenes/fire-canyon.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
+          "name": "火焰星",
+          "description": "一颗被熔岩覆盖的炽热星球，到处是喷涌的火山和流淌的岩浆。",
+          "theme": "fire",
+          "bgColor": "#1a0a00",
           "requiredLevel": 1,
-          "wildPets": [
+          "scenes": [
             {
-              "petId": 1,
-              "minLevel": 8,
-              "maxLevel": 14,
-              "rate": 30
+              "id": 0,
+              "name": "熔岩入口",
+              "icon": "🌋",
+              "description": "火焰星的入口区域，地面散发着灼热的气息。",
+              "bgGradient": "linear-gradient(180deg, #1a0a00 0%, #3d1200 40%, #6b2000 100%)",
+              "backgroundImage": "/img/scenes/fire-entrance.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 1,
+                  "minLevel": 3,
+                  "maxLevel": 8,
+                  "rate": 48
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 3,
+                  "maxLevel": 6,
+                  "rate": 14
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 3,
+                  "maxLevel": 5,
+                  "rate": 7
+                },
+                {
+                  "petId": 34,
+                  "minLevel": 4,
+                  "maxLevel": 9,
+                  "rate": 28
+                },
+                {
+                  "petId": 37,
+                  "minLevel": 5,
+                  "maxLevel": 10,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_elder_fire",
+                  "name": "烈焰智者",
+                  "x": 20,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_elder_fire.png",
+                  "defaultText": "火山深处的封印似乎松动了……"
+                }
+              ]
             },
             {
-              "petId": 2,
-              "minLevel": 16,
-              "maxLevel": 20,
-              "rate": 19
+              "id": 1,
+              "name": "烈焰峡谷",
+              "icon": "🔥",
+              "description": "峡谷两侧的岩壁不断喷射着火焰，只有勇者才敢深入。",
+              "bgGradient": "linear-gradient(180deg, #2d0800 0%, #6b1a00 40%, #a03000 100%)",
+              "backgroundImage": "/img/scenes/fire-canyon.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 1,
+                  "minLevel": 8,
+                  "maxLevel": 14,
+                  "rate": 30
+                },
+                {
+                  "petId": 2,
+                  "minLevel": 16,
+                  "maxLevel": 20,
+                  "rate": 19
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 8,
+                  "maxLevel": 12,
+                  "rate": 15
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 8,
+                  "maxLevel": 12,
+                  "rate": 11
+                },
+                {
+                  "petId": 35,
+                  "minLevel": 14,
+                  "maxLevel": 20,
+                  "rate": 22
+                },
+                {
+                  "petId": 38,
+                  "minLevel": 16,
+                  "maxLevel": 22,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_miner",
+                  "name": "迷路的矿工",
+                  "x": 80,
+                  "y": 70,
+                  "sprite": "/img/npcs/npc_miner.png",
+                  "defaultText": "救命啊，海盗把我的钻探机抢走了！"
+                }
+              ]
             },
             {
-              "petId": 10,
-              "minLevel": 8,
-              "maxLevel": 12,
-              "rate": 15
-            },
-            {
-              "petId": 17,
-              "minLevel": 8,
-              "maxLevel": 12,
-              "rate": 11
-            },
-            {
-              "petId": 35,
-              "minLevel": 14,
-              "maxLevel": 20,
-              "rate": 22
-            },
-            {
-              "petId": 38,
-              "minLevel": 16,
-              "maxLevel": 22,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_miner",
-              "name": "迷路的矿工",
-              "x": 80,
-              "y": 70,
-              "sprite": "👷",
-              "defaultText": "救命啊，海盗把我的钻探机抢走了！"
+              "id": 2,
+              "name": "火山核心",
+              "icon": "💀",
+              "description": "火焰星最深处，炽热的熔岩之心。传说炎帝猩在此守护着远古之力。",
+              "bgGradient": "linear-gradient(180deg, #4a0e00 0%, #8b1a00 40%, #ff4500 100%)",
+              "backgroundImage": "/img/scenes/fire-core.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 2,
+                  "minLevel": 16,
+                  "maxLevel": 25,
+                  "rate": 37
+                },
+                {
+                  "petId": 1,
+                  "minLevel": 12,
+                  "maxLevel": 18,
+                  "rate": 25
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 15,
+                  "maxLevel": 20,
+                  "rate": 12
+                },
+                {
+                  "petId": 12,
+                  "minLevel": 18,
+                  "maxLevel": 22,
+                  "rate": 8
+                },
+                {
+                  "petId": 36,
+                  "minLevel": 30,
+                  "maxLevel": 40,
+                  "rate": 16
+                },
+                {
+                  "petId": 39,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 2
+                }
+              ],
+              "boss": {
+                "petId": 21,
+                "level": 35,
+                "name": "焱龙帝·炎皇",
+                "rate": 100,
+                "essenceId": "fire"
+              }
             }
           ]
         },
         {
           "id": 2,
-          "name": "火山核心",
-          "icon": "💀",
-          "description": "火焰星最深处，炽热的熔岩之心。传说炎帝猩在此守护着远古之力。",
-          "bgGradient": "linear-gradient(180deg, #4a0e00 0%, #8b1a00 40%, #ff4500 100%)",
-          "backgroundImage": "/img/scenes/fire-core.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
+          "name": "海洋星",
+          "description": "深蓝色的海洋星球，水下隐藏着古老的遗迹和强大的水系精灵。",
+          "theme": "water",
+          "bgColor": "#000a1a",
           "requiredLevel": 1,
-          "wildPets": [
+          "scenes": [
             {
-              "petId": 2,
-              "minLevel": 16,
-              "maxLevel": 25,
-              "rate": 37
+              "id": 0,
+              "name": "浅海沙滩",
+              "icon": "🏖️",
+              "description": "温暖的浅海区域，波浪轻柔拍打着金色沙滩。",
+              "bgGradient": "linear-gradient(180deg, #001833 0%, #003366 40%, #1a6699 100%)",
+              "backgroundImage": "/img/scenes/water-beach.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 4,
+                  "minLevel": 3,
+                  "maxLevel": 8,
+                  "rate": 48
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 3,
+                  "maxLevel": 6,
+                  "rate": 14
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 3,
+                  "maxLevel": 6,
+                  "rate": 7
+                },
+                {
+                  "petId": 40,
+                  "minLevel": 3,
+                  "maxLevel": 8,
+                  "rate": 28
+                },
+                {
+                  "petId": 43,
+                  "minLevel": 5,
+                  "maxLevel": 10,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_sailor",
+                  "name": "老水手",
+                  "x": 70,
+                  "y": 40,
+                  "sprite": "/img/npcs/npc_sailor.png",
+                  "defaultText": "最近海里的水质越来越差了，鱼儿们都在发狂。"
+                }
+              ]
             },
             {
-              "petId": 1,
-              "minLevel": 12,
-              "maxLevel": 18,
-              "rate": 25
+              "id": 1,
+              "name": "珊瑚迷宫",
+              "icon": "🐚",
+              "description": "五彩斑斓的珊瑚礁迷宫，隐藏着许多神秘的水系精灵。",
+              "bgGradient": "linear-gradient(180deg, #001a4d 0%, #003380 40%, #0055b3 100%)",
+              "backgroundImage": "/img/scenes/water-coral.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 4,
+                  "minLevel": 8,
+                  "maxLevel": 14,
+                  "rate": 30
+                },
+                {
+                  "petId": 5,
+                  "minLevel": 16,
+                  "maxLevel": 20,
+                  "rate": 19
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 8,
+                  "maxLevel": 12,
+                  "rate": 15
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 8,
+                  "maxLevel": 12,
+                  "rate": 11
+                },
+                {
+                  "petId": 41,
+                  "minLevel": 15,
+                  "maxLevel": 22,
+                  "rate": 22
+                },
+                {
+                  "petId": 44,
+                  "minLevel": 18,
+                  "maxLevel": 25,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_mermaid",
+                  "name": "人鱼公主",
+                  "x": 30,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_mermaid.png",
+                  "defaultText": "海神大人被污染控制了，请你救救他！"
+                }
+              ]
             },
             {
-              "petId": 10,
-              "minLevel": 15,
-              "maxLevel": 20,
-              "rate": 12
-            },
-            {
-              "petId": 12,
-              "minLevel": 18,
-              "maxLevel": 22,
-              "rate": 8
-            },
-            {
-              "petId": 36,
-              "minLevel": 30,
-              "maxLevel": 40,
-              "rate": 16
-            },
-            {
-              "petId": 39,
-              "minLevel": 35,
-              "maxLevel": 45,
-              "rate": 2
+              "id": 2,
+              "name": "深海遗迹",
+              "icon": "🌊",
+              "description": "沉睡万年的深海遗迹，海皇蛙在最深处守护着古老秘宝。",
+              "bgGradient": "linear-gradient(180deg, #000d33 0%, #001a66 40%, #003399 100%)",
+              "backgroundImage": "/img/scenes/water-ruins.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 5,
+                  "minLevel": 16,
+                  "maxLevel": 25,
+                  "rate": 37
+                },
+                {
+                  "petId": 4,
+                  "minLevel": 12,
+                  "maxLevel": 18,
+                  "rate": 25
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 15,
+                  "maxLevel": 20,
+                  "rate": 12
+                },
+                {
+                  "petId": 11,
+                  "minLevel": 18,
+                  "maxLevel": 22,
+                  "rate": 8
+                },
+                {
+                  "petId": 42,
+                  "minLevel": 30,
+                  "maxLevel": 40,
+                  "rate": 16
+                },
+                {
+                  "petId": 45,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 2
+                }
+              ],
+              "boss": {
+                "petId": 24,
+                "level": 35,
+                "name": "渊鲲王·海神",
+                "rate": 100,
+                "essenceId": "water"
+              }
             }
-          ],
-          "boss": {
-            "petId": 21,
-            "level": 35,
-            "name": "焱龙帝·炎皇",
-            "rate": 100,
-            "essenceId": "fire"
-          }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "丛林星",
+          "description": "被茂密森林覆盖的绿色星球，巨大的古树直插云霄。",
+          "theme": "grass",
+          "bgColor": "#001a0a",
+          "requiredLevel": 1,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "林间小道",
+              "icon": "🌿",
+              "description": "阳光透过树叶洒在林间小道上，空气中弥漫着草木清香。",
+              "bgGradient": "linear-gradient(180deg, #001a0a 0%, #003316 40%, #006622 100%)",
+              "backgroundImage": "/img/scenes/grass-path.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 7,
+                  "minLevel": 5,
+                  "maxLevel": 10,
+                  "rate": 48
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 5,
+                  "maxLevel": 8,
+                  "rate": 10
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 5,
+                  "maxLevel": 8,
+                  "rate": 10
+                },
+                {
+                  "petId": 46,
+                  "minLevel": 5,
+                  "maxLevel": 10,
+                  "rate": 28
+                },
+                {
+                  "petId": 49,
+                  "minLevel": 6,
+                  "maxLevel": 11,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_ranger",
+                  "name": "游侠",
+                  "x": 40,
+                  "y": 65,
+                  "sprite": "/img/npcs/npc_ranger.png",
+                  "defaultText": "森林里的植物正在枯萎，这绝对不是自然现象。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "蘑菇森林",
+              "icon": "🍄",
+              "description": "巨型蘑菇组成的奇幻森林，到处是闪烁的孢子。",
+              "bgGradient": "linear-gradient(180deg, #002d10 0%, #005522 40%, #008838 100%)",
+              "backgroundImage": "/img/scenes/grass-mushroom.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 7,
+                  "minLevel": 10,
+                  "maxLevel": 18,
+                  "rate": 30
+                },
+                {
+                  "petId": 8,
+                  "minLevel": 16,
+                  "maxLevel": 22,
+                  "rate": 19
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 10,
+                  "maxLevel": 16,
+                  "rate": 15
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 10,
+                  "maxLevel": 16,
+                  "rate": 11
+                },
+                {
+                  "petId": 47,
+                  "minLevel": 16,
+                  "maxLevel": 24,
+                  "rate": 22
+                },
+                {
+                  "petId": 50,
+                  "minLevel": 18,
+                  "maxLevel": 26,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_fairy",
+                  "name": "花仙子",
+                  "x": 80,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_fairy.png",
+                  "defaultText": "毒气已经蔓延到这里了，咳咳……"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "古树之心",
+              "icon": "🌳",
+              "description": "万年古树的核心，森林守护者沉睡于此。",
+              "bgGradient": "linear-gradient(180deg, #003d15 0%, #006628 40%, #00993d 100%)",
+              "backgroundImage": "/img/scenes/grass-heart.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 8,
+                  "minLevel": 20,
+                  "maxLevel": 30,
+                  "rate": 37
+                },
+                {
+                  "petId": 7,
+                  "minLevel": 15,
+                  "maxLevel": 22,
+                  "rate": 20
+                },
+                {
+                  "petId": 12,
+                  "minLevel": 18,
+                  "maxLevel": 25,
+                  "rate": 12
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 18,
+                  "maxLevel": 24,
+                  "rate": 12
+                },
+                {
+                  "petId": 48,
+                  "minLevel": 32,
+                  "maxLevel": 42,
+                  "rate": 16
+                },
+                {
+                  "petId": 51,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 2
+                }
+              ],
+              "boss": {
+                "petId": 27,
+                "level": 40,
+                "name": "蛮荒古树·森灵",
+                "rate": 100,
+                "essenceId": "grass"
+              }
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "雷霆星",
+          "description": "电闪雷鸣的风暴星球，永不停歇的闪电照亮紫色天空。",
+          "theme": "electric",
+          "bgColor": "#1a1500",
+          "requiredLevel": 1,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "雷鸣平原",
+              "icon": "⚡",
+              "description": "闪电不时划过天际的广阔平原，空气中充满了静电。",
+              "bgGradient": "linear-gradient(180deg, #1a1500 0%, #332b00 40%, #665500 100%)",
+              "backgroundImage": "/img/scenes/electric-plains.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 10,
+                  "minLevel": 10,
+                  "maxLevel": 18,
+                  "rate": 41
+                },
+                {
+                  "petId": 1,
+                  "minLevel": 10,
+                  "maxLevel": 15,
+                  "rate": 14
+                },
+                {
+                  "petId": 4,
+                  "minLevel": 10,
+                  "maxLevel": 15,
+                  "rate": 14
+                },
+                {
+                  "petId": 52,
+                  "minLevel": 8,
+                  "maxLevel": 15,
+                  "rate": 28
+                },
+                {
+                  "petId": 55,
+                  "minLevel": 10,
+                  "maxLevel": 16,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_engineer",
+                  "name": "雷电工程师",
+                  "x": 25,
+                  "y": 70,
+                  "sprite": "/img/npcs/npc_engineer.png",
+                  "defaultText": "磁场完全紊乱了，我的仪器都失效了！"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "闪电峡谷",
+              "icon": "🌩️",
+              "description": "峡谷中雷电密集交织，只有电系精灵才能自如行动。",
+              "bgGradient": "linear-gradient(180deg, #332200 0%, #664400 40%, #997700 100%)",
+              "backgroundImage": "/img/scenes/electric-canyon.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 10,
+                  "minLevel": 18,
+                  "maxLevel": 25,
+                  "rate": 26
+                },
+                {
+                  "petId": 13,
+                  "minLevel": 20,
+                  "maxLevel": 28,
+                  "rate": 22
+                },
+                {
+                  "petId": 7,
+                  "minLevel": 18,
+                  "maxLevel": 22,
+                  "rate": 15
+                },
+                {
+                  "petId": 1,
+                  "minLevel": 18,
+                  "maxLevel": 22,
+                  "rate": 11
+                },
+                {
+                  "petId": 53,
+                  "minLevel": 20,
+                  "maxLevel": 28,
+                  "rate": 22
+                },
+                {
+                  "petId": 56,
+                  "minLevel": 22,
+                  "maxLevel": 30,
+                  "rate": 3
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_guard",
+                  "name": "神殿守卫",
+                  "x": 60,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_guard.png",
+                  "defaultText": "海盗破坏了能量节点，雷帝大人发怒了！"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "雷神殿堂",
+              "icon": "🏛️",
+              "description": "雷霆星最高处的神殿，传说雷神在此掌控天雷。",
+              "bgGradient": "linear-gradient(180deg, #4d3d00 0%, #806600 40%, #cc9900 100%)",
+              "backgroundImage": "/img/scenes/electric-temple.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 13,
+                  "minLevel": 28,
+                  "maxLevel": 38,
+                  "rate": 37
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 25,
+                  "maxLevel": 32,
+                  "rate": 20
+                },
+                {
+                  "petId": 2,
+                  "minLevel": 25,
+                  "maxLevel": 30,
+                  "rate": 12
+                },
+                {
+                  "petId": 5,
+                  "minLevel": 25,
+                  "maxLevel": 30,
+                  "rate": 12
+                },
+                {
+                  "petId": 54,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 16
+                },
+                {
+                  "petId": 57,
+                  "minLevel": 38,
+                  "maxLevel": 48,
+                  "rate": 2
+                }
+              ],
+              "boss": {
+                "petId": 30,
+                "level": 45,
+                "name": "天雷兽·雷帝",
+                "rate": 100,
+                "essenceId": "electric"
+              }
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "光暗星",
+          "description": "半边永昼半边永夜的神秘星球，光明与黑暗的力量在此交汇。",
+          "theme": "neutral",
+          "bgColor": "#0a0a1a",
+          "requiredLevel": 1,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "晨曦之地",
+              "icon": "🌅",
+              "description": "永恒黎明笼罩的圣地，柔和的金光赋予一切温暖与希望。",
+              "bgGradient": "linear-gradient(180deg, #1a1033 0%, #332066 40%, #553399 100%)",
+              "backgroundImage": "/img/scenes/light-dawn.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 15,
+                  "minLevel": 20,
+                  "maxLevel": 28,
+                  "rate": 34
+                },
+                {
+                  "petId": 11,
+                  "minLevel": 20,
+                  "maxLevel": 28,
+                  "rate": 21
+                },
+                {
+                  "petId": 10,
+                  "minLevel": 18,
+                  "maxLevel": 24,
+                  "rate": 14
+                },
+                {
+                  "petId": 58,
+                  "minLevel": 22,
+                  "maxLevel": 30,
+                  "rate": 24
+                },
+                {
+                  "petId": 64,
+                  "minLevel": 15,
+                  "maxLevel": 25,
+                  "rate": 7
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_priest",
+                  "name": "光之祭司",
+                  "x": 85,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_priest.png",
+                  "defaultText": "黑暗正在侵蚀这片晨曦，我们必须守住最后的碎片。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "黄昏边界",
+              "icon": "🌗",
+              "description": "光与暗的交界地带，两种力量在此激烈碰撞。",
+              "bgGradient": "linear-gradient(180deg, #1a0a33 0%, #330d66 40%, #551a99 100%)",
+              "backgroundImage": "/img/scenes/light-twilight.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 11,
+                  "minLevel": 28,
+                  "maxLevel": 36,
+                  "rate": 22
+                },
+                {
+                  "petId": 12,
+                  "minLevel": 28,
+                  "maxLevel": 36,
+                  "rate": 22
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 25,
+                  "maxLevel": 32,
+                  "rate": 14
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 25,
+                  "maxLevel": 32,
+                  "rate": 14
+                },
+                {
+                  "petId": 61,
+                  "minLevel": 28,
+                  "maxLevel": 36,
+                  "rate": 22
+                },
+                {
+                  "petId": 65,
+                  "minLevel": 25,
+                  "maxLevel": 35,
+                  "rate": 6
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_oracle",
+                  "name": "暗影先知",
+                  "x": 15,
+                  "y": 65,
+                  "sprite": "/img/npcs/npc_oracle.png",
+                  "defaultText": "虚空魔神即将苏醒，宇宙的终结要来了……"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "永夜深渊",
+              "icon": "🌑",
+              "description": "永恒黑夜的最深处，暗影刺客在此统治着一切。",
+              "bgGradient": "linear-gradient(180deg, #0d0020 0%, #1a0040 40%, #330066 100%)",
+              "backgroundImage": "/img/scenes/dark-abyss.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 1,
+              "wildPets": [
+                {
+                  "petId": 12,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 28
+                },
+                {
+                  "petId": 11,
+                  "minLevel": 35,
+                  "maxLevel": 42,
+                  "rate": 20
+                },
+                {
+                  "petId": 17,
+                  "minLevel": 32,
+                  "maxLevel": 40,
+                  "rate": 20
+                },
+                {
+                  "petId": 15,
+                  "minLevel": 32,
+                  "maxLevel": 40,
+                  "rate": 12
+                },
+                {
+                  "petId": 62,
+                  "minLevel": 38,
+                  "maxLevel": 48,
+                  "rate": 16
+                },
+                {
+                  "petId": 63,
+                  "minLevel": 40,
+                  "maxLevel": 50,
+                  "rate": 2
+                }
+              ],
+              "boss": {
+                "petId": 33,
+                "level": 55,
+                "name": "虚空魔神·混沌",
+                "rate": 100,
+                "essenceId": "dark"
+              }
+            }
+          ]
         }
       ]
     },
     {
       "id": 2,
-      "name": "海洋星",
-      "description": "深蓝色的海洋星球，水下隐藏着古老的遗迹和强大的水系精灵。",
-      "theme": "water",
-      "bgColor": "#000a1a",
-      "requiredLevel": 1,
-      "scenes": [
+      "name": "阿瑞斯星系",
+      "description": "充满未知危险的高阶星系，只有强大的赛尔才能进入。",
+      "requiredLevel": 30,
+      "planets": [
         {
-          "id": 0,
-          "name": "浅海沙滩",
-          "icon": "🏖️",
-          "description": "温暖的浅海区域，波浪轻柔拍打着金色沙滩。",
-          "bgGradient": "linear-gradient(180deg, #001833 0%, #003366 40%, #1a6699 100%)",
-          "backgroundImage": "/img/scenes/water-beach.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
+          "id": 6,
+          "name": "冰霜星",
+          "description": "永恒冰封的极寒世界，生存着强大的冰系精灵。",
+          "theme": "water",
+          "bgColor": "#001a33",
+          "requiredLevel": 30,
+          "scenes": [
             {
-              "petId": 4,
-              "minLevel": 3,
-              "maxLevel": 8,
-              "rate": 48
-            },
-            {
-              "petId": 15,
-              "minLevel": 3,
-              "maxLevel": 6,
-              "rate": 14
-            },
-            {
-              "petId": 10,
-              "minLevel": 3,
-              "maxLevel": 6,
-              "rate": 7
-            },
-            {
-              "petId": 40,
-              "minLevel": 3,
-              "maxLevel": 8,
-              "rate": 28
-            },
-            {
-              "petId": 43,
-              "minLevel": 5,
-              "maxLevel": 10,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_sailor",
-              "name": "老水手",
-              "x": 70,
-              "y": 40,
-              "sprite": "⚓",
-              "defaultText": "最近海里的水质越来越差了，鱼儿们都在发狂。"
+              "id": 0,
+              "name": "冰晶平原",
+              "icon": "❄️",
+              "description": "被厚厚冰层覆盖的平原。",
+              "bgGradient": "linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%)",
+              "backgroundImage": "/img/scenes/water-beach.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 30,
+              "wildPets": [
+                {
+                  "petId": 67,
+                  "minLevel": 30,
+                  "maxLevel": 40,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_ice_guardian",
+                  "name": "冰晶守护者",
+                  "x": 20,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_ice_guardian.png",
+                  "defaultText": "这里是极寒禁地。"
+                },
+                {
+                  "id": "npc_lost_explorer",
+                  "name": "迷失的探险家",
+                  "x": 70,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_lost_explorer.png",
+                  "defaultText": "好冷...我找不到回去的路了。"
+                }
+              ]
             }
           ]
         },
         {
-          "id": 1,
-          "name": "珊瑚迷宫",
-          "icon": "🐚",
-          "description": "五彩斑斓的珊瑚礁迷宫，隐藏着许多神秘的水系精灵。",
-          "bgGradient": "linear-gradient(180deg, #001a4d 0%, #003380 40%, #0055b3 100%)",
-          "backgroundImage": "/img/scenes/water-coral.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
+          "id": 7,
+          "name": "沙漠星",
+          "description": "黄沙漫天的荒芜星球，隐藏着古老的秘密。",
+          "theme": "fire",
+          "bgColor": "#331a00",
+          "requiredLevel": 35,
+          "scenes": [
             {
-              "petId": 4,
-              "minLevel": 8,
-              "maxLevel": 14,
-              "rate": 30
-            },
-            {
-              "petId": 5,
-              "minLevel": 16,
-              "maxLevel": 20,
-              "rate": 19
-            },
-            {
-              "petId": 15,
-              "minLevel": 8,
-              "maxLevel": 12,
-              "rate": 15
-            },
-            {
-              "petId": 10,
-              "minLevel": 8,
-              "maxLevel": 12,
-              "rate": 11
-            },
-            {
-              "petId": 41,
-              "minLevel": 15,
-              "maxLevel": 22,
-              "rate": 22
-            },
-            {
-              "petId": 44,
-              "minLevel": 18,
-              "maxLevel": 25,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_mermaid",
-              "name": "人鱼公主",
-              "x": 30,
-              "y": 60,
-              "sprite": "🧜‍♀️",
-              "defaultText": "海神大人被污染控制了，请你救救他！"
+              "id": 0,
+              "name": "流沙绿洲",
+              "icon": "🌵",
+              "description": "沙漠中罕见的绿洲。",
+              "bgGradient": "linear-gradient(180deg, #ffcc80 0%, #ffb74d 100%)",
+              "backgroundImage": "/img/scenes/fire-canyon.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 35,
+              "wildPets": [
+                {
+                  "petId": 68,
+                  "minLevel": 35,
+                  "maxLevel": 45,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_desert_merchant",
+                  "name": "沙丘商人",
+                  "x": 30,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_desert_merchant.png",
+                  "defaultText": "朋友，需要点稀罕玩意儿吗？"
+                },
+                {
+                  "id": "npc_ruin_scholar",
+                  "name": "遗迹学者",
+                  "x": 75,
+                  "y": 65,
+                  "sprite": "/img/npcs/npc_ruin_scholar.png",
+                  "defaultText": "这些遗迹的文字，我马上就能破译了！"
+                }
+              ]
             }
           ]
         },
         {
-          "id": 2,
-          "name": "深海遗迹",
-          "icon": "🌊",
-          "description": "沉睡万年的深海遗迹，海皇蛙在最深处守护着古老秘宝。",
-          "bgGradient": "linear-gradient(180deg, #000d33 0%, #001a66 40%, #003399 100%)",
-          "backgroundImage": "/img/scenes/water-ruins.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
+          "id": 8,
+          "name": "幻梦星",
+          "description": "充满幻境的神秘星球，现实与虚幻在这里交织。",
+          "theme": "light",
+          "bgColor": "#1a0033",
+          "requiredLevel": 40,
+          "scenes": [
             {
-              "petId": 5,
-              "minLevel": 16,
-              "maxLevel": 25,
-              "rate": 37
-            },
-            {
-              "petId": 4,
-              "minLevel": 12,
-              "maxLevel": 18,
-              "rate": 25
-            },
-            {
-              "petId": 15,
-              "minLevel": 15,
-              "maxLevel": 20,
-              "rate": 12
-            },
-            {
-              "petId": 11,
-              "minLevel": 18,
-              "maxLevel": 22,
-              "rate": 8
-            },
-            {
-              "petId": 42,
-              "minLevel": 30,
-              "maxLevel": 40,
-              "rate": 16
-            },
-            {
-              "petId": 45,
-              "minLevel": 35,
-              "maxLevel": 45,
-              "rate": 2
-            }
-          ],
-          "boss": {
-            "petId": 24,
-            "level": 35,
-            "name": "渊鲲王·海神",
-            "rate": 100,
-            "essenceId": "water"
-          }
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "丛林星",
-      "description": "被茂密森林覆盖的绿色星球，巨大的古树直插云霄。",
-      "theme": "grass",
-      "bgColor": "#001a0a",
-      "requiredLevel": 1,
-      "scenes": [
-        {
-          "id": 0,
-          "name": "林间小道",
-          "icon": "🌿",
-          "description": "阳光透过树叶洒在林间小道上，空气中弥漫着草木清香。",
-          "bgGradient": "linear-gradient(180deg, #001a0a 0%, #003316 40%, #006622 100%)",
-          "backgroundImage": "/img/scenes/grass-path.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 7,
-              "minLevel": 5,
-              "maxLevel": 10,
-              "rate": 48
-            },
-            {
-              "petId": 15,
-              "minLevel": 5,
-              "maxLevel": 8,
-              "rate": 10
-            },
-            {
-              "petId": 17,
-              "minLevel": 5,
-              "maxLevel": 8,
-              "rate": 10
-            },
-            {
-              "petId": 46,
-              "minLevel": 5,
-              "maxLevel": 10,
-              "rate": 28
-            },
-            {
-              "petId": 49,
-              "minLevel": 6,
-              "maxLevel": 11,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_ranger",
-              "name": "游侠",
-              "x": 40,
-              "y": 65,
-              "sprite": "🏹",
-              "defaultText": "森林里的植物正在枯萎，这绝对不是自然现象。"
+              "id": 0,
+              "name": "梦境花园",
+              "icon": "🌸",
+              "description": "充满发光植物的花园。",
+              "bgGradient": "linear-gradient(180deg, #e1bee7 0%, #ce93d8 100%)",
+              "backgroundImage": "/img/scenes/light-dawn.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 40,
+              "wildPets": [
+                {
+                  "petId": 69,
+                  "minLevel": 40,
+                  "maxLevel": 50,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_dream_weaver",
+                  "name": "织梦者",
+                  "x": 25,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_dream_weaver.png",
+                  "defaultText": "你看到的，真的是真实的吗？"
+                },
+                {
+                  "id": "npc_illusion_guide",
+                  "name": "幻境向导",
+                  "x": 65,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_illusion_guide.png",
+                  "defaultText": "跟我来，不要迷失在花海中。"
+                }
+              ]
             }
           ]
         },
         {
-          "id": 1,
-          "name": "蘑菇森林",
-          "icon": "🍄",
-          "description": "巨型蘑菇组成的奇幻森林，到处是闪烁的孢子。",
-          "bgGradient": "linear-gradient(180deg, #002d10 0%, #005522 40%, #008838 100%)",
-          "backgroundImage": "/img/scenes/grass-mushroom.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
+          "id": 9,
+          "name": "机械星",
+          "description": "废弃机械文明的遗迹，随处可见失控的智能机械。",
+          "theme": "electric",
+          "bgColor": "#1a1a1a",
+          "requiredLevel": 45,
+          "scenes": [
             {
-              "petId": 7,
-              "minLevel": 10,
-              "maxLevel": 18,
-              "rate": 30
-            },
-            {
-              "petId": 8,
-              "minLevel": 16,
-              "maxLevel": 22,
-              "rate": 19
-            },
-            {
-              "petId": 17,
-              "minLevel": 10,
-              "maxLevel": 16,
-              "rate": 15
-            },
-            {
-              "petId": 15,
-              "minLevel": 10,
-              "maxLevel": 16,
-              "rate": 11
-            },
-            {
-              "petId": 47,
-              "minLevel": 16,
-              "maxLevel": 24,
-              "rate": 22
-            },
-            {
-              "petId": 50,
-              "minLevel": 18,
-              "maxLevel": 26,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_fairy",
-              "name": "花仙子",
-              "x": 80,
-              "y": 45,
-              "sprite": "🧚‍♀️",
-              "defaultText": "毒气已经蔓延到这里了，咳咳……"
+              "id": 0,
+              "name": "废弃工厂",
+              "icon": "🏭",
+              "description": "轰鸣声不断的钢铁工厂。",
+              "bgGradient": "linear-gradient(180deg, #cfd8dc 0%, #b0bec5 100%)",
+              "backgroundImage": "/img/scenes/electric-plains.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 45,
+              "wildPets": [
+                {
+                  "petId": 70,
+                  "minLevel": 45,
+                  "maxLevel": 55,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_ai_core",
+                  "name": "AI核心",
+                  "x": 40,
+                  "y": 40,
+                  "sprite": "/img/npcs/npc_ai_core.png",
+                  "defaultText": "警告：检测到未授权访问。"
+                },
+                {
+                  "id": "npc_cyborg_rebel",
+                  "name": "改造人叛军",
+                  "x": 80,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_cyborg_rebel.png",
+                  "defaultText": "这帮废铜烂铁交给我对付！"
+                }
+              ]
             }
           ]
         },
         {
-          "id": 2,
-          "name": "古树之心",
-          "icon": "🌳",
-          "description": "万年古树的核心，森林守护者沉睡于此。",
-          "bgGradient": "linear-gradient(180deg, #003d15 0%, #006628 40%, #00993d 100%)",
-          "backgroundImage": "/img/scenes/grass-heart.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
+          "id": 10,
+          "name": "熔核星",
+          "description": "星球核心暴露的危险世界，最深处沉睡着远古巨兽。",
+          "theme": "dark",
+          "bgColor": "#330000",
+          "requiredLevel": 50,
+          "scenes": [
             {
-              "petId": 8,
-              "minLevel": 20,
-              "maxLevel": 30,
-              "rate": 37
-            },
-            {
-              "petId": 7,
-              "minLevel": 15,
-              "maxLevel": 22,
-              "rate": 20
-            },
-            {
-              "petId": 12,
-              "minLevel": 18,
-              "maxLevel": 25,
-              "rate": 12
-            },
-            {
-              "petId": 17,
-              "minLevel": 18,
-              "maxLevel": 24,
-              "rate": 12
-            },
-            {
-              "petId": 48,
-              "minLevel": 32,
-              "maxLevel": 42,
-              "rate": 16
-            },
-            {
-              "petId": 51,
-              "minLevel": 35,
-              "maxLevel": 45,
-              "rate": 2
-            }
-          ],
-          "boss": {
-            "petId": 27,
-            "level": 40,
-            "name": "蛮荒古树·森灵",
-            "rate": 100,
-            "essenceId": "grass"
-          }
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "name": "雷霆星",
-      "description": "电闪雷鸣的风暴星球，永不停歇的闪电照亮紫色天空。",
-      "theme": "electric",
-      "bgColor": "#1a1500",
-      "requiredLevel": 1,
-      "scenes": [
-        {
-          "id": 0,
-          "name": "雷鸣平原",
-          "icon": "⚡",
-          "description": "闪电不时划过天际的广阔平原，空气中充满了静电。",
-          "bgGradient": "linear-gradient(180deg, #1a1500 0%, #332b00 40%, #665500 100%)",
-          "backgroundImage": "/img/scenes/electric-plains.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 10,
-              "minLevel": 10,
-              "maxLevel": 18,
-              "rate": 41
-            },
-            {
-              "petId": 1,
-              "minLevel": 10,
-              "maxLevel": 15,
-              "rate": 14
-            },
-            {
-              "petId": 4,
-              "minLevel": 10,
-              "maxLevel": 15,
-              "rate": 14
-            },
-            {
-              "petId": 52,
-              "minLevel": 8,
-              "maxLevel": 15,
-              "rate": 28
-            },
-            {
-              "petId": 55,
-              "minLevel": 10,
-              "maxLevel": 16,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_engineer",
-              "name": "雷电工程师",
-              "x": 25,
-              "y": 70,
-              "sprite": "👨‍🔧",
-              "defaultText": "磁场完全紊乱了，我的仪器都失效了！"
+              "id": 0,
+              "name": "地壳裂缝",
+              "icon": "🌋",
+              "description": "岩浆喷涌的危险裂缝。",
+              "bgGradient": "linear-gradient(180deg, #ff8a65 0%, #ff7043 100%)",
+              "backgroundImage": "/img/scenes/fire-core.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 50,
+              "wildPets": [
+                {
+                  "petId": 71,
+                  "minLevel": 50,
+                  "maxLevel": 60,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_magma_lord",
+                  "name": "炎魔领主",
+                  "x": 20,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_magma_lord.png",
+                  "defaultText": "感受深渊的烈焰吧！"
+                },
+                {
+                  "id": "npc_fire_spirit",
+                  "name": "灰烬精灵",
+                  "x": 65,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_fire_spirit.png",
+                  "defaultText": "小心别被烫伤哦~"
+                }
+              ]
             }
           ]
-        },
-        {
-          "id": 1,
-          "name": "闪电峡谷",
-          "icon": "🌩️",
-          "description": "峡谷中雷电密集交织，只有电系精灵才能自如行动。",
-          "bgGradient": "linear-gradient(180deg, #332200 0%, #664400 40%, #997700 100%)",
-          "backgroundImage": "/img/scenes/electric-canyon.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 10,
-              "minLevel": 18,
-              "maxLevel": 25,
-              "rate": 26
-            },
-            {
-              "petId": 13,
-              "minLevel": 20,
-              "maxLevel": 28,
-              "rate": 22
-            },
-            {
-              "petId": 7,
-              "minLevel": 18,
-              "maxLevel": 22,
-              "rate": 15
-            },
-            {
-              "petId": 1,
-              "minLevel": 18,
-              "maxLevel": 22,
-              "rate": 11
-            },
-            {
-              "petId": 53,
-              "minLevel": 20,
-              "maxLevel": 28,
-              "rate": 22
-            },
-            {
-              "petId": 56,
-              "minLevel": 22,
-              "maxLevel": 30,
-              "rate": 3
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_guard",
-              "name": "神殿守卫",
-              "x": 60,
-              "y": 55,
-              "sprite": "🛡️",
-              "defaultText": "海盗破坏了能量节点，雷帝大人发怒了！"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "name": "雷神殿堂",
-          "icon": "🏛️",
-          "description": "雷霆星最高处的神殿，传说雷神在此掌控天雷。",
-          "bgGradient": "linear-gradient(180deg, #4d3d00 0%, #806600 40%, #cc9900 100%)",
-          "backgroundImage": "/img/scenes/electric-temple.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 13,
-              "minLevel": 28,
-              "maxLevel": 38,
-              "rate": 37
-            },
-            {
-              "petId": 10,
-              "minLevel": 25,
-              "maxLevel": 32,
-              "rate": 20
-            },
-            {
-              "petId": 2,
-              "minLevel": 25,
-              "maxLevel": 30,
-              "rate": 12
-            },
-            {
-              "petId": 5,
-              "minLevel": 25,
-              "maxLevel": 30,
-              "rate": 12
-            },
-            {
-              "petId": 54,
-              "minLevel": 35,
-              "maxLevel": 45,
-              "rate": 16
-            },
-            {
-              "petId": 57,
-              "minLevel": 38,
-              "maxLevel": 48,
-              "rate": 2
-            }
-          ],
-          "boss": {
-            "petId": 30,
-            "level": 45,
-            "name": "天雷兽·雷帝",
-            "rate": 100,
-            "essenceId": "electric"
-          }
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "光暗星",
-      "description": "半边永昼半边永夜的神秘星球，光明与黑暗的力量在此交汇。",
-      "theme": "neutral",
-      "bgColor": "#0a0a1a",
-      "requiredLevel": 1,
-      "scenes": [
-        {
-          "id": 0,
-          "name": "晨曦之地",
-          "icon": "🌅",
-          "description": "永恒黎明笼罩的圣地，柔和的金光赋予一切温暖与希望。",
-          "bgGradient": "linear-gradient(180deg, #1a1033 0%, #332066 40%, #553399 100%)",
-          "backgroundImage": "/img/scenes/light-dawn.png",
-          "maxSpawns": 4,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 15,
-              "minLevel": 20,
-              "maxLevel": 28,
-              "rate": 34
-            },
-            {
-              "petId": 11,
-              "minLevel": 20,
-              "maxLevel": 28,
-              "rate": 21
-            },
-            {
-              "petId": 10,
-              "minLevel": 18,
-              "maxLevel": 24,
-              "rate": 14
-            },
-            {
-              "petId": 58,
-              "minLevel": 22,
-              "maxLevel": 30,
-              "rate": 24
-            },
-            {
-              "petId": 64,
-              "minLevel": 15,
-              "maxLevel": 25,
-              "rate": 7
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_priest",
-              "name": "光之祭司",
-              "x": 85,
-              "y": 50,
-              "sprite": "👼",
-              "defaultText": "黑暗正在侵蚀这片晨曦，我们必须守住最后的碎片。"
-            }
-          ]
-        },
-        {
-          "id": 1,
-          "name": "黄昏边界",
-          "icon": "🌗",
-          "description": "光与暗的交界地带，两种力量在此激烈碰撞。",
-          "bgGradient": "linear-gradient(180deg, #1a0a33 0%, #330d66 40%, #551a99 100%)",
-          "backgroundImage": "/img/scenes/light-twilight.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 11,
-              "minLevel": 28,
-              "maxLevel": 36,
-              "rate": 22
-            },
-            {
-              "petId": 12,
-              "minLevel": 28,
-              "maxLevel": 36,
-              "rate": 22
-            },
-            {
-              "petId": 15,
-              "minLevel": 25,
-              "maxLevel": 32,
-              "rate": 14
-            },
-            {
-              "petId": 17,
-              "minLevel": 25,
-              "maxLevel": 32,
-              "rate": 14
-            },
-            {
-              "petId": 61,
-              "minLevel": 28,
-              "maxLevel": 36,
-              "rate": 22
-            },
-            {
-              "petId": 65,
-              "minLevel": 25,
-              "maxLevel": 35,
-              "rate": 6
-            }
-          ],
-          "npcs": [
-            {
-              "id": "npc_oracle",
-              "name": "暗影先知",
-              "x": 15,
-              "y": 65,
-              "sprite": "🔮",
-              "defaultText": "虚空魔神即将苏醒，宇宙的终结要来了……"
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "name": "永夜深渊",
-          "icon": "🌑",
-          "description": "永恒黑夜的最深处，暗影刺客在此统治着一切。",
-          "bgGradient": "linear-gradient(180deg, #0d0020 0%, #1a0040 40%, #330066 100%)",
-          "backgroundImage": "/img/scenes/dark-abyss.png",
-          "maxSpawns": 5,
-          "refreshInterval": 30,
-          "requiredLevel": 1,
-          "wildPets": [
-            {
-              "petId": 12,
-              "minLevel": 35,
-              "maxLevel": 45,
-              "rate": 28
-            },
-            {
-              "petId": 11,
-              "minLevel": 35,
-              "maxLevel": 42,
-              "rate": 20
-            },
-            {
-              "petId": 17,
-              "minLevel": 32,
-              "maxLevel": 40,
-              "rate": 20
-            },
-            {
-              "petId": 15,
-              "minLevel": 32,
-              "maxLevel": 40,
-              "rate": 12
-            },
-            {
-              "petId": 62,
-              "minLevel": 38,
-              "maxLevel": 48,
-              "rate": 16
-            },
-            {
-              "petId": 63,
-              "minLevel": 40,
-              "maxLevel": 50,
-              "rate": 2
-            }
-          ],
-          "boss": {
-            "petId": 33,
-            "level": 55,
-            "name": "虚空魔神·混沌",
-            "rate": 100,
-            "essenceId": "dark"
-          }
         }
       ]
     }

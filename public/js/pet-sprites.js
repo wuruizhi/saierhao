@@ -81,9 +81,43 @@ const PET_TYPE_MAP = {
   "66": "normal"
 };
 
-function renderPetSprite(container, petId, size) {
+// Lazy loading observer for pet sprites
+const _petSpriteObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const petId = parseInt(el.dataset.petId);
+      const size = parseInt(el.dataset.petSize);
+      if (petId && size) {
+        _renderPetSpriteImmediate(el, petId, size);
+      }
+      _petSpriteObserver.unobserve(el);
+    }
+  });
+}, { rootMargin: '200px' }); // Start loading 200px before visible
+
+function renderPetSprite(container, petId, size, lazy) {
   if (!container) return;
   const s = size || 80;
+  container.innerHTML = '';
+  container.style.position = 'relative';
+  container.style.width = s + 'px';
+  container.style.height = s + 'px';
+
+  // If lazy, defer rendering until visible
+  if (lazy) {
+    container.dataset.petId = petId;
+    container.dataset.petSize = s;
+    // Show a subtle placeholder
+    container.innerHTML = `<div style="width:${s}px;height:${s}px;display:flex;align-items:center;justify-content:center;opacity:0.3;font-size:${s*0.4}px">⏳</div>`;
+    _petSpriteObserver.observe(container);
+    return;
+  }
+
+  _renderPetSpriteImmediate(container, petId, s);
+}
+
+function _renderPetSpriteImmediate(container, petId, s) {
   container.innerHTML = '';
   container.style.position = 'relative';
   container.style.width = s + 'px';
@@ -110,8 +144,9 @@ function renderPetSprite(container, petId, size) {
 
   // Image
   const img = document.createElement('img');
-  img.src = `/img/pets/${petId}.png?v=14`;
+  img.src = `/img/pets/${petId}.png?v=15`;
   img.alt = `Pet ${petId}`;
+  img.loading = 'lazy';
   img.style.cssText = `
     width:${s*0.88}px;height:${s*0.88}px;object-fit:contain;
     position:relative;z-index:1;

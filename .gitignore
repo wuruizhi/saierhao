@@ -3,3 +3,16 @@ db/*.db
 db/*.db-shm
 db/*.db-wal
 .env
+*.pyc
+__pycache__/
+server.log
+database.sqlite
+public/img/pets_backup/
+test*.js
+test*.py
+fix_*.py
+check_*.py
+check_*.js
+rembg_all.py
+compress_pets.py
+find_transparent_commit.py

@@ -31,8 +31,21 @@ console.log('✅ PVP管理器初始化完成');
 const app = express();
 app.use(express.json());
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files with optimized caching
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filepath) => {
+    // Images: cache aggressively (we use ?v= cache busters)
+    if (/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(filepath)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 days
+    }
+    // JS/CSS: always validate freshness
+    else if (/\.(js|css)$/i.test(filepath)) {
+      res.setHeader('Cache-Control', 'no-cache'); // validate via ETag
+    }
+  }
+}));
 
 // API routes
 app.use('/api', (req, res, next) => {

@@ -3658,6 +3658,211 @@
       ],
       "lore": "羽翼如钢铁般坚硬的战鹰，普通系的巅峰。",
       "captureGuide": "无法直接捕获，需要由幼体进化而来。"
+    },
+    {
+      "id": 67,
+      "name": "极寒冰狐",
+      "type": "water",
+      "maxHp": 130,
+      "attack": 65,
+      "defense": 60,
+      "spAttack": 125,
+      "spDefense": 110,
+      "speed": 100,
+      "skills": [
+        {
+          "name": "极冰闪",
+          "type": "water",
+          "power": 60,
+          "pp": 20,
+          "description": "发射冰凌攻击对手"
+        },
+        {
+          "name": "霜冻护甲",
+          "type": "water",
+          "power": 0,
+          "pp": 10,
+          "description": "提升自身防御1个等级"
+        },
+        {
+          "name": "绝对零度",
+          "type": "water",
+          "power": 90,
+          "pp": 10,
+          "description": "降低周围温度，有几率冻伤对手"
+        },
+        {
+          "name": "九尾风暴",
+          "type": "water",
+          "power": 140,
+          "pp": 5,
+          "description": "释放强大的冰雪风暴"
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "name": "沙丘巨蝎",
+      "type": "fire",
+      "maxHp": 140,
+      "attack": 120,
+      "defense": 125,
+      "spAttack": 50,
+      "spDefense": 90,
+      "speed": 85,
+      "skills": [
+        {
+          "name": "剧毒尾刺",
+          "type": "fire",
+          "power": 70,
+          "pp": 15,
+          "description": "使用带毒的尾刺攻击对手"
+        },
+        {
+          "name": "高温装甲",
+          "type": "fire",
+          "power": 0,
+          "pp": 10,
+          "description": "提升自身防御2个等级"
+        },
+        {
+          "name": "流沙陷阱",
+          "type": "fire",
+          "power": 85,
+          "pp": 15,
+          "description": "制造流沙限制对手行动"
+        },
+        {
+          "name": "炎魔连斩",
+          "type": "fire",
+          "power": 130,
+          "pp": 5,
+          "description": "双钳连续斩击，附带极高温度"
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "name": "幻境花妖",
+      "type": "light",
+      "maxHp": 110,
+      "attack": 40,
+      "defense": 70,
+      "spAttack": 135,
+      "spDefense": 120,
+      "speed": 115,
+      "skills": [
+        {
+          "name": "迷幻花粉",
+          "type": "light",
+          "power": 50,
+          "pp": 20,
+          "description": "散播致幻花粉，有几率让对手睡眠"
+        },
+        {
+          "name": "光合作用",
+          "type": "light",
+          "power": 0,
+          "pp": 10,
+          "description": "回复自身部分体力"
+        },
+        {
+          "name": "精神冲击",
+          "type": "light",
+          "power": 95,
+          "pp": 15,
+          "description": "使用精神力量冲击对手"
+        },
+        {
+          "name": "梦魇花环",
+          "type": "light",
+          "power": 145,
+          "pp": 5,
+          "description": "召唤巨大的发光花环，给予毁灭性打击"
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "name": "泰坦机甲",
+      "type": "electric",
+      "maxHp": 160,
+      "attack": 135,
+      "defense": 140,
+      "spAttack": 60,
+      "spDefense": 100,
+      "speed": 75,
+      "skills": [
+        {
+          "name": "重装铁拳",
+          "type": "electric",
+          "power": 80,
+          "pp": 20,
+          "description": "用沉重的铁拳锤击"
+        },
+        {
+          "name": "雷达锁定",
+          "type": "electric",
+          "power": 0,
+          "pp": 10,
+          "description": "提升自身命中1个等级"
+        },
+        {
+          "name": "高压电击",
+          "type": "electric",
+          "power": 95,
+          "pp": 15,
+          "description": "释放高压电流，有几率麻痹对手"
+        },
+        {
+          "name": "等离子炮",
+          "type": "electric",
+          "power": 150,
+          "pp": 5,
+          "description": "蓄力发射高能等离子光束"
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "name": "熔核魔神",
+      "type": "dark",
+      "maxHp": 150,
+      "attack": 140,
+      "defense": 110,
+      "spAttack": 130,
+      "spDefense": 105,
+      "speed": 90,
+      "skills": [
+        {
+          "name": "黑暗之火",
+          "type": "dark",
+          "power": 75,
+          "pp": 20,
+          "description": "喷射漆黑的火焰"
+        },
+        {
+          "name": "魔神觉醒",
+          "type": "dark",
+          "power": 0,
+          "pp": 10,
+          "description": "大幅提升自身攻击与特攻"
+        },
+        {
+          "name": "深渊凝视",
+          "type": "dark",
+          "power": 100,
+          "pp": 10,
+          "description": "来自深渊的凝视，降低对手防御"
+        },
+        {
+          "name": "灭世熔岩",
+          "type": "dark",
+          "power": 160,
+          "pp": 5,
+          "description": "召唤毁天灭地的熔岩雨"
+        }
+      ]
     }
   ]
 }

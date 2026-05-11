@@ -120,8 +120,12 @@
 
     <!-- Planets section -->
     <section id="section-planets" class="hub-section active">
-      <h2 class="section-title">星球探险</h2>
-      <div class="planet-grid" id="planet-grid"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 class="section-title" style="margin-bottom:0;" id="planets-title">星系探险</h2>
+        <button id="btn-back-galaxy" class="btn-primary" style="display:none; padding: 6px 12px; font-size: 14px;">返回星际航图</button>
+      </div>
+      <div class="planet-grid" id="galaxy-grid"></div>
+      <div class="planet-grid" id="planet-grid" style="display:none;"></div>
     </section>
 
     <!-- Team section -->
@@ -680,10 +684,10 @@
     </div>
   </div>
 
-  <script src="js/pet-sprites.js?v=14"></script>
-  <script src="js/api.js?v=14"></script>
-  <script src="js/websocket.js?v=14"></script>
-  <script src="js/app.js?v=14"></script>
-  <script src="js/scene.js?v=14"></script>
+  <script src="js/pet-sprites.js?v=15"></script>
+  <script src="js/api.js?v=15"></script>
+  <script src="js/websocket.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
+  <script src="js/scene.js?v=15"></script>
 </body>
 </html>

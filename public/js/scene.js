@@ -194,7 +194,11 @@ function renderSceneNpcs(vp, npcs) {
     spriteDiv.style.display = 'flex';
     spriteDiv.style.alignItems = 'flex-end';
     spriteDiv.style.justifyContent = 'center';
-    spriteDiv.textContent = npc.sprite;
+    if (npc.sprite && npc.sprite.startsWith('/img/')) {
+      spriteDiv.innerHTML = `<img src="${npc.sprite}?v=15" alt="${npc.name}" style="width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,245,212,0.5));">`;
+    } else {
+      spriteDiv.textContent = npc.sprite;
+    }
     pet3d.appendChild(spriteDiv);
     
     const shadow = document.createElement('div');

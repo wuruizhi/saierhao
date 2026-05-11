@@ -81,14 +81,57 @@ document.getElementById('auth-form').addEventListener('submit', async(e) => {
   } catch(err){ errEl.textContent=err.message; }
 });
 
-// Logout
+// Logout with confirmation
 document.getElementById('btn-logout').addEventListener('click', () => {
-  API.clearToken();
-  currentUserId = null;
-  currentBattleId = null;
-  if (ws && ws.disconnect) ws.disconnect();
-  showScreen('auth');
+  showConfirmDialog('确认退出', '确定要退出登录吗？当前游戏进度已自动保存。', () => {
+    API.clearToken();
+    currentUserId = null;
+    currentBattleId = null;
+    if (ws && ws.disconnect) ws.disconnect();
+    showScreen('auth');
+    toast('已安全退出登录');
+  });
 });
+
+// Generic confirm dialog utility
+function showConfirmDialog(title, message, onConfirm) {
+  // Remove existing dialog if any
+  const existing = document.getElementById('confirm-dialog-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'confirm-dialog-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease';
+
+  const dialog = document.createElement('div');
+  dialog.style.cssText = 'background:rgba(15,20,50,0.95);border:1px solid rgba(100,120,255,0.3);border-radius:16px;padding:28px 32px;min-width:320px;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 30px rgba(0,245,212,0.1);text-align:center;animation:slideUp .3s ease';
+
+  dialog.innerHTML = `
+    <div style="font-size:18px;font-weight:700;color:#f8fafc;margin-bottom:12px">${title}</div>
+    <div style="font-size:14px;color:#94a3b8;margin-bottom:24px;line-height:1.6">${message}</div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button id="confirm-dialog-cancel" style="flex:1;padding:10px 20px;border-radius:10px;border:1px solid rgba(148,163,184,0.3);background:rgba(148,163,184,0.1);color:#94a3b8;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s">取消</button>
+      <button id="confirm-dialog-ok" style="flex:1;padding:10px 20px;border-radius:10px;border:1px solid rgba(239,68,68,0.5);background:rgba(239,68,68,0.15);color:#ef4444;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s">确认退出</button>
+    </div>
+  `;
+
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+
+  // Cancel
+  document.getElementById('confirm-dialog-cancel').addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+  // Confirm
+  document.getElementById('confirm-dialog-ok').addEventListener('click', () => {
+    overlay.remove();
+    onConfirm();
+  });
+
+  // ESC to cancel
+  const escHandler = (e) => { if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); } };
+  document.addEventListener('keydown', escHandler);
+}
 
 // ===== GAME LOAD =====
 async function loadGame(){
@@ -190,63 +233,135 @@ async function loadHub(data){
 // ===== PLANETS =====
 async function loadPlanets(){
   try {
-    const {maps} = await API.getMaps();
+    const data = await API.getMaps();
+    const galaxies = data.galaxies || [];
     const profile = await API.profile();
     const maxLv = Math.max(...(profile.teamPets.length?profile.teamPets.map(p=>p.level):[1]));
-    const grid = document.getElementById('planet-grid');
-    grid.innerHTML = '';
-    maps.forEach(m=>{
-      const locked = maxLv < m.requiredLevel;
-      const colors = {fire:'#ff4757',water:'#3b82f6',grass:'#22c55e',electric:'#facc15',neutral:'#a855f7'};
-      const pColor = colors[m.theme] || '#00f5d4';
-      
+    
+    const galaxyGrid = document.getElementById('galaxy-grid');
+    const planetGrid = document.getElementById('planet-grid');
+    const btnBack = document.getElementById('btn-back-galaxy');
+    const title = document.getElementById('planets-title');
+    
+    // Initial state: show galaxies, hide planets
+    galaxyGrid.style.display = 'grid';
+    planetGrid.style.display = 'none';
+    btnBack.style.display = 'none';
+    title.textContent = '星系探险';
+    
+    // Render Galaxies
+    galaxyGrid.innerHTML = '';
+    galaxies.forEach(g => {
+      const locked = maxLv < g.requiredLevel;
       const container = document.createElement('div');
       container.className = `planet-container${locked ? ' locked' : ''}`;
-      container.style.setProperty('--planet-color', pColor);
-      
-      let rgb = '0, 245, 212';
-      if(pColor.startsWith('#')) {
-        const r = parseInt(pColor.slice(1,3), 16);
-        const g = parseInt(pColor.slice(3,5), 16);
-        const b = parseInt(pColor.slice(5,7), 16);
-        rgb = `${r}, ${g}, ${b}`;
-      }
-      container.style.setProperty('--planet-color-rgb', rgb);
+      // Use neutral styling for galaxies
+      container.style.setProperty('--planet-color', '#a855f7');
+      container.style.setProperty('--planet-color-rgb', '168, 85, 247');
       
       const model = document.createElement('div');
       model.className = 'planet-model';
-      model.style.backgroundImage = `url('/img/planets/${m.theme}.png')`;
+      model.style.backgroundImage = `url('/img/planets/neutral.png')`; // Placeholder for galaxy image
+      model.style.backgroundSize = 'cover';
       
       const info = document.createElement('div');
       info.className = 'planet-info';
       info.style.transition = 'opacity 0.3s';
-      info.innerHTML = `<div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked ? `需要 Lv.${m.requiredLevel}` : '点击降落'}</div>`;
+      info.innerHTML = `<div class="planet-name">${g.name}</div><div class="planet-desc">${g.description}</div><div class="planet-req">${locked ? `需要 Lv.${g.requiredLevel}` : '点击进入星系'}</div>`;
       
       if(!locked) {
         model.addEventListener('click', () => {
           model.classList.add('zoom-in');
           info.style.opacity = '0';
-          // Hide siblings to keep the screen clean during zoom
-          Array.from(grid.children).forEach(child => {
+          Array.from(galaxyGrid.children).forEach(child => {
             if (child !== container) child.style.opacity = '0';
           });
           
           setTimeout(() => {
-            goToPlanet(m.id);
-            setTimeout(() => {
-              model.classList.remove('zoom-in');
-              info.style.opacity = '1';
-              Array.from(grid.children).forEach(child => child.style.opacity = '1');
-            }, 500);
-          }, 700);
+            renderPlanets(g, maxLv, planetGrid, galaxyGrid, btnBack, title);
+            model.classList.remove('zoom-in');
+            info.style.opacity = '1';
+            Array.from(galaxyGrid.children).forEach(child => child.style.opacity = '1');
+          }, 600);
         });
       }
       
       container.appendChild(model);
       container.appendChild(info);
-      grid.appendChild(container);
+      galaxyGrid.appendChild(container);
     });
+    
+    // Back button logic
+    btnBack.onclick = () => {
+      planetGrid.style.display = 'none';
+      galaxyGrid.style.display = 'grid';
+      btnBack.style.display = 'none';
+      title.textContent = '星系探险';
+    };
+
   } catch(err){ toast(err.message,'error'); }
+}
+
+function renderPlanets(galaxy, maxLv, planetGrid, galaxyGrid, btnBack, title) {
+  galaxyGrid.style.display = 'none';
+  planetGrid.style.display = 'grid';
+  btnBack.style.display = 'block';
+  title.textContent = `${galaxy.name} - 星球`;
+  
+  planetGrid.innerHTML = '';
+  galaxy.planets.forEach(m => {
+    const locked = maxLv < m.requiredLevel;
+    const colors = {fire:'#ff4757',water:'#3b82f6',grass:'#22c55e',electric:'#facc15',neutral:'#a855f7',dark:'#a855f7',light:'#facc15'};
+    const pColor = colors[m.theme] || '#00f5d4';
+    
+    const container = document.createElement('div');
+    container.className = `planet-container${locked ? ' locked' : ''}`;
+    container.style.setProperty('--planet-color', pColor);
+    
+    let rgb = '0, 245, 212';
+    if(pColor.startsWith('#')) {
+      const r = parseInt(pColor.slice(1,3), 16);
+      const g = parseInt(pColor.slice(3,5), 16);
+      const b = parseInt(pColor.slice(5,7), 16);
+      rgb = `${r}, ${g}, ${b}`;
+    }
+    container.style.setProperty('--planet-color-rgb', rgb);
+    
+    const model = document.createElement('div');
+    model.className = 'planet-model';
+    // Map new themes to existing images if new images aren't ready yet
+    let imgName = m.theme;
+    if (imgName === 'dark' || imgName === 'light') imgName = 'neutral';
+    model.style.backgroundImage = `url('/img/planets/${imgName}.png')`;
+    
+    const info = document.createElement('div');
+    info.className = 'planet-info';
+    info.style.transition = 'opacity 0.3s';
+    info.innerHTML = `<div class="planet-name">${m.name}</div><div class="planet-desc">${m.description}</div><div class="planet-req">${locked ? `需要 Lv.${m.requiredLevel}` : '点击降落'}</div>`;
+    
+    if(!locked) {
+      model.addEventListener('click', () => {
+        model.classList.add('zoom-in');
+        info.style.opacity = '0';
+        Array.from(planetGrid.children).forEach(child => {
+          if (child !== container) child.style.opacity = '0';
+        });
+        
+        setTimeout(() => {
+          goToPlanet(m.id, galaxy.id);
+          setTimeout(() => {
+            model.classList.remove('zoom-in');
+            info.style.opacity = '1';
+            Array.from(planetGrid.children).forEach(child => child.style.opacity = '1');
+          }, 500);
+        }, 700);
+      });
+    }
+    
+    container.appendChild(model);
+    container.appendChild(info);
+    planetGrid.appendChild(container);
+  });
 }
 
 // ===== TEAM =====
@@ -405,8 +520,12 @@ document.getElementById('heal-btn').addEventListener('click', async()=>{
 async function showPlanetDetail(mapId) {
   console.log('[showPlanetDetail] START mapId:', mapId);
   try {
-    const { maps } = await API.getMaps();
-    const map = maps.find(m => m.id == mapId);
+    const { galaxies } = await API.getMaps();
+    let map = null;
+    for (const g of (galaxies || [])) {
+      const found = g.planets.find(m => m.id == mapId);
+      if (found) { map = found; break; }
+    }
     if (!map) { toast('星球不存在', 'error'); return; }
     const profile = await API.profile();
     const maxLv = Math.max(...(profile.teamPets.length ? profile.teamPets.map(p=>p.level) : [1]));
@@ -1243,7 +1362,7 @@ function renderPokedex() {
         card.innerHTML = `<div class="dex-card-sprite" id="dex-sp-${pet.id}"></div><div class="dex-card-name">${pet.name}</div><div class="dex-card-form">${pet.form}</div>`;
         card.addEventListener('click', () => showDexDetail(pet));
         grid.appendChild(card);
-        setTimeout(() => renderPetSprite(document.getElementById(`dex-sp-${pet.id}`), pet.id, 64), 0);
+        setTimeout(() => renderPetSprite(document.getElementById(`dex-sp-${pet.id}`), pet.id, 64, true), 0);
       });
       section.appendChild(grid);
       container.appendChild(section);
