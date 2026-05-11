@@ -443,21 +443,35 @@ function createPlayerRouter(db) {
 
   // Accept friend request
   router.post('/friends/accept', authMiddleware, (req, res) => {
-    const { friendshipId } = req.body;
-    const friendship = db.prepare('SELECT * FROM friends WHERE id = ?').get(friendshipId);
-    
-    if (!friendship) return res.status(404).json({ error: '请求不存在' });
-    if (friendship.friend_id !== req.userId) return res.status(403).json({ error: '无权操作' });
+    try {
+      const { friendshipId } = req.body;
+      if (!friendshipId) return res.status(400).json({ error: '缺少好友请求ID' });
+      
+      const friendship = db.prepare('SELECT * FROM friends WHERE id = ?').get(friendshipId);
+      
+      if (!friendship) return res.status(404).json({ error: '请求不存在' });
+      if (friendship.friend_id !== req.userId) return res.status(403).json({ error: '无权操作' });
 
-    db.prepare('UPDATE friends SET status = "accepted" WHERE id = ?').run(friendshipId);
-    res.json({ success: true, message: '已接受好友请求' });
+      db.prepare('UPDATE friends SET status = "accepted" WHERE id = ?').run(friendshipId);
+      res.json({ success: true, message: '已接受好友请求' });
+    } catch (e) {
+      console.error('/friends/accept error:', e);
+      res.status(500).json({ error: '服务器内部错误' });
+    }
   });
 
   // Remove friend / reject request
   router.post('/friends/remove', authMiddleware, (req, res) => {
-    const { friendshipId } = req.body;
-    db.prepare('DELETE FROM friends WHERE id = ? AND (user_id = ? OR friend_id = ?)').run(friendshipId, req.userId, req.userId);
-    res.json({ success: true, message: '已删除好友/拒绝请求' });
+    try {
+      const { friendshipId } = req.body;
+      if (!friendshipId) return res.status(400).json({ error: '缺少好友请求ID' });
+      
+      db.prepare('DELETE FROM friends WHERE id = ? AND (user_id = ? OR friend_id = ?)').run(friendshipId, req.userId, req.userId);
+      res.json({ success: true, message: '已删除好友/拒绝请求' });
+    } catch (e) {
+      console.error('/friends/remove error:', e);
+      res.status(500).json({ error: '服务器内部错误' });
+    }
   });
 
   // Release pet

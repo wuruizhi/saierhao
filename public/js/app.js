@@ -472,12 +472,15 @@ const SHOP_CATEGORIES = {
     { key: 'body', label: '👕 服饰', icon: '👕' },
     { key: 'back', label: '🦸 背饰', icon: '🦸' },
     { key: 'accessory', label: '👓 饰品', icon: '👓' },
+  ],
+  base: [
+    { key: 'furniture', label: '🪑 家具', icon: '🪑' }
   ]
 };
 
 function getShopItems(group, subKey) {
   if (!shopDataCache) return [];
-  if (group === 'supply') {
+  if (group === 'supply' || group === 'base') {
     return shopDataCache[subKey] || [];
   } else {
     return (shopDataCache.wardrobe || []).filter(w => w.part === subKey);
@@ -1983,7 +1986,7 @@ document.getElementById('tab-base-pets')?.addEventListener('click', () => {
 
 async function loadBase() {
   try {
-    const invData = await API.getInventory();
+    const invData = await API.inventory();
     baseInventory = invData.items.filter(i => i.item_id.startsWith('base_'));
     
     const baseData = await API.getBase();
