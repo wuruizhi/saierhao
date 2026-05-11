@@ -436,11 +436,15 @@ async function goToPlanet(mapId) {
       // Quest not started yet
       promptQuestStart(mapId, async () => {
         // Accept
-        await API.advanceStoryQuest(mapId);
-        toast('剧情任务已开启！');
-        loadStoryQuests(); // Update global tracker
-        showPlanetDetail(mapId);
-        checkAndPlayPlanetDialogue(mapId, 0); // Check for dialogue on step 0
+        try {
+          await API.advanceStoryQuest(mapId);
+          toast('剧情任务已开启！');
+          loadStoryQuests(); // Update global tracker
+          showPlanetDetail(mapId);
+          checkAndPlayPlanetDialogue(mapId, 0); // Check for dialogue on step 0
+        } catch (e) {
+          toast(e.message, 'error');
+        }
       }, () => {
         // Decline (Free explore)
         showPlanetDetail(mapId);
@@ -466,15 +470,25 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
     const planetData = res.storyData[mapId];
     if (!planetData) return;
     const stepData = planetData.steps.find(s => s.step === step);
-    if (!stepData || stepData.type !== 'dialogue') return;
+    if (!stepData) return;
+    
+    // Play start dialogues if they exist
+    const dialogues = stepData.startDialogues || [];
+    if (dialogues.length === 0) {
+      if (stepData.type === 'dialogue') {
+        // If it's a pure dialogue step with no text (shouldn't happen), just advance
+        API.advanceStoryQuest(mapId).then(() => loadStoryQuests());
+      }
+      return;
+    }
     
     // Play dialogue sequence
     let q = [];
-    stepData.dialogues.forEach(d => {
+    dialogues.forEach(d => {
       q.push({
-        name: d.speaker,
+        name: d.character,
         text: d.text,
-        spriteUrl: d.speaker === '赛尔' ? '/img/player.png' : null
+        spriteUrl: d.avatar === 'player' ? '/img/player.png' : null
       });
     });
     
@@ -484,10 +498,15 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
         const d = q[idx++];
         showDialogue(d.name, d.text, d.spriteUrl, playNext);
       } else {
-        // Dialogue finished, advance quest
-        API.advanceStoryQuest(mapId).then(() => {
-          loadStoryQuests(); // refresh tracker
-        });
+        // Dialogue finished
+        if (stepData.type === 'dialogue') {
+          // If it's a dialogue-only step, advance the quest automatically
+          API.advanceStoryQuest(mapId).then(() => {
+            loadStoryQuests(); // refresh tracker
+            // Maybe check next step's dialogue immediately?
+            checkAndPlayPlanetDialogue(mapId, step + 1);
+          });
+        }
       }
     };
     playNext();
