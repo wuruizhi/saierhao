@@ -541,12 +541,12 @@
             {
               "character": "迷失的探险家",
               "avatar": "npc_lost_explorer",
-              "text": "阿嚏！太冷了……这里的冰狐突然狂暴了，我的罗盘也坏了！"
+              "text": "阿嚏！太冷了……深处的冰封古王好像苏醒了！"
             },
             {
               "character": "迷失的探险家",
               "avatar": "npc_lost_explorer",
-              "text": "去问问前方的守护者吧，他可能知道原因！"
+              "text": "去问问前方的冰霜女巫吧，她可能知道原因！"
             }
           ],
           "endDialogues": [],
@@ -558,22 +558,16 @@
         {
           "step": 1,
           "name": "极寒考验",
-          "description": "在【冰晶平原】击败3只狂暴的极寒冰狐。",
+          "description": "在【寒冰洞窟】或【冰晶平原】击败3只狂暴的冰系精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
-          "startDialogues": [
-            {
-              "character": "玩家",
-              "avatar": "player",
-              "text": "先让这些冰狐冷静下来！"
-            }
-          ],
+          "startDialogues": [],
           "endDialogues": [
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "呼，冻死我了，总算搞定了。"
+              "text": "呼，冻死我了，总算清出一条路了。"
             }
           ],
           "rewards": {
@@ -583,26 +577,54 @@
         },
         {
           "step": 2,
-          "name": "冰晶守护者",
-          "description": "向冰晶守护者汇报情况。",
+          "name": "女巫的警告",
+          "description": "在【寒冰洞窟】找到冰霜女巫。",
           "type": "npc_talk",
-          "targetId": "npc_ice_guardian",
+          "targetId": "npc_ice_witch",
           "startDialogues": [
             {
-              "character": "冰晶守护者",
-              "avatar": "npc_ice_guardian",
-              "text": "外来者，你的实力不错。冰脉的躁动暂息了。"
+              "character": "冰霜女巫",
+              "avatar": "npc_ice_witch",
+              "text": "愚蠢的外来者，你们的到来惊醒了沉睡的王。"
             },
             {
-              "character": "冰晶守护者",
-              "avatar": "npc_ice_guardian",
-              "text": "带上这份冰霜之礼，离开这里吧。"
+              "character": "冰霜女巫",
+              "avatar": "npc_ice_witch",
+              "text": "想要平息他的怒火，就去永冻王座证明你的实力吧。"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 2000,
-            "exp": 1000
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "冰封古王",
+          "description": "在【永冻王座】击败极光冰麟·冰帝。",
+          "type": "boss_battle",
+          "targetId": 74,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "冰封古王",
+              "avatar": "npc_ice_king",
+              "text": "感受绝对零度的恐惧吧！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "冰封古王",
+              "avatar": "npc_ice_king",
+              "text": "你证明了你的勇气，冰霜星再次归于宁静。"
+            }
+          ],
+          "rewards": {
+            "money": 3000,
+            "items": {
+              "capsule_master": 1
+            }
           }
         }
       ]
@@ -613,14 +635,14 @@
         {
           "step": 0,
           "name": "沙丘的秘密",
-          "description": "向沙丘商人打听遗迹的情报。",
+          "description": "向【流沙绿洲】的沙丘商人打听遗迹的情报。",
           "type": "npc_talk",
           "targetId": "npc_desert_merchant",
           "startDialogues": [
             {
               "character": "沙丘商人",
               "avatar": "npc_desert_merchant",
-              "text": "嘿嘿，想要情报？去帮我清理掉那些烦人的巨蝎吧！"
+              "text": "嘿嘿，想要情报？去帮我清理掉那些烦人的巨蝎和沙蜥吧！"
             }
           ],
           "endDialogues": [],
@@ -631,8 +653,8 @@
         },
         {
           "step": 1,
-          "name": "驱逐巨蝎",
-          "description": "击败3只沙丘巨蝎。",
+          "name": "驱逐沙怪",
+          "description": "击败3只沙漠星精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -645,26 +667,54 @@
         },
         {
           "step": 2,
-          "name": "遗迹学者",
-          "description": "商人告诉你学者在废墟深处，去找他。",
+          "name": "沙漠战士",
+          "description": "前往【焦岩峡谷】寻找沙漠战士。",
           "type": "npc_talk",
-          "targetId": "npc_ruin_scholar",
+          "targetId": "npc_sand_warrior",
           "startDialogues": [
             {
-              "character": "遗迹学者",
-              "avatar": "npc_ruin_scholar",
-              "text": "你看这块石板！上面记载了阿瑞斯星系的远古武器……"
+              "character": "沙漠战士",
+              "avatar": "npc_sand_warrior",
+              "text": "遗迹的大门已经被打开，法老的守卫炎沙暴龙暴走了！"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "远古武器？听起来很危险！"
+              "text": "交给我吧，我会阻止它的！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 2000,
-            "exp": 1000
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "法老的愤怒",
+          "description": "在【远古遗迹】击败炎沙暴龙·沙皇。",
+          "type": "boss_battle",
+          "targetId": 79,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "沙漠法老",
+              "avatar": "npc_sand_king",
+              "text": "打扰法老安眠者，将被黄沙吞噬！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "沙漠法老",
+              "avatar": "npc_sand_king",
+              "text": "干得好，年轻的勇士。黄沙退去了。"
+            }
+          ],
+          "rewards": {
+            "money": 3000,
+            "items": {
+              "capsule_master": 1
+            }
           }
         }
       ]
@@ -675,7 +725,7 @@
         {
           "step": 0,
           "name": "迷幻花粉",
-          "description": "与幻境向导对话。",
+          "description": "与【梦境花园】的幻境向导对话。",
           "type": "npc_talk",
           "targetId": "npc_illusion_guide",
           "startDialogues": [
@@ -694,7 +744,7 @@
         {
           "step": 1,
           "name": "花妖之梦",
-          "description": "击败3只幻境花妖。",
+          "description": "击败3只幻梦星精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -707,21 +757,49 @@
         },
         {
           "step": 2,
-          "name": "梦境的真相",
-          "description": "将花粉交给织梦者。",
+          "name": "梦境仙女",
+          "description": "前往【幻影迷林】寻找梦境仙女。",
           "type": "npc_talk",
-          "targetId": "npc_dream_weaver",
+          "targetId": "npc_dream_fairy",
           "startDialogues": [
             {
-              "character": "织梦者",
-              "avatar": "npc_dream_weaver",
-              "text": "梦与现实，本就没有界限。谢谢你的帮助。"
+              "character": "梦境仙女",
+              "avatar": "npc_dream_fairy",
+              "text": "噩梦之主控制了织梦神，所有人的梦境都变成了噩梦！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 2000,
-            "exp": 1000
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "噩梦苏醒",
+          "description": "在【梦魇神殿】击破虹光梦凤·织梦神。",
+          "type": "boss_battle",
+          "targetId": 84,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "噩梦之主",
+              "avatar": "npc_nightmare",
+              "text": "在无尽的噩梦中沉沦吧！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "织梦者",
+              "avatar": "npc_dream_weaver",
+              "text": "梦与现实恢复了平衡，谢谢你打破了噩梦。"
+            }
+          ],
+          "rewards": {
+            "money": 3000,
+            "items": {
+              "capsule_master": 1
+            }
           }
         }
       ]
@@ -732,14 +810,14 @@
         {
           "step": 0,
           "name": "智械危机",
-          "description": "听取改造人叛军的求救。",
+          "description": "在【废弃工厂】听取改造人叛军的求救。",
           "type": "npc_talk",
           "targetId": "npc_cyborg_rebel",
           "startDialogues": [
             {
               "character": "改造人叛军",
               "avatar": "npc_cyborg_rebel",
-              "text": "AI 核心失控了！它们造出了一大批泰坦机甲，快帮忙干掉几个！"
+              "text": "AI 核心失控了！它们造出了一大批机器怪物，快帮忙干掉几个！"
             }
           ],
           "endDialogues": [],
@@ -751,7 +829,7 @@
         {
           "step": 1,
           "name": "摧毁机甲",
-          "description": "击败3只泰坦机甲。",
+          "description": "击败3只机械星精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -764,26 +842,49 @@
         },
         {
           "step": 2,
-          "name": "重置核心",
-          "description": "前往质问AI核心。",
+          "name": "数据走廊",
+          "description": "前往【数据走廊】找到机械工程师。",
           "type": "npc_talk",
-          "targetId": "npc_ai_core",
+          "targetId": "npc_mech_engineer",
           "startDialogues": [
             {
-              "character": "AI核心",
-              "avatar": "npc_ai_core",
-              "text": "逻辑冲突：人类的存在导致了战争。结论：消灭人类。"
-            },
-            {
-              "character": "玩家",
-              "avatar": "player",
-              "text": "（按下强制重置按钮）抱歉，你的逻辑出错了！"
+              "character": "机械工程师",
+              "avatar": "npc_mech_engineer",
+              "text": "超级AI接管了中央主脑，我们必须重启它的核心逻辑！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 2000,
-            "exp": 1000
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "核心重置",
+          "description": "在【中央主脑】击溃量子机神·欧米茄。",
+          "type": "boss_battle",
+          "targetId": 89,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "超级AI",
+              "avatar": "npc_mech_overlord",
+              "text": "警告：检测到未授权的重启尝试。启动最高防御机制。"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "超级AI",
+              "avatar": "npc_mech_overlord",
+              "text": "系统重置完成。和平模式已激活。"
+            }
+          ],
+          "rewards": {
+            "money": 3000,
+            "items": {
+              "capsule_master": 1
+            }
           }
         }
       ]
@@ -794,14 +895,14 @@
         {
           "step": 0,
           "name": "灰烬中的低语",
-          "description": "向灰烬精灵询问炎魔的下落。",
+          "description": "在【地壳裂缝】向灰烬精灵询问情况。",
           "type": "npc_talk",
           "targetId": "npc_fire_spirit",
           "startDialogues": [
             {
               "character": "灰烬精灵",
               "avatar": "npc_fire_spirit",
-              "text": "领主大人正在苏醒……那些熔核魔神就是前兆！快去阻止它们！"
+              "text": "深渊的封印正在崩坏……快去阻止那些狂暴的暗影生物！"
             }
           ],
           "endDialogues": [],
@@ -813,7 +914,7 @@
         {
           "step": 1,
           "name": "深渊阻击战",
-          "description": "击退3只熔核魔神。",
+          "description": "击退3只熔核星精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -826,26 +927,49 @@
         },
         {
           "step": 2,
-          "name": "直面炎魔",
-          "description": "挑战炎魔领主。",
+          "name": "熔岩守望者",
+          "description": "前往【熔岩之河】寻找熔岩守望者。",
           "type": "npc_talk",
-          "targetId": "npc_magma_lord",
+          "targetId": "npc_lava_keeper",
           "startDialogues": [
             {
-              "character": "炎魔领主",
-              "avatar": "npc_magma_lord",
-              "text": "渺小的虫子，竟敢挑战深渊的怒火？！"
-            },
-            {
-              "character": "玩家",
-              "avatar": "player",
-              "text": "赛尔号的勇士绝不退缩！"
+              "character": "熔岩守望者",
+              "avatar": "npc_lava_keeper",
+              "text": "深渊领主正在召唤末日冥龙，一旦它完全苏醒，整个星系都将毁灭！"
             }
           ],
           "endDialogues": [],
           "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "终焉之战",
+          "description": "在【深渊祭坛】击败深渊冥龙·末日。",
+          "type": "boss_battle",
+          "targetId": 94,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "深渊领主",
+              "avatar": "npc_abyss_lord",
+              "text": "渺小的虫子，见证真正的末日吧！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "深渊领主",
+              "avatar": "npc_abyss_lord",
+              "text": "不可能……深渊的力量怎么会被打败……"
+            }
+          ],
+          "rewards": {
             "money": 5000,
-            "exp": 3000
+            "items": {
+              "capsule_legend": 1
+            }
           }
         }
       ]
