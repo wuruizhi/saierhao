@@ -192,7 +192,7 @@ function createBattleRouter(db, sceneManager) {
 
         // Grant battle money
         const moneyGain = Math.floor(battle.wildPet.level * 5 + 10);
-        db.prepare('UPDATE players SET money = money + ? WHERE id = ?')
+        db.prepare('UPDATE players SET money = money + ?, pve_wins = pve_wins + 1, total_battles = total_battles + 1 WHERE id = ?')
           .run(moneyGain, battle.playerId);
 
         activeBattles.delete(battleId);
@@ -294,6 +294,7 @@ function createBattleRouter(db, sceneManager) {
         }
 
         activeBattles.delete(battleId);
+        db.prepare('UPDATE players SET total_battles = total_battles + 1 WHERE id = ?').run(battle.playerId);
         return res.json({ ...result, battleEnd: true, playerWin: false });
       }
     }
@@ -377,6 +378,7 @@ function createBattleRouter(db, sceneManager) {
         .run(Math.max(0, battle.activePet.current_hp), battle.activePet.id);
 
       activeBattles.delete(battleId);
+      db.prepare('UPDATE players SET total_captures = total_captures + 1, total_battles = total_battles + 1 WHERE id = ?').run(player.id);
       incrementQuestProgress(db, player.id, 'capture', 1);
       
       const petDef = petsData.pets.find(p => p.id === wp.pet_id);

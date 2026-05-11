@@ -178,16 +178,28 @@ function createPlayerRouter(db) {
 
     const specialItem = itemsData.others.find(o => o.id === itemId);
     if (!specialItem) return res.status(400).json({ error: '道具不存在' });
+    const usableSpecialItems = new Set(['level_boost', 'evolve_stone', 'reset_stats', 'gene_resequencer']);
+    if (!usableSpecialItems.has(itemId)) {
+      return res.status(400).json({ error: '该道具不能直接对精灵使用' });
+    }
 
     const item = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
     if (!item || item.quantity < 1) {
       return res.status(400).json({ error: '道具数量不足' });
     }
 
-    db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(item.id);
-
     let message = '';
     let levelResult = null;
+    let evolvePetDef = null;
+
+    if (itemId === 'evolve_stone') {
+      evolvePetDef = petsData.pets.find(p => p.id === pet.pet_id);
+      if (!evolvePetDef || !evolvePetDef.evolution) {
+        return res.status(400).json({ error: '该精灵已无法进化' });
+      }
+    }
+
+    db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(item.id);
 
     if (itemId === 'level_boost') {
       const newLevel = Math.min(100, parseInt(pet.level) + 10);
@@ -195,11 +207,7 @@ function createPlayerRouter(db) {
       levelResult = addExp(db, petInstanceId, neededExp);
       message = `${pet.nickname}直升了10级！`;
     } else if (itemId === 'evolve_stone') {
-      const petDef = petsData.pets.find(p => p.id === pet.pet_id);
-      if (!petDef || !petDef.evolution) {
-        return res.status(400).json({ error: '该精灵已无法进化' });
-      }
-      const neededExp = petsData.expTable[petDef.evolution.level] - petsData.expTable[parseInt(pet.level)];
+      const neededExp = petsData.expTable[evolvePetDef.evolution.level] - petsData.expTable[parseInt(pet.level)];
       if (neededExp > 0) {
         levelResult = addExp(db, petInstanceId, Math.max(neededExp, 1));
       }
@@ -249,6 +257,11 @@ function createPlayerRouter(db) {
   // Use experience candy on a pet
   router.post('/use-candy', authMiddleware, (req, res) => {
     const { petInstanceId, candyId, quantity = 1 } = req.body;
+    const candyQuantity = Number(quantity);
+    if (!Number.isInteger(candyQuantity) || candyQuantity < 1) {
+      return res.status(400).json({ error: '使用数量必须为正整数' });
+    }
+
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
@@ -259,20 +272,20 @@ function createPlayerRouter(db) {
     if (!candy) return res.status(400).json({ error: '糖果不存在' });
 
     const item = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, candyId);
-    if (!item || item.quantity < quantity) {
+    if (!item || item.quantity < candyQuantity) {
       return res.status(400).json({ error: '糖果数量不足' });
     }
 
     // Consume candy
-    db.prepare('UPDATE player_items SET quantity = quantity - ? WHERE id = ?').run(quantity, item.id);
+    db.prepare('UPDATE player_items SET quantity = quantity - ? WHERE id = ?').run(candyQuantity, item.id);
 
     // Add exp
-    const totalExp = candy.exp * quantity;
+    const totalExp = candy.exp * candyQuantity;
     const levelResult = addExp(db, petInstanceId, totalExp);
 
     res.json({
       success: true,
-      message: `使用了${quantity}个${candy.name}，获得${totalExp}经验！`,
+      message: `使用了${candyQuantity}个${candy.name}，获得${totalExp}经验！`,
       levelResult
     });
   });
@@ -802,6 +815,12 @@ function createPlayerRouter(db) {
 
   router.post('/expedition/start', authMiddleware, (req, res) => {
     const { petId, planetId, durationHours } = req.body;
+    const allowedDurations = new Set([2, 4, 8]);
+    const duration = Number(durationHours ?? 2);
+    if (!allowedDurations.has(duration)) {
+      return res.status(400).json({ error: '派遣时长无效' });
+    }
+
     const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: 'Player not found' });
 
@@ -814,21 +833,21 @@ function createPlayerRouter(db) {
     const existing = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(pet.id);
     if (existing) return res.status(400).json({ error: '这只精灵已经在派遣中了！' });
 
-    const durationSeconds = (durationHours || 2) * 3600;
+    const durationSeconds = duration * 3600;
     
     // Define rewards based on duration
     const rewards = { money: 0, exp: 0, items: [] };
     
-    if (durationHours === 2) {
+    if (duration === 2) {
       rewards.money = 2000;
       rewards.exp = 1000;
       rewards.items.push({ id: 'candy_m', quantity: 1 });
-    } else if (durationHours === 4) {
+    } else if (duration === 4) {
       rewards.money = 4000;
       rewards.exp = 2000;
       rewards.items.push({ id: 'candy_l', quantity: 1 });
       rewards.items.push({ id: 'capsule_normal', quantity: 1 });
-    } else if (durationHours >= 8) {
+    } else if (duration === 8) {
       rewards.money = 8000;
       rewards.exp = 4000;
       rewards.items.push({ id: 'candy_xl', quantity: 1 });
@@ -996,20 +1015,25 @@ function createPlayerRouter(db) {
 
   router.post('/guild/donate', authMiddleware, (req, res) => {
     const { amount } = req.body;
+    const donateAmount = Number(amount);
+    if (!Number.isInteger(donateAmount) || donateAmount < 1) {
+      return res.status(400).json({ error: '捐献金额必须为正整数' });
+    }
+
     const player = db.prepare('SELECT id, money FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
-    if (player.money < amount) return res.status(400).json({ error: '金币不足' });
+    if (player.money < donateAmount) return res.status(400).json({ error: '金币不足' });
 
     const membership = db.prepare('SELECT * FROM guild_members WHERE user_id = ?').get(req.userId);
     if (!membership) return res.status(400).json({ error: '你还没有加入战队' });
 
     db.transaction(() => {
-      db.prepare('UPDATE players SET money = money - ? WHERE id = ?').run(amount, player.id);
-      db.prepare('UPDATE guild_members SET contribution = contribution + ? WHERE id = ?').run(amount, membership.id);
+      db.prepare('UPDATE players SET money = money - ? WHERE id = ?').run(donateAmount, player.id);
+      db.prepare('UPDATE guild_members SET contribution = contribution + ? WHERE id = ?').run(donateAmount, membership.id);
       
       const guild = db.prepare('SELECT * FROM guilds WHERE id = ?').get(membership.guild_id);
-      let newExp = guild.exp + amount;
+      let newExp = guild.exp + donateAmount;
       let newLevel = guild.level;
       while (newExp >= newLevel * 10000) {
         newExp -= newLevel * 10000;
@@ -1124,4 +1148,3 @@ function createPlayerRouter(db) {
 }
 
 module.exports = createPlayerRouter;
-

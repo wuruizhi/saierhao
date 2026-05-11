@@ -2095,8 +2095,6 @@ if (origHealBtn) {
       document.getElementById('heal-result').textContent = r.message;
       toast('治疗完成！');
       refreshTeam();
-      // Quest progress
-      try { await API.questProgress('heal'); } catch(e) {}
     } catch(err) { toast(err.message, 'error'); }
   });
 }

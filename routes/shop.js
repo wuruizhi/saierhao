@@ -31,6 +31,11 @@ function createShopRouter(db) {
   // Buy item
   router.post('/buy', authMiddleware, (req, res) => {
     const { itemId, quantity = 1 } = req.body;
+    const buyQuantity = Number(quantity);
+    if (!Number.isInteger(buyQuantity) || buyQuantity < 1) {
+      return res.status(400).json({ error: '购买数量必须为正整数' });
+    }
+
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });
 
@@ -46,7 +51,7 @@ function createShopRouter(db) {
     const item = allItems.find(i => i.id === itemId);
     if (!item) return res.status(400).json({ error: '商品不存在' });
 
-    const totalCost = item.price * quantity;
+    const totalCost = item.price * buyQuantity;
     if (player.money < totalCost) {
       return res.status(400).json({ error: `金币不足！需要 ${totalCost}💰，当前 ${player.money}💰` });
     }
@@ -57,11 +62,12 @@ function createShopRouter(db) {
       
       const existing = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
       if (existing) {
-        db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(quantity, existing.id);
+        db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(buyQuantity, existing.id);
       } else {
-        db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(player.id, itemId, quantity);
+        db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(player.id, itemId, buyQuantity);
       }
       
+      db.prepare('UPDATE players SET total_shop_buys = total_shop_buys + ? WHERE id = ?').run(buyQuantity, player.id);
       incrementQuestProgress(db, player.id, 'shop', 1);
     })();
 
@@ -69,10 +75,10 @@ function createShopRouter(db) {
     const updatedPlayer = db.prepare('SELECT money FROM players WHERE id = ?').get(player.id);
     res.json({
       success: true,
-      message: `购买了 ${quantity}个 ${item.name}！`,
+      message: `购买了 ${buyQuantity}个 ${item.name}！`,
       playerMoney: updatedPlayer.money,
       itemId,
-      newQuantity: (existing ? existing.quantity : 0) + quantity
+      newQuantity: existing ? existing.quantity : 0
     });
   });
 

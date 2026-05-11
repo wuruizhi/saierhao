@@ -364,10 +364,12 @@ class PvpManager {
       if (room.isRanked) {
         this.updateElo(room.player1.userId, room.player2.userId, winnerId);
       } else {
-        // Casual PVP achievements
-        const winnerP = this.db.prepare('SELECT * FROM players WHERE user_id = ?').get(winnerId);
-        if (winnerP) {
-          this.db.prepare('UPDATE players SET pvp_wins = pvp_wins + 1 WHERE id = ?').run(winnerP.id);
+        const loserId = winnerId === room.player1.userId ? room.player2.userId : room.player1.userId;
+        const winnerP = this.db.prepare('SELECT id FROM players WHERE user_id = ?').get(winnerId);
+        const loserP = this.db.prepare('SELECT id FROM players WHERE user_id = ?').get(loserId);
+        if (winnerP && loserP) {
+          this.db.prepare('UPDATE players SET pvp_wins = pvp_wins + 1, total_battles = total_battles + 1 WHERE id = ?').run(winnerP.id);
+          this.db.prepare('UPDATE players SET pvp_losses = pvp_losses + 1, total_battles = total_battles + 1 WHERE id = ?').run(loserP.id);
           const { incrementQuestProgress } = require('./quest-manager');
           incrementQuestProgress(this.db, winnerP.id, 'pvp', 1);
         }
@@ -394,8 +396,10 @@ class PvpManager {
     const newR1 = Math.round(r1 + k * (s1 - e1));
     const newR2 = Math.round(r2 + k * (s2 - e2));
 
-    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ? WHERE id = ?').run(newR1, s1, p1Player.id);
-    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ? WHERE id = ?').run(newR2, s2, p2Player.id);
+    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ?, pvp_wins = pvp_wins + ?, pvp_losses = pvp_losses + ?, total_battles = total_battles + 1 WHERE id = ?')
+      .run(newR1, s1, s1, s2, p1Player.id);
+    this.db.prepare('UPDATE players SET elo_rating = ?, ranked_wins = ranked_wins + ?, pvp_wins = pvp_wins + ?, pvp_losses = pvp_losses + ?, total_battles = total_battles + 1 WHERE id = ?')
+      .run(newR2, s2, s2, s1, p2Player.id);
 
     this.sendTo(p1UserId, { type: 'pvp_ranked_result', oldElo: r1, newElo: newR1, result: s1 === 1 ? 'win' : 'lose' });
     this.sendTo(p2UserId, { type: 'pvp_ranked_result', oldElo: r2, newElo: newR2, result: s2 === 1 ? 'win' : 'lose' });

@@ -80,7 +80,7 @@ function canAct(pet) {
       return { canAct: false, reason: `${pet.nickname}被眩晕了，无法行动！` };
     }
     if (effect.type === 'freeze') {
-      if (Math.random() < (effect.chance || 0.5)) {
+      if (Math.random() < (effect.chance ?? 0.5)) {
         return { canAct: false, reason: `${pet.nickname}被冰冻了，无法行动！` };
       }
     }
@@ -100,11 +100,11 @@ function tickStatusEffects(pet) {
       toRemove.push(i);
       // Restore stats for expired debuffs
       if (effect.type === 'debuff' && pet._origStats) {
-        pet[effect.stat] = pet._origStats[effect.stat];
+        pet[effect.stat] = getOriginalStat(pet, effect.stat);
         messages.push(`${pet.nickname}的${statLabel(effect.stat)}恢复了！`);
       }
       if (effect.type === 'paralyze' && pet._origStats) {
-        pet.speed = pet._origStats.speed;
+        pet.speed = getOriginalStat(pet, 'speed');
         messages.push(`${pet.nickname}的麻痹效果解除了！`);
       }
       messages.push(`${pet.nickname}的${statusLabel(effect.type)}效果消失了。`);
@@ -126,7 +126,7 @@ function tickStatusEffects(pet) {
 }
 
 function statLabel(stat) {
-  const map = { attack: '物攻', defense: '物防', spAttack: '法攻', spDefense: '法防', speed: '速度' };
+  const map = { attack: '物攻', defense: '物防', sp_attack: '法攻', sp_defense: '法防', spAttack: '法攻', spDefense: '法防', speed: '速度' };
   return map[stat] || stat;
 }
 
@@ -141,11 +141,16 @@ function ensureOrigStats(pet) {
     pet._origStats = {
       attack: pet.attack,
       defense: pet.defense,
-      spAttack: pet.sp_attack,
-      spDefense: pet.sp_defense,
+      sp_attack: pet.sp_attack,
+      sp_defense: pet.sp_defense,
       speed: pet.speed
     };
   }
+}
+
+function getOriginalStat(pet, stat) {
+  const legacyKey = stat === 'sp_attack' ? 'spAttack' : stat === 'sp_defense' ? 'spDefense' : stat;
+  return pet._origStats[stat] !== undefined ? pet._origStats[stat] : pet._origStats[legacyKey];
 }
 
 function executePveTurn(playerPet, enemyPet, playerSkillId) {
@@ -238,7 +243,7 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
 
 function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   // Accuracy check
-  if (skill.category !== 'status' && Math.random() * 100 > skill.accuracy) {
+  if (Math.random() * 100 > (skill.accuracy ?? 100)) {
     return {
       isPlayerAttacking,
       skillName: skill.name,
@@ -283,11 +288,11 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   if (skill.clearDebuff && attacker.statusEffects) {
     attacker.statusEffects = attacker.statusEffects.filter(e => e.type !== 'debuff' && e.type !== 'paralyze');
     if (attacker._origStats) {
-      attacker.attack = attacker._origStats.attack;
-      attacker.defense = attacker._origStats.defense;
-      attacker.sp_attack = attacker._origStats.spAttack;
-      attacker.sp_defense = attacker._origStats.spDefense;
-      attacker.speed = attacker._origStats.speed;
+      attacker.attack = getOriginalStat(attacker, 'attack');
+      attacker.defense = getOriginalStat(attacker, 'defense');
+      attacker.sp_attack = getOriginalStat(attacker, 'sp_attack');
+      attacker.sp_defense = getOriginalStat(attacker, 'sp_defense');
+      attacker.speed = getOriginalStat(attacker, 'speed');
     }
     clearMsg = ' 负面状态被清除了！';
   }
@@ -301,6 +306,7 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
 
     // Apply debuff to defender from status skill (e.g., 嚎叫)
     applyDebuff(defender, skill);
+    applyStatusEffect(defender, skill);
 
     return { isPlayerAttacking, skillName: skill.name, message: msg };
   }
@@ -408,22 +414,26 @@ function applyStatusEffect(defender, skill) {
   if (!defender.statusEffects) defender.statusEffects = [];
   ensureOrigStats(defender);
 
-  if (skill.burn) {
+  if (skill.burn && shouldApplyEffect(skill.burn)) {
     defender.statusEffects.push({ type: 'burn', turns: skill.burn.turns, damage: skill.burn.damage });
   }
-  if (skill.freeze) {
-    defender.statusEffects.push({ type: 'freeze', turns: skill.freeze.turns, chance: skill.freeze.chance });
+  if (skill.freeze && shouldApplyEffect(skill.freeze)) {
+    defender.statusEffects.push({ type: 'freeze', turns: skill.freeze.turns, chance: skill.freeze.skipChance ?? 0.5 });
   }
-  if (skill.poison) {
+  if (skill.poison && shouldApplyEffect(skill.poison)) {
     defender.statusEffects.push({ type: 'poison', turns: skill.poison.turns, hpPercent: skill.poison.hpPercent });
   }
-  if (skill.paralyze) {
+  if (skill.paralyze && shouldApplyEffect(skill.paralyze)) {
     defender.speed = Math.floor(defender.speed * skill.paralyze.speedMult);
     defender.statusEffects.push({ type: 'paralyze', turns: skill.paralyze.turns, speedMult: skill.paralyze.speedMult });
   }
-  if (skill.stun) {
+  if (skill.stun && shouldApplyEffect(skill.stun)) {
     defender.statusEffects.push({ type: 'stun', turns: skill.stun.turns });
   }
+}
+
+function shouldApplyEffect(effect) {
+  return Math.random() < (effect.chance ?? 1);
 }
 
 function chooseEnemySkill(enemyPet) {
