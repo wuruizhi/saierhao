@@ -59,6 +59,7 @@ async function enterScene3D(mapId, sceneIndex) {
     vp.style.position = 'relative';
     
     renderSceneSpawns(vp, data.spawns);
+    if (data.scene.npcs) renderSceneNpcs(vp, data.scene.npcs);
     renderSceneNav(mapId, sceneIndex);
     showScreen('scene');
     startSceneRefresh();
@@ -174,6 +175,51 @@ function renderSceneSpawns(vp, spawns) {
       }
     });
   }, 50);
+}
+
+function renderSceneNpcs(vp, npcs) {
+  vp.querySelectorAll('.scene-npc-container').forEach(el => el.remove());
+  npcs.forEach(npc => {
+    const el = document.createElement('div');
+    el.className = 'scene-npc-container scene-pet-3d'; 
+    el.style.left = npc.x + '%';
+    el.style.top = npc.y + '%';
+    
+    const pet3d = document.createElement('div');
+    pet3d.className = 'pet-3d-container';
+    
+    const spriteDiv = document.createElement('div');
+    spriteDiv.className = 'scene-pet-sprite';
+    spriteDiv.style.fontSize = '40px';
+    spriteDiv.style.display = 'flex';
+    spriteDiv.style.alignItems = 'flex-end';
+    spriteDiv.style.justifyContent = 'center';
+    spriteDiv.textContent = npc.sprite;
+    pet3d.appendChild(spriteDiv);
+    
+    const shadow = document.createElement('div');
+    shadow.className = 'pet-ground-shadow';
+    pet3d.appendChild(shadow);
+    
+    el.appendChild(pet3d);
+    
+    const label = document.createElement('div');
+    label.className = 'scene-pet-label';
+    label.textContent = npc.name;
+    label.style.color = 'var(--neon-cyan)';
+    el.appendChild(label);
+    
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      walkToNpc(parseFloat(el.style.left), parseFloat(el.style.top), npc);
+    });
+    el.addEventListener('touchstart', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      walkToNpc(parseFloat(el.style.left), parseFloat(el.style.top), npc);
+    }, { passive: false });
+    
+    vp.appendChild(el);
+  });
 }
 
 // ===== SCENE NAVIGATION: Corner arrows inside viewport =====
@@ -433,6 +479,74 @@ function walkToPet(petX, petY, spawnId) {
   });
 }
 
+// Walk to NPC then interact
+function walkToNpc(npcX, npcY, npc) {
+  const offsetX = npcX + (playerPos.x < npcX ? -5 : 5);
+  const offsetY = npcY + 3;
+  movePlayerTo(offsetX, offsetY, () => {
+    const dist = Math.sqrt((playerPos.x-npcX)**2 + (playerPos.y-npcY)**2);
+    if (dist < 15) {
+      interactWithNpc(npc);
+    }
+  });
+}
+
+async function interactWithNpc(npc) {
+  try {
+    const res = await API.getStoryQuests();
+    const activeQuest = res.quests.find(q => q.status === 'active' && q.planet_id == currentMapId);
+    if (activeQuest) {
+      const pData = res.storyData[currentMapId];
+      const stepDef = pData.steps.find(s => s.step === activeQuest.quest_step);
+      if (stepDef && stepDef.type === 'npc_talk' && stepDef.targetId === npc.id) {
+         let q = [];
+         (stepDef.startDialogues || []).forEach(d => {
+           q.push({
+             name: d.character,
+             text: d.text,
+             spriteUrl: d.avatar === 'player' ? '/img/player.png' : null
+           });
+         });
+         let idx = 0;
+         const playNext = () => {
+           if (idx < q.length) {
+             const d = q[idx++];
+             showDialogue(d.name, d.text, d.spriteUrl, playNext);
+           } else {
+             API.advanceStoryQuest(currentMapId).then(() => {
+               toast('剧情已推进！');
+               if (window.loadStoryQuests) window.loadStoryQuests();
+               if (stepDef.endDialogues && stepDef.endDialogues.length > 0) {
+                 let eq = [];
+                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png' : null }));
+                 let eidx = 0;
+                 const playEndNext = () => {
+                   if (eidx < eq.length) {
+                     const d = eq[eidx++];
+                     showDialogue(d.name, d.text, d.spriteUrl, playEndNext);
+                   }
+                 };
+                 playEndNext();
+               }
+             }).catch(e => toast(e.message, 'error'));
+           }
+         };
+         if (q.length > 0) {
+           playNext();
+         } else {
+           API.advanceStoryQuest(currentMapId).then(() => {
+               toast('剧情已推进！');
+               if (window.loadStoryQuests) window.loadStoryQuests();
+           });
+         }
+         return;
+      }
+    }
+  } catch(e) { console.error(e); }
+  
+  showDialogue(npc.name, npc.defaultText || "你好，小赛尔！");
+}
+
 async function startSceneBattle(spawnId) {
   stopSceneRefresh();
   if (window.ws) window.ws.send({ type: 'leave_scene' });
@@ -462,6 +576,7 @@ function startSceneRefresh() {
       try {
         const data = await API.getScene(currentMapId, currentSceneIndex);
         renderSceneSpawns(document.getElementById('scene-viewport'), data.spawns);
+        if (data.scene.npcs) renderSceneNpcs(document.getElementById('scene-viewport'), data.scene.npcs);
       } catch(e) {}
     }
   }, 1000);

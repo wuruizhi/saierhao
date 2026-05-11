@@ -63,9 +63,9 @@ function createQuestRouter(db) {
         return res.status(400).json({ error: 'This planet quest is already completed.' });
       }
 
-      // If this is a dialogue step, advancing it means we completed the dialogue.
+      // If this is a dialogue or npc_talk step, advancing it means we completed the dialogue.
       // We should check the target conditions. If it's pure dialogue, we can advance.
-      if (currentStepDef.type === 'dialogue') {
+      if (currentStepDef.type === 'dialogue' || currentStepDef.type === 'npc_talk') {
         // Note: For now, we assume frontend calls advance when a dialogue finishes,
         // and if it's pure dialogue, we increment the step.
         // Actually, the battle script handles battle types, so here we can just 

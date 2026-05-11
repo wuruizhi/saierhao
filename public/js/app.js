@@ -96,6 +96,15 @@ async function loadGame(){
     const data = await API.profile();
     currentUserId = data.player.user_id;
     currentEquips = data.player.equips || {};
+    
+    // Load skills map now that we are authenticated
+    try {
+      if (Object.keys(SKILLS_MAP).length === 0) {
+        const { skills } = await API.getSkills();
+        if (skills) skills.forEach(s => { SKILLS_MAP[s.id] = s; });
+      }
+    } catch(e) { console.error('Failed to load skills:', e); }
+
     document.getElementById('hub-username').textContent = data.player.user_id ? `训练师` : '';
     document.getElementById('hub-money').textContent = formatMoney(data.player.money);
     if(data.player.starter_pet_id === 0){ showStarterScreen(); }
@@ -471,6 +480,9 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
     if (!planetData) return;
     const stepData = planetData.steps.find(s => s.step === step);
     if (!stepData) return;
+    
+    // Do not auto-play dialogues for npc_talk steps, as they are triggered by clicking the NPC
+    if (stepData.type === 'npc_talk') return;
     
     // Play start dialogues if they exist
     const dialogues = stepData.startDialogues || [];
@@ -1327,12 +1339,6 @@ document.getElementById('dex-detail-close').addEventListener('click', () => {
 
 // ===== INIT =====
 (async function init(){
-  // Load skills map
-  try {
-    const { skills } = await API.getSkills();
-    skills.forEach(s => { SKILLS_MAP[s.id] = s; });
-  } catch(e) {}
-
   const autoHealToggle = document.getElementById('auto-heal-toggle');
   if (autoHealToggle) {
     autoHealToggle.checked = localStorage.getItem('saierhao_auto_heal') === 'true';
@@ -1691,9 +1697,15 @@ async function loadStoryQuests() {
     if (!list) return;
     list.innerHTML = '';
     let hasActiveStory = false;
+    let activeQuestTitle = '';
+    let activeQuestDesc = '';
+    let activeQuestProgress = '';
 
     if (!res.quests || res.quests.length === 0) {
       list.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无主线剧情，去各大星球探索吧！</p>';
+      
+      const tracker = document.getElementById('quest-tracker-container');
+      if (tracker) tracker.style.display = 'none';
       return;
     }
 
@@ -1711,6 +1723,9 @@ async function loadStoryQuests() {
         statusHtml = '<span style="color:var(--hp-green)">✅ 已通关</span>';
       } else {
         hasActiveStory = true;
+        activeQuestTitle = `${pData.planetName} - 剧情任务`;
+        activeQuestDesc = stepDef ? stepDef.description : '正在探索...';
+        activeQuestProgress = `进度: ${q.progress}/${stepDef ? stepDef.targetCount : 0}`;
         statusHtml = `<span style="color:var(--neon-cyan)">进行中 (${q.progress}/${stepDef ? stepDef.targetCount : 0})</span>`;
       }
 
@@ -1725,6 +1740,18 @@ async function loadStoryQuests() {
       `;
       list.appendChild(card);
     });
+
+    const tracker = document.getElementById('quest-tracker-container');
+    if (tracker) {
+      if (hasActiveStory) {
+        tracker.style.display = 'block';
+        document.getElementById('quest-tracker-title').textContent = activeQuestTitle;
+        document.getElementById('quest-tracker-desc').textContent = activeQuestDesc;
+        document.getElementById('quest-tracker-progress').textContent = activeQuestProgress;
+      } else {
+        tracker.style.display = 'none';
+      }
+    }
 
   } catch(e) { console.error('Failed to load story quests:', e); }
 }
@@ -2628,3 +2655,13 @@ document.getElementById('btn-save-base')?.addEventListener('click', async () => 
     toast(res.message, 'success');
   } catch(e) { toast(e.message, 'error'); }
 });
+
+// ===== QUEST TRACKER TOGGLE =====
+const questTrackerToggle = document.getElementById('quest-tracker-toggle');
+if (questTrackerToggle) {
+  questTrackerToggle.addEventListener('click', () => {
+    const container = document.getElementById('quest-tracker-container');
+    container.classList.toggle('collapsed');
+    questTrackerToggle.textContent = container.classList.contains('collapsed') ? '展开' : '收起';
+  });
+}

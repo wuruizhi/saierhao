@@ -1701,14 +1701,53 @@ input:checked + .toggle-slider:before {
   width: 250px;
   padding: 12px;
   z-index: 50;
-  pointer-events: none; /* Let clicks pass through */
+  pointer-events: auto;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  transition: width 0.3s, background 0.3s;
+}
+.quest-tracker-container.collapsed {
+  width: auto;
+  min-width: 80px;
+  background: rgba(0,0,0,0.3);
+}
+.quest-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 4px;
+}
+.quest-tracker-container.collapsed .quest-tracker-header {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 .quest-tracker-title {
   font-size: 13px;
   color: var(--neon-cyan);
-  margin-bottom: 8px;
-  border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 4px;
+  margin-bottom: 0;
+}
+.quest-tracker-container.collapsed .quest-tracker-title {
+  display: none;
+}
+.quest-tracker-toggle {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 4px;
+}
+.quest-tracker-toggle:hover {
+  color: var(--neon-cyan);
+}
+.quest-tracker-content {
+  margin-top: 8px;
+}
+.quest-tracker-container.collapsed .quest-tracker-content {
+  display: none;
 }
 .quest-tracker-item {
   font-size: 12px;
