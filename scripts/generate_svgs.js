@@ -6,7 +6,7 @@ if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
 // Common SVG wrapper
 const makeSvg = (paths, viewBox = '0 0 24 24') => 
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
 
 // SVGs using clean, modern paths (Lucide-inspired)
 const icons = {
