@@ -29,7 +29,7 @@ function createAuthRouter(db) {
     const userId = result.lastInsertRowid;
 
     // Create player profile
-    const playerResult = db.prepare('INSERT INTO players (user_id, money) VALUES (?, 999999999)').run(userId);
+    const playerResult = db.prepare('INSERT INTO players (user_id, money) VALUES (?, 2000)').run(userId);
     const playerId = playerResult.lastInsertRowid;
 
     // Give initial wardrobe items and equip them

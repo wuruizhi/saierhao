@@ -1,6 +1,14 @@
 // ===== MAIN APP =====
 const TYPE_NAMES = { fire:'火',water:'水',grass:'草',electric:'电',light:'光',dark:'暗',normal:'普通' };
-const TYPE_ICONS = { fire:'🔥',water:'💧',grass:'🌿',electric:'⚡',light:'✨',dark:'🌑',normal:'⚪' };
+const TYPE_ICONS = { 
+  fire: '<img src="/img/icons/type_fire.svg" class="type-svg-icon">',
+  water: '<img src="/img/icons/type_water.svg" class="type-svg-icon">',
+  grass: '<img src="/img/icons/type_grass.svg" class="type-svg-icon">',
+  electric: '<img src="/img/icons/type_electric.svg" class="type-svg-icon">',
+  light: '<img src="/img/icons/type_light.svg" class="type-svg-icon">',
+  dark: '<img src="/img/icons/type_dark.svg" class="type-svg-icon">',
+  normal: '<img src="/img/icons/type_normal.svg" class="type-svg-icon">'
+};
 const PLANET_ICONS = ['','🌋','🌊','🌲','⚡','🌗'];
 var currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null;
 let SKILLS_MAP = {};
@@ -477,6 +485,7 @@ function showPetDetail(pet, isTeam){
     : `<button class="btn btn-primary btn-sm" onclick="swapPet(${pet.id},true)">加入队伍</button>
        <button class="btn btn-danger btn-sm" style="background:var(--hp-red);margin-left:4px;" onclick="releasePet(${pet.id})">放生</button>`;
   actionsHtml += ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#facc15,#f59e0b);color:#000;margin-left:4px;" onclick="showCandyPanel(${pet.id})">🍬 喂糖果</button>`;
+  actionsHtml += ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#00ffcc,#00bfff);color:#000;margin-left:4px;" onclick="openSkillManage(${pet.id})">🛠️ 技能管理</button>`;
   actions.innerHTML = actionsHtml;
 
   // Candy panel (initially hidden)
@@ -506,6 +515,93 @@ async function releasePet(id) {
   } catch (err) { toast(err.message, 'error'); }
 }
 window.releasePet = releasePet;
+
+// ===== SKILL MANAGEMENT =====
+let currentSkillManagePetId = null;
+let currentSkillManageEquipped = [];
+let currentSkillManageUnlocked = [];
+
+function openSkillManage(petInstanceId) {
+  const pet = [..._allTeamPets, ..._allStoragePets].find(p => p.id === petInstanceId);
+  if (!pet) return;
+  
+  currentSkillManagePetId = pet.id;
+  currentSkillManageEquipped = Array.isArray(pet.skills) ? [...pet.skills] : JSON.parse(pet.skills || '[]');
+  
+  if (!pet.petDef || !pet.petDef.learnset) return;
+  
+  currentSkillManageUnlocked = pet.petDef.learnset
+    .filter(s => s.level <= pet.level)
+    .map(s => s.skillId);
+    
+  renderSkillManage();
+  document.getElementById('modal-skill-manage').classList.add('active');
+}
+window.openSkillManage = openSkillManage;
+
+document.getElementById('skill-manage-close').addEventListener('click', () => {
+  document.getElementById('modal-skill-manage').classList.remove('active');
+});
+
+function renderSkillManage() {
+  const eqGrid = document.getElementById('equipped-skills-grid');
+  const unGrid = document.getElementById('unlocked-skills-grid');
+  
+  eqGrid.innerHTML = currentSkillManageEquipped.map(sid => {
+    const sk = getSkillDef(sid);
+    return `<div class="skill-btn" style="cursor:pointer;" onclick="toggleSkill('${sid}', true)">
+      <span class="skill-name">${getSkillName(sid)}</span>
+      <span class="skill-meta" style="font-size:10px;display:block">威力:${sk?sk.power||'-':'-'}</span>
+    </div>`;
+  }).join('');
+  
+  const unequipped = currentSkillManageUnlocked.filter(sid => !currentSkillManageEquipped.includes(sid));
+  unGrid.innerHTML = unequipped.map(sid => {
+    const sk = getSkillDef(sid);
+    return `<div class="skill-btn" style="cursor:pointer; opacity:0.7;" onclick="toggleSkill('${sid}', false)">
+      <span class="skill-name">${getSkillName(sid)}</span>
+      <span class="skill-meta" style="font-size:10px;display:block">威力:${sk?sk.power||'-':'-'}</span>
+    </div>`;
+  }).join('');
+}
+window.renderSkillManage = renderSkillManage;
+
+function toggleSkill(skillId, isEquipping) {
+  const normalizedSkillId = Number(skillId);
+  if (!Number.isInteger(normalizedSkillId)) return;
+
+  if (isEquipping) {
+    currentSkillManageEquipped = currentSkillManageEquipped.filter(s => s !== normalizedSkillId);
+  } else {
+    if (currentSkillManageEquipped.length >= 4) {
+      toast('最多只能装备 4 个技能！', 'error');
+      return;
+    }
+    if (!currentSkillManageEquipped.includes(normalizedSkillId)) {
+      currentSkillManageEquipped.push(normalizedSkillId);
+    }
+  }
+  renderSkillManage();
+}
+window.toggleSkill = toggleSkill;
+
+document.getElementById('btn-save-skills').addEventListener('click', async () => {
+  if (!currentSkillManagePetId) return;
+  if (currentSkillManageEquipped.length === 0) {
+    toast('至少需要装备 1 个技能！', 'error');
+    return;
+  }
+  try {
+    const res = await API.changeSkills(currentSkillManagePetId, currentSkillManageEquipped);
+    toast(res.message);
+    document.getElementById('modal-skill-manage').classList.remove('active');
+    await refreshTeam();
+    const updatedPet = [..._allTeamPets, ..._allStoragePets].find(p => p.id === currentSkillManagePetId);
+    if (updatedPet) showPetDetail(updatedPet, updatedPet.in_team === 1);
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+});
 
 // ===== HEAL =====
 document.getElementById('heal-btn').addEventListener('click', async()=>{
@@ -939,26 +1035,19 @@ function renderWardrobeAvatar() {
   applyEquipsToWrapper(wrapper, currentEquips);
 }
 
-function setupBattle(pp, wp){
+function renderBattlePlayerPet(pp) {
   document.getElementById('player-name').textContent = pp.nickname||pp.petDef?.name;
   document.getElementById('player-level').textContent = `Lv.${pp.level}`;
-  document.getElementById('player-type').textContent = `${TYPE_ICONS[pp.petDef?.type]||''}`;
+  document.getElementById('player-type').innerHTML = `${TYPE_ICONS[pp.petDef?.type]||''}`;
   document.getElementById('player-type').className = `battle-pet-type type-${pp.petDef?.type||'normal'}`;
   updateHpBar('player', pp.current_hp, pp.max_hp);
   renderStatusEffects('player', pp);
   renderPetSprite(document.getElementById('player-sprite'), pp.pet_id, 140);
+  renderBattleSkillButtons(pp);
+}
+window.renderBattlePlayerPet = renderBattlePlayerPet;
 
-  document.getElementById('enemy-name').textContent = `野生 ${wp.nickname||wp.petDef?.name}`;
-  document.getElementById('enemy-level').textContent = `Lv.${wp.level}`;
-  document.getElementById('enemy-type').textContent = `${TYPE_ICONS[wp.petDef?.type]||''}`;
-  document.getElementById('enemy-type').className = `battle-pet-type type-${wp.petDef?.type||'normal'}`;
-  updateHpBar('enemy', wp.current_hp, wp.max_hp);
-  renderStatusEffects('enemy', wp);
-  renderPetSprite(document.getElementById('enemy-sprite'), wp.pet_id, 140);
-
-  document.getElementById('battle-log').innerHTML = `<p>野生的 ${wp.petDef?.name} 出现了！</p>`;
-
-  // Skills
+function renderBattleSkillButtons(pp) {
   const skills = Array.isArray(pp.skills)?pp.skills:(typeof pp.skills==='string'?JSON.parse(pp.skills):[]);
   const grid = document.getElementById('skill-grid');
   grid.innerHTML = '';
@@ -971,6 +1060,19 @@ function setupBattle(pp, wp){
     btn.addEventListener('click',()=>doBattleAction(sid));
     grid.appendChild(btn);
   });
+}
+
+function setupBattle(pp, wp){
+  renderBattlePlayerPet(pp);
+  document.getElementById('enemy-name').textContent = `野生 ${wp.nickname||wp.petDef?.name}`;
+  document.getElementById('enemy-level').textContent = `Lv.${wp.level}`;
+  document.getElementById('enemy-type').innerHTML = `${TYPE_ICONS[wp.petDef?.type]||''}`;
+  document.getElementById('enemy-type').className = `battle-pet-type type-${wp.petDef?.type||'normal'}`;
+  updateHpBar('enemy', wp.current_hp, wp.max_hp);
+  renderStatusEffects('enemy', wp);
+  renderPetSprite(document.getElementById('enemy-sprite'), wp.pet_id, 140);
+
+  document.getElementById('battle-log').innerHTML = `<p>野生的 ${wp.petDef?.name} 出现了！</p>`;
 }
 
 function updateHpBar(side, current, max){
@@ -1132,6 +1234,16 @@ async function doBattleAction(skillId){
       }, r.playerWin&&r.levelResult?.evolved?4000:2500);
       return;
     }
+    if (r.petFainted && r.nextPet) {
+      const p=document.createElement('p');
+      p.textContent=`${r.playerPet?.nickname || '我方精灵'}倒下了，${r.nextPet.nickname}上场！`;
+      p.style.color='var(--exp-blue)';
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+      renderBattlePlayerPet(r.nextPet);
+      document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
+      return;
+    }
   } catch(err){ toast(err.message,'error'); }
   document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
 }
@@ -1155,7 +1267,7 @@ function showEvolution(result){
   if(!result.evolved) return;
   const overlay = document.getElementById('evolution-overlay');
   overlay.classList.add('active');
-  renderPetSprite(document.getElementById('evolution-old'), result.pet.pet_id, 120);
+  renderPetSprite(document.getElementById('evolution-old'), result.oldPetId || result.pet.pet_id, 120);
   renderPetSprite(document.getElementById('evolution-new'), result.newPetId, 120);
   document.getElementById('evolution-name').textContent = `进化为 ${result.pet.nickname}！`;
 }
@@ -1246,8 +1358,34 @@ ws.on('pvp_turn_result', async (msg) => {
   await playBattleAnimationSequence(msg.results, true);
   
   const log=document.getElementById('pvp-battle-log');
-  if(msg.yourPet) updateHpBar('pvp-player',msg.yourPet.current_hp,msg.yourPet.max_hp);
-  if(msg.opponentPet) updateHpBar('pvp-enemy',msg.opponentPet.current_hp,msg.opponentPet.max_hp);
+  if(msg.yourPet) {
+    updateHpBar('pvp-player',msg.yourPet.current_hp,msg.yourPet.max_hp);
+    if(msg.youSwitched) {
+      document.getElementById('pvp-player-name').textContent=msg.yourPet.nickname;
+      document.getElementById('pvp-player-level').textContent=`Lv.${msg.yourPet.level}`;
+      renderPetSprite(document.getElementById('pvp-player-sprite'),msg.yourPet.pet_id,140);
+      const grid=document.getElementById('pvp-skill-grid');
+      grid.innerHTML='';
+      (msg.yourPet.skills||[]).forEach(sid=>{
+        const sk = getSkillDef(sid);
+        const btn=document.createElement('button'); btn.className='skill-btn';
+        if(sk) btn.classList.add(`type-${sk.type}`);
+        btn.innerHTML=`<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'使用'}</span>`;
+        btn.addEventListener('click',()=>{ ws.send({type:'pvp_action',roomId:pvpRoomId,skillId:sid}); grid.querySelectorAll('.skill-btn').forEach(b=>b.disabled=true); });
+        grid.appendChild(btn);
+      });
+      const p=document.createElement('p'); p.textContent=`你换上了 ${msg.yourPet.nickname}！`; p.style.color='#f59e0b'; log.appendChild(p);
+    }
+  }
+  if(msg.opponentPet) {
+    updateHpBar('pvp-enemy',msg.opponentPet.current_hp,msg.opponentPet.max_hp);
+    if(msg.opponentSwitched) {
+      document.getElementById('pvp-enemy-name').textContent=msg.opponentPet.nickname;
+      document.getElementById('pvp-enemy-level').textContent=`Lv.${msg.opponentPet.level}`;
+      renderPetSprite(document.getElementById('pvp-enemy-sprite'),msg.opponentPet.pet_id,140);
+      const p=document.createElement('p'); p.textContent=`对手换上了 ${msg.opponentPet.nickname}！`; p.style.color='#f59e0b'; log.appendChild(p);
+    }
+  }
   if(msg.battleEnd){
     const won=msg.winnerId===currentUserId;
     const p=document.createElement('p'); p.textContent=won?'🎉 你赢了！':'😢 你输了...'; p.style.color=won?'var(--neon-cyan)':'var(--hp-red)'; log.appendChild(p);
@@ -1275,9 +1413,15 @@ document.getElementById('pokedex-search-input')?.addEventListener('input', (e) =
   renderPokedex();
 });
 
-document.querySelectorAll('.pokedex-tab').forEach(tab => {
+['pokedex-filter-type', 'pokedex-filter-form', 'pokedex-filter-skill'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', () => {
+    renderPokedex();
+  });
+});
+
+document.querySelectorAll('#section-pokedex .pokedex-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.pokedex-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('#section-pokedex .pokedex-tab').forEach(t => t.classList.toggle('active', t === tab));
     _pokedexMode = tab.dataset.dex;
     renderPokedex();
   });
@@ -1297,15 +1441,52 @@ function renderPokedex() {
   const container = document.getElementById('pokedex-container');
   container.innerHTML = '';
   let pets = _pokedexData.pets || [];
+  const typeLabels = {
+    fire: `${TYPE_ICONS.fire} 火系`,
+    water: `${TYPE_ICONS.water} 水系`,
+    grass: `${TYPE_ICONS.grass} 草系`,
+    electric: `${TYPE_ICONS.electric} 电系`,
+    light: `${TYPE_ICONS.light} 光系`,
+    dark: `${TYPE_ICONS.dark} 暗系`,
+    normal: `${TYPE_ICONS.normal} 普通系`
+  };
   
-  const typeLabels = {fire:'🔥 火系',water:'💧 水系',grass:'🌿 草系',electric:'⚡ 电系',light:'✨ 光系',dark:'🌑 暗系',normal:'⚪ 普通系'};
-  
-  if (_pokedexSearchTerm) {
-    pets = pets.filter(p => {
-      const typeStr = typeLabels[p.type] || p.type;
-      return p.name.toLowerCase().includes(_pokedexSearchTerm) || typeStr.toLowerCase().includes(_pokedexSearchTerm);
+  // Populate skills dropdown once
+  const skillSelect = document.getElementById('pokedex-filter-skill');
+  if (skillSelect && skillSelect.children.length <= 1 && _pokedexData.skills) {
+    _pokedexData.skills.sort((a, b) => a.name.localeCompare(b.name)).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.innerHTML = `${s.name} (${TYPE_NAMES[s.type]||s.type}系)`;
+      skillSelect.appendChild(opt);
     });
   }
+
+  // Get filter values
+  const filterType = document.getElementById('pokedex-filter-type')?.value || 'all';
+  const filterForm = document.getElementById('pokedex-filter-form')?.value || 'all';
+  const filterSkillId = parseInt(document.getElementById('pokedex-filter-skill')?.value || '0', 10);
+
+  // Apply filters
+  pets = pets.filter(p => {
+    // 1. Search term
+    if (_pokedexSearchTerm) {
+      const searchTypeStr = (TYPE_NAMES[p.type] || p.type) + '系';
+      if (!p.name.toLowerCase().includes(_pokedexSearchTerm) && !searchTypeStr.toLowerCase().includes(_pokedexSearchTerm)) {
+        return false;
+      }
+    }
+    // 2. Type filter
+    if (filterType !== 'all' && p.type !== filterType) return false;
+    // 3. Form filter
+    if (filterForm !== 'all' && p.form !== filterForm) return false;
+    // 4. Skill filter
+    if (filterSkillId > 0) {
+      const canLearn = p.learnset?.some(s => s.skillId === filterSkillId);
+      if (!canLearn) return false;
+    }
+    return true;
+  });
   
   if (_pokedexMode === 'boss') {
     // Boss pokedex: show Boss evolution lines
@@ -1322,15 +1503,18 @@ function renderPokedex() {
       section.innerHTML = `<h3 class="dex-boss-title"><span class="dex-boss-planet">${line.planet}</span> ${line.name}</h3>`;
       const grid = document.createElement('div');
       grid.className = 'dex-evo-chain';
-      line.ids.forEach((id, idx) => {
+      
+      let drawnCount = 0;
+      line.ids.forEach(id => {
         const pet = pets.find(p => p.id === id);
         if (!pet) return;
-        if (idx > 0) {
+        if (drawnCount > 0) {
           const arrow = document.createElement('div');
           arrow.className = 'dex-evo-arrow';
           arrow.textContent = '→';
           grid.appendChild(arrow);
         }
+        drawnCount++;
         const card = document.createElement('div');
         card.className = `dex-card dex-card-boss type-${pet.type}`;
         card.innerHTML = `<div class="dex-card-sprite" id="dex-sp-${pet.id}"></div><div class="dex-card-name">${pet.name}</div><div class="dex-card-form">${pet.form}</div>`;
@@ -1338,8 +1522,11 @@ function renderPokedex() {
         grid.appendChild(card);
         setTimeout(() => renderPetSprite(document.getElementById(`dex-sp-${pet.id}`), pet.id, 72), 0);
       });
-      section.appendChild(grid);
-      container.appendChild(section);
+      
+      if (drawnCount > 0) {
+        section.appendChild(grid);
+        container.appendChild(section);
+      }
     });
   } else {
     // Normal pet pokedex: group by type
@@ -1889,7 +2076,7 @@ async function loadStoryQuests() {
 window.loadStoryQuests = loadStoryQuests;
 
 // Quest tabs logic
-document.querySelectorAll('.pokedex-tabs .pokedex-tab').forEach(tab => {
+document.querySelectorAll('#section-quests .pokedex-tabs .pokedex-tab').forEach(tab => {
   if (tab.id === 'quest-tab-daily' || tab.id === 'quest-tab-story') {
     tab.addEventListener('click', () => {
       document.getElementById('quest-tab-daily').classList.remove('active');

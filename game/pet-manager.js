@@ -79,7 +79,7 @@ function addExp(db, playerPetId, expGain) {
   let { level, exp, pet_id } = pet;
   exp += expGain;
 
-  const results = { levelUps: [], evolved: false, newPetId: null };
+  const results = { levelUps: [], evolved: false, newPetId: null, oldPetId: pet.pet_id };
 
   // Level up loop
   while (level < 100) {
@@ -98,11 +98,31 @@ function addExp(db, playerPetId, expGain) {
     }
   }
 
+  if (level >= 100) {
+    level = 100;
+    exp = 0;
+  }
+
   // Recalculate stats
   const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
   const evs = pet.evs ? JSON.parse(pet.evs) : {};
   const newStats = calculateStats(pet_id, level, ivs, evs);
-  const newSkills = getSkillsAtLevel(pet_id, level);
+  
+  let newSkills = JSON.parse(pet.skills || '[]');
+  if (results.levelUps.length > 0 || results.evolved) {
+    const petDefObj = petsData.pets.find(p => p.id === pet_id);
+    if (petDefObj && petDefObj.learnset) {
+      const allUnlocked = petDefObj.learnset
+        .filter(s => s.level <= level)
+        .map(s => s.skillId);
+        
+      for (const skillId of allUnlocked) {
+        if (newSkills.length < 4 && !newSkills.includes(skillId)) {
+          newSkills.push(skillId);
+        }
+      }
+    }
+  }
   const petDef = petsData.pets.find(p => p.id === pet_id);
 
   // Preserve custom nickname

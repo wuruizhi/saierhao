@@ -7,7 +7,7 @@
   <meta name="description" content="赛尔号精灵养成游戏，收集精灵、战斗进化、多人对战">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/index.css?v=7">
+  <link rel="stylesheet" href="css/index.css?v=8">
 </head>
 <body>
   <!-- Stars background -->
@@ -18,49 +18,49 @@
   <header class="top-bar" id="top-bar">
     <div class="hub-user-info">
       <span class="hub-username" id="hub-username"></span>
-      <span class="hub-money" id="hub-money">💰 0</span>
-      <button class="btn btn-sm" id="btn-recharge" style="margin-left: 8px; padding: 4px 10px; font-size: 12px; background: rgba(0,245,212,.15); border-color: var(--neon-cyan); color: var(--neon-cyan);">💎 充值</button>
-      <button class="btn-logout" id="btn-logout" title="退出登录">🚪</button>
+      <span class="hub-money" id="hub-money"><img src="/img/icons/icon_money.svg" class="nav-svg-icon" style="width:16px;height:16px;vertical-align:middle;margin-right:4px;">0</span>
+      <button class="btn btn-sm" id="btn-recharge" style="margin-left: 8px; padding: 4px 10px; font-size: 12px; background: rgba(0,245,212,.15); border-color: var(--neon-cyan); color: var(--neon-cyan);"><img src="/img/icons/icon_recharge.svg" class="nav-svg-icon" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;">充值</button>
+      <button class="btn-logout" id="btn-logout" title="退出登录"><img src="/img/icons/icon_logout.svg" class="nav-svg-icon" style="width:18px;height:18px;vertical-align:middle;"></button>
     </div>
     <nav class="hub-nav">
       <button class="hub-nav-btn active" data-section="planets" id="nav-planets">
-        <span class="nav-icon">🪐</span><span>星球探险</span>
+        <img src="/img/icons/nav_planets.svg" class="nav-svg-icon"><span>星球探险</span>
       </button>
       <button class="hub-nav-btn" data-section="team" id="nav-team">
-        <span class="nav-icon">🎒</span><span>精灵背包</span>
+        <img src="/img/icons/nav_team.svg" class="nav-svg-icon"><span>精灵背包</span>
       </button>
       <button class="hub-nav-btn" data-section="pokedex" id="nav-pokedex">
-        <span class="nav-icon">📖</span><span class="nav-text">图鉴</span>
+        <img src="/img/icons/nav_pokedex.svg" class="nav-svg-icon"><span class="nav-text">图鉴</span>
       </button>
       <button class="hub-nav-btn" data-section="wardrobe" id="nav-wardrobe">
-        <span class="nav-icon">👗</span><span class="nav-text">衣橱</span>
+        <img src="/img/icons/nav_wardrobe.svg" class="nav-svg-icon"><span class="nav-text">衣橱</span>
       </button>
       <button class="hub-nav-btn" data-section="shop" id="nav-shop">
-        <span class="nav-icon">🏪</span><span class="nav-text">商店</span>
+        <img src="/img/icons/nav_shop.svg" class="nav-svg-icon"><span class="nav-text">商店</span>
       </button>
       <button class="hub-nav-btn" data-section="pvp" id="nav-pvp">
-        <span class="nav-icon">⚔️</span><span>对战大厅</span>
+        <img src="/img/icons/nav_pvp.svg" class="nav-svg-icon"><span>对战大厅</span>
       </button>
       <button class="hub-nav-btn" data-section="heal" id="nav-heal">
-        <span class="nav-icon">💊</span><span>治疗中心</span>
+        <img src="/img/icons/nav_heal.svg" class="nav-svg-icon"><span>治疗中心</span>
       </button>
       <button class="hub-nav-btn" data-section="social" id="nav-social">
-        <span class="nav-icon">🌟</span><span>社交大厅</span>
+        <img src="/img/icons/nav_social.svg" class="nav-svg-icon"><span>社交大厅</span>
       </button>
       <button class="hub-nav-btn" data-section="quests" id="nav-quests">
-        <span class="nav-icon">📋</span><span>任务</span><span class="quest-red-dot" id="quest-red-dot" style="display:none"></span>
+        <img src="/img/icons/nav_quests.svg" class="nav-svg-icon"><span>任务</span><span class="quest-red-dot" id="quest-red-dot" style="display:none"></span>
       </button>
       <button class="hub-nav-btn" data-section="bag" id="nav-bag">
-        <span class="nav-icon">🎒</span><span>背包</span>
+        <img src="/img/icons/nav_bag.svg" class="nav-svg-icon"><span>背包</span>
       </button>
       <button class="hub-nav-btn" data-section="gacha" id="nav-gacha">
-        <span class="nav-icon">🎰</span><span>扭蛋</span>
+        <img src="/img/icons/nav_gacha.svg" class="nav-svg-icon"><span>扭蛋</span>
       </button>
       <button class="hub-nav-btn" data-section="expedition" id="nav-expedition">
-        <span class="nav-icon">🚀</span><span>派遣</span>
+        <img src="/img/icons/nav_expedition.svg" class="nav-svg-icon"><span>派遣</span>
       </button>
       <button class="hub-nav-btn" data-section="base" id="nav-base">
-        <span class="nav-icon">🏠</span><span>基地</span>
+        <img src="/img/icons/nav_base.svg" class="nav-svg-icon"><span>基地</span>
       </button>
       <button class="btn-return-scene" id="btn-return-scene" style="display:none" title="返回当前场景">↩ 返回场景</button>
     </nav>
@@ -138,12 +138,12 @@
         <input type="text" id="pet-search-input" placeholder="🔍 搜索精灵名称..." class="pet-search-input">
         <select id="pet-filter-type" class="pet-filter-select">
           <option value="all">全部类型</option>
-          <option value="fire">🔥 火</option>
-          <option value="water">💧 水</option>
-          <option value="grass">🌿 草</option>
-          <option value="electric">⚡ 电</option>
-          <option value="light">✨ 光</option>
-          <option value="dark">🌑 暗</option>
+          <option value="fire">火</option>
+          <option value="water">水</option>
+          <option value="grass">草</option>
+          <option value="electric">电</option>
+          <option value="light">光</option>
+          <option value="dark">暗</option>
         </select>
         <select id="pet-sort" class="pet-filter-select">
           <option value="default">默认排序</option>
@@ -161,27 +161,45 @@
         <div class="pet-grid" id="storage-grid"></div>
       </div>
       <div class="team-subsection">
-        <h3>🥚 精元</h3>
+        <h3><img src="/img/icons/nav_planets.svg" class="nav-svg-icon" style="width:18px;">精元</h3>
         <div class="pet-grid" id="essence-grid"></div>
       </div>
     </section>
 
     <!-- Pokedex section -->
     <section id="section-pokedex" class="hub-section">
-      <h2 class="section-title">📖 图鉴</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_pokedex.svg" class="nav-svg-icon" style="width:24px;height:24px;">图鉴</h2>
       <div class="pokedex-tabs">
         <button class="pokedex-tab active" data-dex="pets" id="dex-tab-pets">🐾 精灵图鉴</button>
         <button class="pokedex-tab" data-dex="boss" id="dex-tab-boss">👑 Boss图鉴</button>
       </div>
-      <div class="pokedex-search-bar" id="pokedex-search-wrapper">
-        <input type="text" id="pokedex-search-input" placeholder="🔍 搜索精灵名称、属性..." />
+      <div class="pokedex-search-bar" id="pokedex-search-wrapper" style="display:flex; gap:10px; flex-wrap:wrap;">
+        <input type="text" id="pokedex-search-input" placeholder="🔍 搜索精灵名称..." class="pet-search-input" style="flex:1; min-width:200px;">
+        <select id="pokedex-filter-type" class="pet-filter-select">
+          <option value="all">全部属性</option>
+          <option value="fire">火</option>
+          <option value="water">水</option>
+          <option value="grass">草</option>
+          <option value="electric">电</option>
+          <option value="light">光</option>
+          <option value="dark">暗</option>
+          <option value="normal">普通</option>
+        </select>
+        <select id="pokedex-filter-form" class="pet-filter-select">
+          <option value="all">所有形态</option>
+          <option value="幼体">幼体</option>
+          <option value="成体">成体</option>
+        </select>
+        <select id="pokedex-filter-skill" class="pet-filter-select" style="max-width: 150px;">
+          <option value="all">任意技能</option>
+        </select>
       </div>
       <div class="pokedex-container" id="pokedex-container"></div>
     </section>
 
     <!-- Wardrobe section -->
     <section id="section-wardrobe" class="hub-section">
-      <h2 class="section-title">👗 个人衣橱</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_wardrobe.svg" class="nav-svg-icon" style="width:24px;height:24px;">个人衣橱</h2>
       <div class="wardrobe-container">
         <div class="wardrobe-preview glass-card">
           <div class="player-avatar wardrobe-avatar-preview" id="wardrobe-avatar-preview">
@@ -209,7 +227,7 @@
 
     <!-- Shop section -->
     <section id="section-shop" class="hub-section">
-      <h2 class="section-title">🏪 商店</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_shop.svg" class="nav-svg-icon" style="width:24px;height:24px;">商店</h2>
       <!-- Top-level tabs -->
       <div class="shop-top-tabs" id="shop-top-tabs">
         <button class="shop-top-tab active" data-group="supply">🎒 补给中心</button>
@@ -228,7 +246,7 @@
 
     <!-- PVP section -->
     <section id="section-pvp" class="hub-section">
-      <h2 class="section-title">⚔️ 对战大厅</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_pvp.svg" class="nav-svg-icon" style="width:24px;height:24px;">对战大厅</h2>
       <div class="pvp-container" style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
         <div class="pvp-ranked glass-card" style="flex:1; min-width:300px;">
           <h3>🏆 天梯排位赛</h3>
@@ -265,7 +283,7 @@
 
     <!-- Social section -->
     <section id="section-social" class="hub-section">
-      <h2 class="section-title">🌟 社交大厅</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_social.svg" class="nav-svg-icon" style="width:24px;height:24px;">社交大厅</h2>
       <div class="pokedex-tabs">
         <button class="pokedex-tab active" data-social="friends" id="social-tab-friends">👥 我的好友</button>
         <button class="pokedex-tab" data-social="leaderboard" id="social-tab-leaderboard">🏆 排行榜</button>
@@ -329,7 +347,7 @@
 
     <!-- Expedition section -->
     <section id="section-expedition" class="hub-section">
-      <h2 class="section-title">🚀 星际派遣</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_expedition.svg" class="nav-svg-icon" style="width:24px;height:24px;">星际派遣</h2>
       <p class="section-subtitle">派遣闲置精灵执行任务获取丰厚奖励</p>
       
       <div style="margin-bottom: 20px;">
@@ -343,7 +361,7 @@
 
     <!-- Base section -->
     <section id="section-base" class="hub-section">
-      <h2 class="section-title">🏠 个人基地</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_base.svg" class="nav-svg-icon" style="width:24px;height:24px;">个人基地</h2>
       <p class="section-subtitle">布置你的专属太空休息室</p>
       
       <div style="display: flex; gap: 20px; height: 500px;">
@@ -376,7 +394,7 @@
 
     <!-- Quests section -->
     <section id="section-quests" class="hub-section">
-      <h2 class="section-title">📋 任务大厅</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_quests.svg" class="nav-svg-icon" style="width:24px;height:24px;">任务大厅</h2>
       <div class="pokedex-tabs">
         <button class="pokedex-tab active" data-quest="daily" id="quest-tab-daily">📅 每日任务</button>
         <button class="pokedex-tab" data-quest="story" id="quest-tab-story">📖 主线剧情</button>
@@ -392,13 +410,13 @@
 
     <!-- Bag section -->
     <section id="section-bag" class="hub-section">
-      <h2 class="section-title">🎒 我的背包</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_bag.svg" class="nav-svg-icon" style="width:24px;height:24px;">我的背包</h2>
       <div id="bag-grid"></div>
     </section>
 
     <!-- Gacha section -->
     <section id="section-gacha" class="hub-section">
-      <h2 class="section-title">🎰 扭蛋抽奖</h2>
+      <h2 class="section-title"><img src="/img/icons/nav_gacha.svg" class="nav-svg-icon" style="width:24px;height:24px;">扭蛋抽奖</h2>
       <p class="section-subtitle">花费金币抽取稀有精灵和道具！每10次保底稀有奖品</p>
       <div class="gacha-pools" id="gacha-pools"></div>
       <div class="gacha-result-area" id="gacha-result-area" style="display:none;"></div>
@@ -477,8 +495,8 @@
       <div class="battle-actions" id="battle-actions">
         <div class="skill-grid" id="skill-grid"></div>
         <div class="action-buttons">
-          <button class="btn btn-capture" id="btn-capture">🔮 捕捉</button>
-          <button class="btn btn-run" id="btn-run">🏃 逃跑</button>
+          <button class="btn btn-capture" id="btn-capture"><img src="/img/icons/icon_capture.svg" class="action-svg-icon">捕捉</button>
+          <button class="btn btn-run" id="btn-run"><img src="/img/icons/icon_run.svg" class="action-svg-icon">逃跑</button>
         </div>
       </div>
     </div>
@@ -527,6 +545,24 @@
       <div class="pet-detail-stats" id="pet-detail-stats"></div>
       <div class="pet-detail-skills" id="pet-detail-skills"></div>
       <div class="pet-detail-actions" id="pet-detail-actions"></div>
+    </div>
+  </div>
+
+  <!-- ===== SKILL MANAGE MODAL ===== -->
+  <div id="modal-skill-manage" class="modal" style="z-index: 10001;">
+    <div class="modal-content glass-card">
+      <button class="modal-close" id="skill-manage-close">&times;</button>
+      <h3 style="color:var(--neon-blue);">🛠️ 技能管理</h3>
+      
+      <h4 style="margin-top:15px; color:#ffd700;">已装备技能 (最多4个，点击卸下)</h4>
+      <div class="skill-grid" id="equipped-skills-grid" style="margin-bottom: 20px; min-height: 60px;"></div>
+      
+      <h4 style="color:#00ffcc;">已解锁技能池 (点击装备)</h4>
+      <div class="skill-grid" id="unlocked-skills-grid" style="max-height: 250px; overflow-y: auto;"></div>
+      
+      <div style="margin-top:20px; text-align:center;">
+        <button class="btn btn-primary" id="btn-save-skills">保存技能配置</button>
+      </div>
     </div>
   </div>
 
@@ -684,10 +720,10 @@
     </div>
   </div>
 
-  <script src="js/pet-sprites.js?v=17"></script>
-  <script src="js/api.js?v=16"></script>
-  <script src="js/websocket.js?v=16"></script>
-  <script src="js/app.js?v=17"></script>
-  <script src="js/scene.js?v=16"></script>
+  <script src="js/pet-sprites.js?v=19"></script>
+  <script src="js/api.js?v=17"></script>
+  <script src="js/websocket.js?v=17"></script>
+  <script src="js/app.js?v=18"></script>
+  <script src="js/scene.js?v=17"></script>
 </body>
 </html>

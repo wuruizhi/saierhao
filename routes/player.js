@@ -88,14 +88,70 @@ function createPlayerRouter(db) {
     if (toTeam) {
       const teamCount = db.prepare('SELECT COUNT(*) as c FROM player_pets WHERE player_id = ? AND in_team = 1').get(player.id).c;
       if (teamCount >= 6) return res.status(400).json({ error: '队伍已满（最多6只）' });
+      
+      // Check if pet is on an active expedition
+      const expedition = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(petInstanceId);
+      if (expedition) {
+        return res.status(400).json({ error: '该精灵正在派遣中，无法加入队伍！' });
+      }
+
       db.prepare('UPDATE player_pets SET in_team = 1, team_order = ? WHERE id = ?').run(teamCount, petInstanceId);
     } else {
       const teamCount = db.prepare('SELECT COUNT(*) as c FROM player_pets WHERE player_id = ? AND in_team = 1').get(player.id).c;
       if (teamCount <= 1) return res.status(400).json({ error: '队伍至少需要1只精灵' });
       db.prepare('UPDATE player_pets SET in_team = 0, team_order = -1 WHERE id = ?').run(petInstanceId);
+      
+      const remainingPets = db.prepare('SELECT id FROM player_pets WHERE player_id = ? AND in_team = 1 ORDER BY team_order ASC').all(player.id);
+      remainingPets.forEach((p, idx) => {
+        db.prepare('UPDATE player_pets SET team_order = ? WHERE id = ?').run(idx, p.id);
+      });
     }
 
     res.json({ success: true });
+  });
+
+  // Change equipped skills
+  router.post('/change-skills', authMiddleware, (req, res) => {
+    const { petInstanceId, skills } = req.body;
+    
+    if (!Array.isArray(skills) || skills.length < 1 || skills.length > 4) {
+      return res.status(400).json({ error: '需要装备 1-4 个技能' });
+    }
+    const requestedSkills = skills.map(Number);
+    if (requestedSkills.some(skillId => !Number.isInteger(skillId))) {
+      return res.status(400).json({ error: '技能 ID 无效' });
+    }
+
+    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    const pet = db.prepare('SELECT pet_id, level, skills FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
+    if (!pet) return res.status(404).json({ error: '精灵不存在' });
+
+    const petDef = petsData.pets.find(p => p.id === pet.pet_id);
+    if (!petDef || !petDef.learnset) {
+      return res.status(400).json({ error: '精灵数据异常' });
+    }
+
+    // Determine unlocked skills based on level
+    const unlockedSkills = petDef.learnset
+      .filter(s => s.level <= pet.level)
+      .map(s => s.skillId);
+
+    // Validate that every requested skill is unlocked
+    const unlockedSet = new Set(unlockedSkills);
+    for (const skillId of requestedSkills) {
+      if (!unlockedSet.has(skillId)) {
+        return res.status(400).json({ error: `非法操作：精灵尚未学会技能 ${skillId}` });
+      }
+    }
+
+    // Ensure all requested skills exist in the skills database and deduplicate
+    const validSkills = [...new Set(requestedSkills.filter(skillId => skillsData.skills.some(s => s.id === skillId)))];
+
+    db.prepare('UPDATE player_pets SET skills = ? WHERE id = ?').run(JSON.stringify(validSkills), petInstanceId);
+
+    res.json({ success: true, message: '技能装备成功！', skills: validSkills });
   });
 
   // Heal all pets
@@ -129,6 +185,12 @@ function createPlayerRouter(db) {
     const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
     if (!pet) return res.status(404).json({ error: '精灵不存在' });
 
+    // Check if pet is on expedition
+    const expedition = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(petInstanceId);
+    if (expedition) {
+      return res.status(400).json({ error: '不能对正在派遣中的精灵使用道具！' });
+    }
+
     const booster = (itemsData.boosters || []).find(b => b.id === boosterId);
     if (!booster) return res.status(400).json({ error: '强化剂不存在' });
 
@@ -139,25 +201,53 @@ function createPlayerRouter(db) {
 
     db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(item.id);
 
-    // Apply stat boost
-    if (booster.stat === 'all') {
-      db.prepare(`UPDATE player_pets SET
-        max_hp = CAST(max_hp * ? AS INTEGER),
-        current_hp = CAST(current_hp * ? AS INTEGER),
-        attack = CAST(attack * ? AS INTEGER),
-        defense = CAST(defense * ? AS INTEGER),
-        speed = CAST(speed * ? AS INTEGER),
-        sp_attack = CAST(sp_attack * ? AS INTEGER),
-        sp_defense = CAST(sp_defense * ? AS INTEGER)
-        WHERE id = ?`).run(booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, booster.multiplier, petInstanceId);
-    } else if (booster.stat === 'hp') {
-      db.prepare(`UPDATE player_pets SET max_hp = CAST(max_hp * ? AS INTEGER), current_hp = CAST(current_hp * ? AS INTEGER) WHERE id = ?`)
-        .run(booster.multiplier, booster.multiplier, petInstanceId);
-    } else {
-      const dbStat = booster.stat === 'spAttack' ? 'sp_attack' : booster.stat === 'spDefense' ? 'sp_defense' : booster.stat;
-      db.prepare(`UPDATE player_pets SET ${dbStat} = CAST(${dbStat} * ? AS INTEGER) WHERE id = ?`)
-        .run(booster.multiplier, petInstanceId);
+    // Apply stat boost using EVs
+    let gain = 30; // default EV gain
+    if (booster.multiplier >= 1.2) gain = 85;
+    else if (booster.multiplier < 1.1) gain = 20;
+
+    const evs = pet.evs ? JSON.parse(pet.evs) : { hp:0, attack:0, defense:0, spAttack:0, spDefense:0, speed:0 };
+    const totalEvs = Object.values(evs).reduce((a,b)=>a+b, 0);
+    
+    if (totalEvs >= 510) {
+      db.prepare('UPDATE player_items SET quantity = quantity + 1 WHERE id = ?').run(item.id);
+      return res.status(400).json({ error: '该精灵的学习力已达上限(510)' });
     }
+
+    if (booster.stat === 'all') {
+      const actualGain = Math.min(gain, Math.floor((510 - totalEvs) / 6));
+      for (const stat of ['hp', 'attack', 'defense', 'speed', 'spAttack', 'spDefense']) {
+        evs[stat] = Math.min(255, evs[stat] + actualGain);
+      }
+    } else {
+      let statName = booster.stat; // 'hp', 'attack', 'spAttack', etc.
+      if (statName === 'sp_attack') statName = 'spAttack';
+      if (statName === 'sp_defense') statName = 'spDefense';
+
+      if (evs[statName] >= 255) {
+        db.prepare('UPDATE player_items SET quantity = quantity + 1 WHERE id = ?').run(item.id);
+        return res.status(400).json({ error: '该项学习力已达单项上限(255)' });
+      }
+      const actualGain = Math.min(gain, 255 - evs[statName], 510 - totalEvs);
+      evs[statName] += actualGain;
+    }
+
+    // Recalculate stats
+    const { calculateStats } = require('../game/pet-manager');
+    const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
+    const newStats = calculateStats(pet.pet_id, pet.level, ivs, evs);
+
+    // Preserve HP ratio
+    const hpRatio = pet.current_hp / pet.max_hp;
+    const newMaxHp = newStats.hp;
+    const newCurrentHp = Math.max(1, Math.floor(newMaxHp * hpRatio));
+
+    db.prepare(`
+      UPDATE player_pets SET evs = ?, current_hp = ?, max_hp = ?, 
+      attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?
+      WHERE id = ?
+    `).run(JSON.stringify(evs), newCurrentHp, newMaxHp, newStats.attack, newStats.defense, newStats.speed, newStats.spAttack, newStats.spDefense, petInstanceId);
+
 
     const updatedPet = db.prepare('SELECT * FROM player_pets WHERE id = ?').get(petInstanceId);
     res.json({
@@ -175,6 +265,12 @@ function createPlayerRouter(db) {
 
     const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
     if (!pet) return res.status(404).json({ error: '精灵不存在' });
+
+    // Check if pet is on expedition
+    const expedition = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(petInstanceId);
+    if (expedition) {
+      return res.status(400).json({ error: '不能对正在派遣中的精灵使用道具！' });
+    }
 
     const specialItem = itemsData.others.find(o => o.id === itemId);
     if (!specialItem) return res.status(400).json({ error: '道具不存在' });
@@ -268,12 +364,22 @@ function createPlayerRouter(db) {
     const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
     if (!pet) return res.status(404).json({ error: '精灵不存在' });
 
+    // Check if pet is on expedition
+    const expedition = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(petInstanceId);
+    if (expedition) {
+      return res.status(400).json({ error: '不能对正在派遣中的精灵使用糖果！' });
+    }
+
     const candy = itemsData.candies.find(c => c.id === candyId);
     if (!candy) return res.status(400).json({ error: '糖果不存在' });
 
     const item = db.prepare('SELECT * FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, candyId);
     if (!item || item.quantity < candyQuantity) {
       return res.status(400).json({ error: '糖果数量不足' });
+    }
+
+    if (pet.level >= 100) {
+      return res.status(400).json({ error: '精灵已经满级，无法使用经验糖果！' });
     }
 
     // Consume candy
@@ -300,7 +406,7 @@ function createPlayerRouter(db) {
       const def = itemsData.essences[e.essence_id];
       let ready = false;
       if (e.hatching && e.hatch_start) {
-        const elapsed = (Date.now() - new Date(e.hatch_start).getTime()) / 1000;
+        const elapsed = (Date.now() - new Date(e.hatch_start + 'Z').getTime()) / 1000;
         ready = elapsed >= e.hatch_duration;
       }
       return { ...e, def, ready };
@@ -353,7 +459,7 @@ function createPlayerRouter(db) {
     } else {
       // Check if hatching is complete
       if (!essence.hatching) return res.status(400).json({ error: '还未开始孵化' });
-      const elapsed = (Date.now() - new Date(essence.hatch_start).getTime()) / 1000;
+      const elapsed = (Date.now() - new Date(essence.hatch_start + 'Z').getTime()) / 1000;
       if (elapsed < essence.hatch_duration) {
         const remaining = Math.ceil(essence.hatch_duration - elapsed);
         return res.status(400).json({ error: `还需要${remaining}秒才能孵化完成`, remaining });
@@ -497,6 +603,12 @@ function createPlayerRouter(db) {
     if (!pet) return res.status(404).json({ error: '精灵不存在' });
     if (pet.in_team) return res.status(400).json({ error: '不能放生队伍中的精灵' });
 
+    // Check if pet is on an active expedition
+    const expedition = db.prepare('SELECT id FROM player_expeditions WHERE pet_id = ? AND reward_claimed = 0').get(petInstanceId);
+    if (expedition) {
+      return res.status(400).json({ error: '不能放生正在派遣中的精灵！' });
+    }
+
     db.prepare('DELETE FROM player_pets WHERE id = ?').run(petInstanceId);
     
     // Give some money as compensation
@@ -617,27 +729,7 @@ function createPlayerRouter(db) {
     res.json({ quests: enriched, today: getToday() });
   });
 
-  router.post('/quest-progress', authMiddleware, (req, res) => {
-    const { questType } = req.body;
-    const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
-    if (!player) return res.json({ success: false });
 
-    const today = getToday();
-    const quests = db.prepare('SELECT * FROM daily_quests WHERE player_id = ? AND quest_date = ? AND quest_type = ? AND reward_claimed = 0')
-      .all(player.id, today, questType);
-
-    quests.forEach(q => {
-      if (q.progress < q.target) {
-        db.prepare('UPDATE daily_quests SET progress = progress + 1 WHERE id = ?').run(q.id);
-        const updated = db.prepare('SELECT * FROM daily_quests WHERE id = ?').get(q.id);
-        if (updated.progress >= updated.target) {
-          db.prepare('UPDATE daily_quests SET completed = 1 WHERE id = ?').run(q.id);
-        }
-      }
-    });
-
-    res.json({ success: true });
-  });
 
   router.post('/claim-quest-reward', authMiddleware, (req, res) => {
     const { questDbId } = req.body;
@@ -651,8 +743,14 @@ function createPlayerRouter(db) {
 
     db.prepare('UPDATE daily_quests SET reward_claimed = 1 WHERE id = ?').run(quest.id);
     db.prepare('UPDATE players SET money = money + ? WHERE id = ?').run(quest.reward_money, player.id);
+    const updatedPlayer = db.prepare('SELECT money FROM players WHERE id = ?').get(player.id);
 
-    res.json({ success: true, message: `领取成功！获得 ${quest.reward_money} 💰`, reward: quest.reward_money });
+    res.json({
+      success: true,
+      message: `领取成功！获得 ${quest.reward_money} 💰`,
+      reward: quest.reward_money,
+      playerMoney: updatedPlayer.money
+    });
   });
 
   // Redeem code

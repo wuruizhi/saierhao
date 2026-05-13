@@ -1255,7 +1255,7 @@
                 "level": 55,
                 "name": "虹光梦凤·织梦神",
                 "rate": 100,
-                "essenceId": "light"
+                "essenceId": "dream"
               },
               "npcs": [
                 {
@@ -1509,6 +1509,534 @@
                   "y": 55,
                   "sprite": "/img/npcs/npc_abyss_lord.png",
                   "defaultText": "一切终将归于虚无。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "雅典娜星系",
+      "description": "充满神秘宇宙能量与未知法则的星系，独立于四大元素之外。",
+      "requiredLevel": 30,
+      "planets": [
+        {
+          "id": 11,
+          "name": "星尘渊",
+          "description": "深邃的宇宙深渊，到处漂浮着发光的星尘与陨石碎片。",
+          "theme": "neutral",
+          "bgColor": "#0b001a",
+          "requiredLevel": 30,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "星屑回廊",
+              "icon": "✨",
+              "description": "被星空光辉笼罩的走廊。",
+              "bgGradient": "linear-gradient(180deg, #110022 0%, #1a0033 100%)",
+              "backgroundImage": "/img/scenes/stardust-corridor.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 30,
+              "wildPets": [
+                {
+                  "petId": 101,
+                  "minLevel": 30,
+                  "maxLevel": 35,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_stargazer",
+                  "name": "观星者",
+                  "x": 30,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_stargazer.png",
+                  "defaultText": "群星在低语，深渊中有东西在苏醒。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "陨石荒原",
+              "icon": "☄️",
+              "description": "荒芜的陨石表面，充满空间裂缝。",
+              "bgGradient": "linear-gradient(180deg, #1a0033 0%, #2b004d 100%)",
+              "backgroundImage": "/img/scenes/meteor-wasteland.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 35,
+              "wildPets": [
+                {
+                  "petId": 102,
+                  "minLevel": 35,
+                  "maxLevel": 42,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_void_walker",
+                  "name": "虚空旅人",
+                  "x": 70,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_void_walker.png",
+                  "defaultText": "不要迷失在虚无之中。"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "虚空之眼",
+              "icon": "👁️",
+              "description": "星尘渊的核心，黑洞般深邃的虚空之眼。",
+              "bgGradient": "linear-gradient(180deg, #2b004d 0%, #3c0066 100%)",
+              "backgroundImage": "/img/scenes/eye-of-void.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 40,
+              "wildPets": [
+                {
+                  "petId": 102,
+                  "minLevel": 40,
+                  "maxLevel": 48,
+                  "rate": 100
+                }
+              ],
+              "boss": {
+                "petId": 103,
+                "level": 45,
+                "name": "虚空行者·黑洞",
+                "rate": 100,
+                "essenceId": "dark"
+              },
+              "npcs": [
+                {
+                  "id": "npc_abyss_guard",
+                  "name": "深渊守卫",
+                  "x": 80,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_abyss_guard.png",
+                  "defaultText": "你无法逃脱吞噬。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "棱镜星",
+          "description": "由无尽水晶和棱镜构成的星球，折射着刺眼的光芒。",
+          "theme": "light",
+          "bgColor": "#fffae6",
+          "requiredLevel": 35,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "晶化谷",
+              "icon": "💎",
+              "description": "满是水晶柱的幽深峡谷。",
+              "bgGradient": "linear-gradient(180deg, #fffde6 0%, #fffbd6 100%)",
+              "backgroundImage": "/img/scenes/crystal-valley.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 35,
+              "wildPets": [
+                {
+                  "petId": 104,
+                  "minLevel": 35,
+                  "maxLevel": 40,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_crystal_miner",
+                  "name": "采晶人",
+                  "x": 20,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_crystal_miner.png",
+                  "defaultText": "这些水晶里蕴含着纯粹的光能。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "折射迷宫",
+              "icon": "🪞",
+              "description": "光线在这里扭曲，极易迷失方向的迷宫。",
+              "bgGradient": "linear-gradient(180deg, #fffbd6 0%, #fff8b3 100%)",
+              "backgroundImage": "/img/scenes/refraction-maze.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 40,
+              "wildPets": [
+                {
+                  "petId": 105,
+                  "minLevel": 40,
+                  "maxLevel": 45,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_light_weaver",
+                  "name": "织光者",
+                  "x": 65,
+                  "y": 65,
+                  "sprite": "/img/npcs/npc_light_weaver.png",
+                  "defaultText": "光影虚实，皆是幻象。"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "耀光矩阵",
+              "icon": "🔆",
+              "description": "棱镜星的核心能源矩阵，极为刺眼。",
+              "bgGradient": "linear-gradient(180deg, #fff8b3 0%, #fff080 100%)",
+              "backgroundImage": "/img/scenes/radiant-matrix.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 45,
+              "wildPets": [
+                {
+                  "petId": 105,
+                  "minLevel": 45,
+                  "maxLevel": 50,
+                  "rate": 100
+                }
+              ],
+              "boss": {
+                "petId": 106,
+                "level": 50,
+                "name": "光辉大天使·折射",
+                "rate": 100,
+                "essenceId": "prism"
+              },
+              "npcs": [
+                {
+                  "id": "npc_archangel_projection",
+                  "name": "大天使投影",
+                  "x": 50,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_archangel_projection.png",
+                  "defaultText": "接受圣光的洗礼吧。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "毒瘴星",
+          "description": "被有毒水汽和剧毒酸雨覆盖的危险星球。",
+          "theme": "water",
+          "bgColor": "#1a331a",
+          "requiredLevel": 40,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "腐坏沼泽",
+              "icon": "🦠",
+              "description": "冒着绿色气泡的剧毒沼泽。",
+              "bgGradient": "linear-gradient(180deg, #1a331a 0%, #204020 100%)",
+              "backgroundImage": "/img/scenes/corrupt-swamp.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 40,
+              "wildPets": [
+                {
+                  "petId": 107,
+                  "minLevel": 40,
+                  "maxLevel": 45,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_swamp_hermit",
+                  "name": "沼泽隐士",
+                  "x": 40,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_swamp_hermit.png",
+                  "defaultText": "小心脚下，这里的水能腐蚀骨头。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "酸雨密林",
+              "icon": "🌧️",
+              "description": "下着酸雨的阴暗密林。",
+              "bgGradient": "linear-gradient(180deg, #204020 0%, #2d592d 100%)",
+              "backgroundImage": "/img/scenes/acid-rain-jungle.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 45,
+              "wildPets": [
+                {
+                  "petId": 108,
+                  "minLevel": 45,
+                  "maxLevel": 50,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_mutant_hunter",
+                  "name": "变异猎手",
+                  "x": 75,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_mutant_hunter.png",
+                  "defaultText": "这些毒物可是绝佳的素材。"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "疫病源头",
+              "icon": "☣️",
+              "description": "毒瘴的中心，散发着致命的瘟疫气息。",
+              "bgGradient": "linear-gradient(180deg, #2d592d 0%, #397339 100%)",
+              "backgroundImage": "/img/scenes/plague-source.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 50,
+              "wildPets": [
+                {
+                  "petId": 108,
+                  "minLevel": 50,
+                  "maxLevel": 55,
+                  "rate": 100
+                }
+              ],
+              "boss": {
+                "petId": 109,
+                "level": 55,
+                "name": "疫病之源·瘟疫",
+                "rate": 100,
+                "essenceId": "water"
+              },
+              "npcs": [
+                {
+                  "id": "npc_plague_doctor",
+                  "name": "瘟疫医生",
+                  "x": 30,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_plague_doctor.png",
+                  "defaultText": "疾病……即是进化。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "幻音星",
+          "description": "空气中回荡着无形旋律的星球，音乐构成了这里的世界。",
+          "theme": "neutral",
+          "bgColor": "#1a0033",
+          "requiredLevel": 45,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "寂静荒野",
+              "icon": "🤫",
+              "description": "听不到任何声音的奇特荒原。",
+              "bgGradient": "linear-gradient(180deg, #1a0033 0%, #2a0052 100%)",
+              "backgroundImage": "/img/scenes/silent-wilderness.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 45,
+              "wildPets": [
+                {
+                  "petId": 110,
+                  "minLevel": 45,
+                  "maxLevel": 50,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_silent_monk",
+                  "name": "静默僧侣",
+                  "x": 70,
+                  "y": 65,
+                  "sprite": "/img/npcs/npc_silent_monk.png",
+                  "defaultText": "……"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "回音山谷",
+              "icon": "📢",
+              "description": "声音在这里被无限放大和折射的山谷。",
+              "bgGradient": "linear-gradient(180deg, #2a0052 0%, #3e007a 100%)",
+              "backgroundImage": "/img/scenes/echo-valley.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 50,
+              "wildPets": [
+                {
+                  "petId": 111,
+                  "minLevel": 50,
+                  "maxLevel": 55,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_bard",
+                  "name": "流浪吟游",
+                  "x": 25,
+                  "y": 55,
+                  "sprite": "/img/npcs/npc_bard.png",
+                  "defaultText": "听啊，这风中传来的悲歌。"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "协奏圣殿",
+              "icon": "🎼",
+              "description": "庄严的音乐圣殿，演奏着死亡的安魂曲。",
+              "bgGradient": "linear-gradient(180deg, #3e007a 0%, #5200a3 100%)",
+              "backgroundImage": "/img/scenes/concerto-temple.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 55,
+              "wildPets": [
+                {
+                  "petId": 111,
+                  "minLevel": 55,
+                  "maxLevel": 60,
+                  "rate": 100
+                }
+              ],
+              "boss": {
+                "petId": 112,
+                "level": 60,
+                "name": "绝望安魂曲·夜莺",
+                "rate": 100,
+                "essenceId": "melody"
+              },
+              "npcs": [
+                {
+                  "id": "npc_maestro",
+                  "name": "疯狂指挥家",
+                  "x": 80,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_maestro.png",
+                  "defaultText": "华丽的终章，就要开始了！"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "时之狭间",
+          "description": "脱离正常时间流的裂缝，到处是巨大的齿轮和时钟。",
+          "theme": "electric",
+          "bgColor": "#331a00",
+          "requiredLevel": 50,
+          "scenes": [
+            {
+              "id": 0,
+              "name": "停滞钟摆",
+              "icon": "🕰️",
+              "description": "巨大钟摆停止摇摆的空间。",
+              "bgGradient": "linear-gradient(180deg, #331a00 0%, #4d2600 100%)",
+              "backgroundImage": "/img/scenes/stalled-pendulum.png",
+              "maxSpawns": 4,
+              "refreshInterval": 30,
+              "requiredLevel": 50,
+              "wildPets": [
+                {
+                  "petId": 113,
+                  "minLevel": 50,
+                  "maxLevel": 55,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_time_traveler",
+                  "name": "时空旅人",
+                  "x": 30,
+                  "y": 50,
+                  "sprite": "/img/npcs/npc_time_traveler.png",
+                  "defaultText": "时间在这里失去了意义。"
+                }
+              ]
+            },
+            {
+              "id": 1,
+              "name": "齿轮迷城",
+              "icon": "⚙️",
+              "description": "由无数黄铜齿轮构成的迷宫城市。",
+              "bgGradient": "linear-gradient(180deg, #4d2600 0%, #663300 100%)",
+              "backgroundImage": "/img/scenes/gear-city.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 55,
+              "wildPets": [
+                {
+                  "petId": 114,
+                  "minLevel": 55,
+                  "maxLevel": 60,
+                  "rate": 100
+                }
+              ],
+              "npcs": [
+                {
+                  "id": "npc_clock_maker",
+                  "name": "钟表匠",
+                  "x": 65,
+                  "y": 60,
+                  "sprite": "/img/npcs/npc_clock_maker.png",
+                  "defaultText": "咔哒，咔哒，机械是绝对精确的。"
+                }
+              ]
+            },
+            {
+              "id": 2,
+              "name": "永恒沙漏",
+              "icon": "⏳",
+              "description": "时间的核心，金色的沙粒在此倒流。",
+              "bgGradient": "linear-gradient(180deg, #663300 0%, #804000 100%)",
+              "backgroundImage": "/img/scenes/eternal-hourglass.png",
+              "maxSpawns": 5,
+              "refreshInterval": 30,
+              "requiredLevel": 60,
+              "wildPets": [
+                {
+                  "petId": 114,
+                  "minLevel": 60,
+                  "maxLevel": 65,
+                  "rate": 100
+                }
+              ],
+              "boss": {
+                "petId": 115,
+                "level": 65,
+                "name": "时光领主·无限",
+                "rate": 100,
+                "essenceId": "electric"
+              },
+              "npcs": [
+                {
+                  "id": "npc_keeper_of_time",
+                  "name": "时间看守",
+                  "x": 40,
+                  "y": 45,
+                  "sprite": "/img/npcs/npc_keeper_of_time.png",
+                  "defaultText": "妄图篡改过去之人，必将受到惩罚。"
                 }
               ]
             }

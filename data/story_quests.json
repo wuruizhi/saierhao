@@ -973,6 +973,426 @@
           }
         }
       ]
+    },
+    "11": {
+      "steps": [
+        {
+          "step": 0,
+          "name": "深空异音",
+          "description": "向【星屑回廊】的观星者询问情况。",
+          "type": "npc_talk",
+          "targetId": "npc_stargazer",
+          "startDialogues": [
+            {
+              "character": "观星者",
+              "avatar": "npc_stargazer",
+              "text": "星尘深处传来了不安的异响，某种古老的黑暗正在苏醒……你去陨石群中收集些星尘碎片，也许能找到线索。"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 1,
+          "name": "清理浮游",
+          "description": "在星屑回廊击败3只星尘浮游，收集星尘碎片。",
+          "type": "battle",
+          "targetId": null,
+          "targetCount": 3,
+          "startDialogues": [],
+          "endDialogues": [],
+          "rewards": {
+            "money": 2000,
+            "exp": 1000
+          }
+        },
+        {
+          "step": 2,
+          "name": "虚空旅人",
+          "description": "前往【陨石荒原】寻找虚空旅人。",
+          "type": "npc_talk",
+          "targetId": "npc_void_walker",
+          "startDialogues": [
+            {
+              "character": "虚空旅人",
+              "avatar": "npc_void_walker",
+              "text": "不好！那是虚空行者的气息！他正试图打开连接虚无的通道，快去陨石荒原阻止他！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "黑洞降临",
+          "description": "在【虚空之眼】击败虚空行者·黑洞。",
+          "type": "boss_battle",
+          "targetId": 103,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "深渊守卫",
+              "avatar": "npc_abyss_guard",
+              "text": "无知的光明……你们终将被虚无的黑洞所吞噬！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "深渊守卫",
+              "avatar": "npc_abyss_guard",
+              "text": "黑洞的引力竟然被……打散了。这不可能……"
+            }
+          ],
+          "rewards": {
+            "money": 5000,
+            "items": {
+              "capsule_ultra": 1
+            }
+          }
+        }
+      ]
+    },
+    "12": {
+      "steps": [
+        {
+          "step": 0,
+          "name": "刺眼之光",
+          "description": "向【晶化谷】的采晶人询问情况。",
+          "type": "npc_talk",
+          "targetId": "npc_crystal_miner",
+          "startDialogues": [
+            {
+              "character": "采晶人",
+              "avatar": "npc_crystal_miner",
+              "text": "这里的棱镜光线越来越刺眼了，似乎是有什么纯粹的光之生物在躁动。去清理一下周围暴走的晶棱角吧。"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 1,
+          "name": "清理棱晶",
+          "description": "击败3只晶棱角，平息暴走的光芒。",
+          "type": "battle",
+          "targetId": null,
+          "targetCount": 3,
+          "startDialogues": [],
+          "endDialogues": [],
+          "rewards": {
+            "money": 2000,
+            "exp": 1000
+          }
+        },
+        {
+          "step": 2,
+          "name": "织光者",
+          "description": "前往【折射迷宫】寻找织光者。",
+          "type": "npc_talk",
+          "targetId": "npc_light_weaver",
+          "startDialogues": [
+            {
+              "character": "织光者",
+              "avatar": "npc_light_weaver",
+              "text": "感谢你平息了光芒。可是，耀光矩阵深处的光辉大天使似乎被某种力量折射出了狂暴的一面，快去看看！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "大天使之怒",
+          "description": "在【耀光矩阵】击败光辉大天使·折射。",
+          "type": "boss_battle",
+          "targetId": 106,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "大天使投影",
+              "avatar": "npc_archangel_projection",
+              "text": "审判之光将净化一切杂质！承受大天使的愤怒吧！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "大天使投影",
+              "avatar": "npc_archangel_projection",
+              "text": "这刺眼的光芒……终于变得柔和了。谢谢你，勇敢的赛尔。"
+            }
+          ],
+          "rewards": {
+            "money": 5000,
+            "items": {
+              "capsule_ultra": 1
+            }
+          }
+        }
+      ]
+    },
+    "13": {
+      "steps": [
+        {
+          "step": 0,
+          "name": "致命瘴气",
+          "description": "向【腐坏沼泽】的沼泽隐士询问情况。",
+          "type": "npc_talk",
+          "targetId": "npc_swamp_hermit",
+          "startDialogues": [
+            {
+              "character": "沼泽隐士",
+              "avatar": "npc_swamp_hermit",
+              "text": "咳咳……沼泽里的毒瘴越来越浓了，连我的防毒面具都快撑不住了。去击退几只变异的污泥怪，让空气流通一下！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 1,
+          "name": "清理污泥",
+          "description": "在腐坏沼泽击退3只污泥怪。",
+          "type": "battle",
+          "targetId": null,
+          "targetCount": 3,
+          "startDialogues": [],
+          "endDialogues": [],
+          "rewards": {
+            "money": 2000,
+            "exp": 1000
+          }
+        },
+        {
+          "step": 2,
+          "name": "变异猎手",
+          "description": "前往【酸雨密林】寻找变异猎手。",
+          "type": "npc_talk",
+          "targetId": "npc_mutant_hunter",
+          "startDialogues": [
+            {
+              "character": "变异猎手",
+              "avatar": "npc_mutant_hunter",
+              "text": "毒瘴的源头是那只古老的‘疫病之源’，它从沉睡中苏醒了！如果不阻止它，整个星球都会化为毒水！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "疫病之源",
+          "description": "在【疫病源头】击败疫病之源·瘟疫。",
+          "type": "boss_battle",
+          "targetId": 109,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "瘟疫医生",
+              "avatar": "npc_plague_doctor",
+              "text": "咕噜咕噜……拥抱这甜美的瘟疫吧……"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "瘟疫医生",
+              "avatar": "npc_plague_doctor",
+              "text": "咳咳……瘟疫……也会有终结的一天吗……"
+            }
+          ],
+          "rewards": {
+            "money": 5000,
+            "items": {
+              "capsule_legend": 1
+            }
+          }
+        }
+      ]
+    },
+    "14": {
+      "steps": [
+        {
+          "step": 0,
+          "name": "无声之哀",
+          "description": "与【寂静荒野】的静默僧侣交流。",
+          "type": "npc_talk",
+          "targetId": "npc_silent_monk",
+          "startDialogues": [
+            {
+              "character": "静默僧侣",
+              "avatar": "npc_silent_monk",
+              "text": "嘘……你听，风中的安魂曲。太悲伤了，连音符精灵们都开始哭泣。去安慰它们一下吧。"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 1,
+          "name": "平息音符",
+          "description": "与3只音符精灵交手，平复它们悲伤的情绪。",
+          "type": "battle",
+          "targetId": null,
+          "targetCount": 3,
+          "startDialogues": [],
+          "endDialogues": [],
+          "rewards": {
+            "money": 2000,
+            "exp": 1000
+          }
+        },
+        {
+          "step": 2,
+          "name": "流浪吟游",
+          "description": "前往【回音山谷】寻找流浪吟游。",
+          "type": "npc_talk",
+          "targetId": "npc_bard",
+          "startDialogues": [
+            {
+              "character": "流浪吟游",
+              "avatar": "npc_bard",
+              "text": "那首绝望安魂曲是由‘夜莺’唱出的……她失去了声音的共鸣，只剩下绝望。用你的战斗唤醒她吧！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "安魂曲之终",
+          "description": "在【协奏圣殿】击败绝望安魂曲·夜莺。",
+          "type": "boss_battle",
+          "targetId": 112,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "疯狂指挥家",
+              "avatar": "npc_maestro",
+              "text": "在这个没有回音的宇宙里……我的歌声……你听得到吗？"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "疯狂指挥家",
+              "avatar": "npc_maestro",
+              "text": "谢谢你……我终于听到了……充满希望的和弦……"
+            }
+          ],
+          "rewards": {
+            "money": 5000,
+            "items": {
+              "capsule_ultra": 1
+            }
+          }
+        }
+      ]
+    },
+    "15": {
+      "steps": [
+        {
+          "step": 0,
+          "name": "时间停滞",
+          "description": "向【停滞钟摆】的时空旅人询问情况。",
+          "type": "npc_talk",
+          "targetId": "npc_time_traveler",
+          "startDialogues": [
+            {
+              "character": "时空旅人",
+              "avatar": "npc_time_traveler",
+              "text": "指针不动了！时间的齿轮卡壳了！发条鼠们到处乱窜，快帮我制止它们，不然整个时空都会崩溃！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 1,
+          "name": "修理齿轮",
+          "description": "击败3只发条鼠，收集散落的齿轮。",
+          "type": "battle",
+          "targetId": null,
+          "targetCount": 3,
+          "startDialogues": [],
+          "endDialogues": [],
+          "rewards": {
+            "money": 2000,
+            "exp": 1000
+          }
+        },
+        {
+          "step": 2,
+          "name": "钟表匠",
+          "description": "前往【齿轮迷城】寻找钟表匠。",
+          "type": "npc_talk",
+          "targetId": "npc_clock_maker",
+          "startDialogues": [
+            {
+              "character": "钟表匠",
+              "avatar": "npc_clock_maker",
+              "text": "这些齿轮是用来修复时间引擎的！但是‘时光领主’已经开启了无限的时间循环，他想把这一刻永远定格！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          }
+        },
+        {
+          "step": 3,
+          "name": "时光重置",
+          "description": "在【永恒沙漏】击败时光领主·无限。",
+          "type": "boss_battle",
+          "targetId": 115,
+          "targetCount": 1,
+          "startDialogues": [
+            {
+              "character": "时间看守",
+              "avatar": "npc_keeper_of_time",
+              "text": "你们的未来充满了毁灭，不如在无限的停滞中享受永恒吧！"
+            }
+          ],
+          "endDialogues": [
+            {
+              "character": "时间看守",
+              "avatar": "npc_keeper_of_time",
+              "text": "时间的齿轮……终于又开始转动了。未来……真的值得期待吗……"
+            }
+          ],
+          "rewards": {
+            "money": 5000,
+            "items": {
+              "capsule_legend": 1
+            }
+          }
+        }
+      ]
     }
   }
 }

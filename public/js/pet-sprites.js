@@ -103,7 +103,22 @@ const PET_TYPE_MAP = {
   "93": "dark",
   "94": "dark",
   "95": "fire",
-  "96": "fire"
+  "96": "fire",
+  "101": "dark",
+  "102": "dark",
+  "103": "dark",
+  "104": "light",
+  "105": "light",
+  "106": "light",
+  "107": "water",
+  "108": "water",
+  "109": "water",
+  "110": "normal",
+  "111": "normal",
+  "112": "normal",
+  "113": "electric",
+  "114": "electric",
+  "115": "electric"
 };
 
 // Lazy loading observer for pet sprites
@@ -167,9 +182,8 @@ function _renderPetSpriteImmediate(container, petId, s) {
   `;
   wrapper.appendChild(glow);
 
-  // Image
   const img = document.createElement('img');
-  img.src = `/img/pets/${petId}.png?v=17`;
+  img.src = `/img/pets/${petId}.png?v=18`;
   img.alt = `Pet ${petId}`;
   img.loading = 'lazy';
   img.style.cssText = `

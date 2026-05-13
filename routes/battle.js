@@ -76,6 +76,11 @@ function createBattleRouter(db, sceneManager) {
       return res.status(400).json({ error: '队伍中没有精灵' });
     }
 
+    const alivePets = teamPets.filter(p => p.current_hp > 0);
+    if (alivePets.length === 0) {
+      return res.status(400).json({ error: '队伍中的精灵已全部力竭，请先恢复体力！' });
+    }
+
     const maxLevel = Math.max(...teamPets.map(p => p.level));
     if (maxLevel < scene.requiredLevel) {
       return res.status(400).json({ error: `需要精灵达到${scene.requiredLevel}级才能探索此场景` });
@@ -111,7 +116,9 @@ function createBattleRouter(db, sceneManager) {
 
     // Store active battle
     const battleId = `pve_${req.userId}_${Date.now()}`;
-    const firstTeamPet = teamPets[0];
+    const firstAliveIndex = teamPets.findIndex(p => p.current_hp > 0);
+    const activeTeamPet = teamPets[firstAliveIndex];
+    
     activeBattles.set(battleId, {
       type: 'pve',
       playerId: player.id,
@@ -119,8 +126,8 @@ function createBattleRouter(db, sceneManager) {
       mapId,
       sceneIndex,
       playerTeam: teamPets,
-      activeTeamIndex: 0,
-      activePet: { ...firstTeamPet, skills: JSON.parse(firstTeamPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null },
+      activeTeamIndex: firstAliveIndex,
+      activePet: { ...activeTeamPet, skills: JSON.parse(activeTeamPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null },
       wildPet,
       wildPetOriginal: { ...wildPet },
       isBoss,
@@ -138,9 +145,9 @@ function createBattleRouter(db, sceneManager) {
         bossName: wildPetData.bossName || null
       },
       playerPet: {
-        ...firstTeamPet,
-        skills: JSON.parse(firstTeamPet.skills),
-        petDef: petsData.pets.find(p => p.id === firstTeamPet.pet_id)
+        ...activeTeamPet,
+        skills: JSON.parse(activeTeamPet.skills),
+        petDef: petsData.pets.find(p => p.id === activeTeamPet.pet_id)
       }
     });
     
@@ -154,8 +161,13 @@ function createBattleRouter(db, sceneManager) {
     if (!battle || battle.userId !== req.userId) {
       return res.status(400).json({ error: '战斗不存在' });
     }
+    const numericSkillId = Number(skillId);
+    const activeSkills = Array.isArray(battle.activePet.skills) ? battle.activePet.skills : JSON.parse(battle.activePet.skills || '[]');
+    if (!Number.isInteger(numericSkillId) || !activeSkills.includes(numericSkillId)) {
+      return res.status(400).json({ error: '该精灵未装备此技能' });
+    }
 
-    const result = executePveTurn(battle.activePet, battle.wildPet, skillId);
+    const result = executePveTurn(battle.activePet, battle.wildPet, numericSkillId);
 
     if (result.battleEnd) {
       if (result.playerWin) {
@@ -275,22 +287,28 @@ function createBattleRouter(db, sceneManager) {
           .run(battle.activePet.id);
 
         // Try next team pet
-        battle.activeTeamIndex++;
-        if (battle.activeTeamIndex < battle.playerTeam.length) {
+        let foundNext = false;
+        while (++battle.activeTeamIndex < battle.playerTeam.length) {
           const nextPet = battle.playerTeam[battle.activeTeamIndex];
           if (nextPet.current_hp > 0) {
             battle.activePet = { ...nextPet, skills: JSON.parse(nextPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null };
-            return res.json({
-              ...result,
-              battleEnd: false,
-              petFainted: true,
-              nextPet: {
-                ...nextPet,
-                skills: JSON.parse(nextPet.skills),
-                petDef: petsData.pets.find(p => p.id === nextPet.pet_id)
-              }
-            });
+            foundNext = true;
+            break;
           }
+        }
+
+        if (foundNext) {
+          const nextPet = battle.activePet;
+          return res.json({
+            ...result,
+            battleEnd: false,
+            petFainted: true,
+            nextPet: {
+              ...nextPet,
+              skills: JSON.parse(nextPet.skills),
+              petDef: petsData.pets.find(p => p.id === nextPet.pet_id)
+            }
+          });
         }
 
         activeBattles.delete(battleId);
@@ -320,6 +338,10 @@ function createBattleRouter(db, sceneManager) {
       return res.status(400).json({ error: '战斗不存在' });
     }
 
+    if (battle.isBoss) {
+      return res.status(400).json({ error: 'Boss级精灵无法被普通捕捉！请击败它以获取精元。' });
+    }
+
     // Check capsule
     if (!capsuleId) {
       return res.status(400).json({ error: '请选择胶囊' });
@@ -338,11 +360,16 @@ function createBattleRouter(db, sceneManager) {
     if (!capsuleItem || capsuleItem.quantity <= 0) {
       return res.status(400).json({ error: `没有${capsuleDef.name}了！去商店购买吧` });
     }
+    const wp = battle.wildPet;
+    const wildPetDef = petsData.pets.find(p => p.id === wp.pet_id);
+    
+    if (wildPetDef && wildPetDef.isBossLine) {
+      return res.status(400).json({ error: '该精灵（Boss或特殊稀有种）无法被胶囊捕捉！' });
+    }
 
     // Consume capsule
     db.prepare('UPDATE player_items SET quantity = quantity - 1 WHERE id = ?').run(capsuleItem.id);
 
-    const wp = battle.wildPet;
     const hpRatio = wp.current_hp / wp.max_hp;
 
     // Capture formula: lower HP = higher chance + capsule bonus
@@ -396,13 +423,46 @@ function createBattleRouter(db, sceneManager) {
       const { chooseEnemySkill, executeAttack } = require('../game/battle-engine');
       const enemySkill = chooseEnemySkill(wp);
       const attackResult = executeAttack(wp, battle.activePet, enemySkill, false);
-
-      res.json({
+      const responseBase = {
         captured: false,
         captureRate,
         capsuleUsed: capsuleDef.name,
         message: `${capsuleDef.name}没能抓住${wp.nickname}！它挣脱了！`,
-        counterAttack: attackResult,
+        counterAttack: attackResult
+      };
+
+      if (battle.activePet.current_hp <= 0) {
+        db.prepare('UPDATE player_pets SET current_hp = 0 WHERE id = ?').run(battle.activePet.id);
+        let nextPet = null;
+        while (++battle.activeTeamIndex < battle.playerTeam.length) {
+          const candidate = battle.playerTeam[battle.activeTeamIndex];
+          if (candidate.current_hp > 0) {
+            nextPet = candidate;
+            break;
+          }
+        }
+
+        if (nextPet) {
+          battle.activePet = { ...nextPet, skills: JSON.parse(nextPet.skills), statusEffects: [], _critRateMult: 1.0, _critUpTurns: 0, _shieldHp: 0, _origStats: null };
+          return res.json({
+            ...responseBase,
+            battleEnd: false,
+            petFainted: true,
+            nextPet: {
+              ...nextPet,
+              skills: JSON.parse(nextPet.skills),
+              petDef: petsData.pets.find(p => p.id === nextPet.pet_id)
+            }
+          });
+        }
+
+        activeBattles.delete(battleId);
+        db.prepare('UPDATE players SET total_battles = total_battles + 1 WHERE id = ?').run(player.id);
+        return res.json({ ...responseBase, battleEnd: true, playerWin: false });
+      }
+
+      res.json({
+        ...responseBase,
         playerPet: {
           ...battle.activePet,
           petDef: petsData.pets.find(p => p.id === battle.activePet.pet_id)

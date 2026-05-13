@@ -8,7 +8,12 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "向对手发射小火球"
+      "description": "向对手发射小火球 [特效: 20%几率使对手灼伤]",
+      "burn": {
+        "turns": 2,
+        "damage": 8,
+        "chance": 0.2
+      }
     },
     {
       "id": 2,
@@ -18,7 +23,7 @@
       "power": 60,
       "accuracy": 95,
       "pp": 20,
-      "description": "燃烧的拳头猛击",
+      "description": "燃烧的拳头猛击 [特效: 20%几率使对手灼伤]",
       "burn": {
         "turns": 2,
         "damage": 8,
@@ -33,7 +38,7 @@
       "power": 80,
       "accuracy": 90,
       "pp": 15,
-      "description": "全身燃烧冲向对手",
+      "description": "全身燃烧冲向对手 [特效: 自身受到15%反弹伤害]",
       "recoil": 0.15
     },
     {
@@ -44,7 +49,7 @@
       "power": 115,
       "accuracy": 85,
       "pp": 5,
-      "description": "释放地狱之火焚烧一切",
+      "description": "释放地狱之火焚烧一切 [特效: 40%几率使对手灼伤]",
       "burn": {
         "turns": 3,
         "damage": 15,
@@ -59,7 +64,11 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "喷射水柱攻击"
+      "description": "喷射水柱攻击 [特效: 16%几率使对手冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.16000000000000003
+      }
     },
     {
       "id": 6,
@@ -69,7 +78,7 @@
       "power": 60,
       "accuracy": 95,
       "pp": 20,
-      "description": "高压水流冲击，可能降低物防",
+      "description": "高压水流冲击，可能降低物防 [特效: 100%几率降低对手物防]",
       "debuff": {
         "stat": "defense",
         "statMult": 0.8,
@@ -84,7 +93,17 @@
       "power": 35,
       "accuracy": 100,
       "pp": 30,
-      "description": "用身体撞击对手"
+      "description": "用身体撞击对手 [特效: 20%几率降低对手物防, 容易击中要害]",
+      "critUp": {
+        "multiplier": 2,
+        "turns": 1
+      },
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.9,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 8,
@@ -94,7 +113,7 @@
       "power": 55,
       "accuracy": 90,
       "pp": 15,
-      "description": "火焰旋涡持续灼烧",
+      "description": "火焰旋涡持续灼烧 [特效: 50%几率使对手灼伤]",
       "burn": {
         "turns": 3,
         "damage": 12,
@@ -109,7 +128,7 @@
       "power": 75,
       "accuracy": 90,
       "pp": 15,
-      "description": "凝聚烈焰的重拳",
+      "description": "凝聚烈焰的重拳 [特效: 30%几率使对手灼伤]",
       "burn": {
         "turns": 2,
         "damage": 10,
@@ -124,7 +143,12 @@
       "power": 90,
       "accuracy": 85,
       "pp": 10,
-      "description": "燃烧双腿发动飞踢"
+      "description": "燃烧双腿发动飞踢 [特效: 15%几率使对手灼伤]",
+      "burn": {
+        "turns": 2,
+        "damage": 18,
+        "chance": 0.15
+      }
     },
     {
       "id": 11,
@@ -134,7 +158,7 @@
       "power": 105,
       "accuracy": 80,
       "pp": 5,
-      "description": "聚集全身火焰终极一击",
+      "description": "聚集全身火焰终极一击 [特效: 自身受到20%反弹伤害]",
       "recoil": 0.2
     },
     {
@@ -145,7 +169,7 @@
       "power": 50,
       "accuracy": 100,
       "pp": 20,
-      "description": "彩色泡沫降低速度",
+      "description": "彩色泡沫降低速度 [特效: 100%几率降低对手速度]",
       "debuff": {
         "stat": "speed",
         "statMult": 0.7,
@@ -160,7 +184,11 @@
       "power": 75,
       "accuracy": 95,
       "pp": 15,
-      "description": "释放强力水波攻击"
+      "description": "释放强力水波攻击 [特效: 12%几率使对手冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.12
+      }
     },
     {
       "id": 14,
@@ -170,7 +198,13 @@
       "power": 90,
       "accuracy": 85,
       "pp": 10,
-      "description": "召唤暴风雨攻击"
+      "description": "召唤暴风雨攻击 [特效: 15%几率降低对手速度]",
+      "debuff": {
+        "stat": "speed",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.15
+      }
     },
     {
       "id": 15,
@@ -180,7 +214,13 @@
       "power": 115,
       "accuracy": 80,
       "pp": 5,
-      "description": "召唤海啸吞噬对手"
+      "description": "召唤海啸吞噬对手 [特效: 10%几率降低对手速度]",
+      "debuff": {
+        "stat": "speed",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.1
+      }
     },
     {
       "id": 16,
@@ -190,7 +230,7 @@
       "power": 100,
       "accuracy": 85,
       "pp": 8,
-      "description": "卷入深海漩涡降低法防",
+      "description": "卷入深海漩涡降低法防 [特效: 100%几率降低对手法防]",
       "debuff": {
         "stat": "spDefense",
         "statMult": 0.7,
@@ -205,7 +245,12 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "用藤蔓抽打对手"
+      "description": "用藤蔓抽打对手 [特效: 20%几率使对手中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.05,
+        "chance": 0.2
+      }
     },
     {
       "id": 18,
@@ -215,7 +260,8 @@
       "power": 60,
       "accuracy": 95,
       "pp": 20,
-      "description": "发射锋利的叶片"
+      "description": "发射锋利的叶片 [特效: 将造成伤害的15%转化为生命值]",
+      "drain": 0.15
     },
     {
       "id": 19,
@@ -225,7 +271,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "吸收阳光恢复30%HP",
+      "description": "吸收阳光恢复30%HP [特效: 恢复30%生命值]",
       "heal": 0.3
     },
     {
@@ -236,7 +282,12 @@
       "power": 80,
       "accuracy": 90,
       "pp": 15,
-      "description": "投掷爆炸种子"
+      "description": "投掷爆炸种子 [特效: 15%几率使对手中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.05,
+        "chance": 0.15
+      }
     },
     {
       "id": 21,
@@ -246,7 +297,7 @@
       "power": 90,
       "accuracy": 90,
       "pp": 10,
-      "description": "巨大叶刃劈斩，高暴击",
+      "description": "巨大叶刃劈斩，高暴击 [特效: 容易击中要害]",
       "critUp": {
         "multiplier": 2.5,
         "turns": 1
@@ -260,7 +311,7 @@
       "power": 115,
       "accuracy": 80,
       "pp": 5,
-      "description": "唤起终极风暴",
+      "description": "唤起终极风暴 [特效: 100%几率使对手中毒]",
       "poison": {
         "turns": 3,
         "hpPercent": 0.06
@@ -274,7 +325,7 @@
       "power": 95,
       "accuracy": 90,
       "pp": 8,
-      "description": "借助大地力量，降低法防",
+      "description": "借助大地力量，降低法防 [特效: 100%几率降低对手法防]",
       "debuff": {
         "stat": "spDefense",
         "statMult": 0.75,
@@ -289,7 +340,12 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "释放电击攻击"
+      "description": "释放电击攻击 [特效: 20%几率使对手麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.5,
+        "chance": 0.2
+      }
     },
     {
       "id": 25,
@@ -299,7 +355,7 @@
       "power": 60,
       "accuracy": 95,
       "pp": 20,
-      "description": "极速电击必先制",
+      "description": "极速电击必先制 [特效: 必定先制]",
       "priority": true
     },
     {
@@ -310,7 +366,7 @@
       "power": 85,
       "accuracy": 90,
       "pp": 15,
-      "description": "释放强力电流",
+      "description": "释放强力电流 [特效: 30%几率使对手麻痹]",
       "paralyze": {
         "turns": 2,
         "speedMult": 0.5,
@@ -325,7 +381,7 @@
       "power": 105,
       "accuracy": 80,
       "pp": 8,
-      "description": "召唤雷电轰击",
+      "description": "召唤雷电轰击 [特效: 40%几率使对手麻痹]",
       "paralyze": {
         "turns": 2,
         "speedMult": 0.4,
@@ -340,7 +396,8 @@
       "power": 125,
       "accuracy": 75,
       "pp": 5,
-      "description": "毁灭电磁风暴"
+      "description": "毁灭电磁风暴 [特效: 自身受到15%反弹伤害]",
+      "recoil": 0.15
     },
     {
       "id": 29,
@@ -350,7 +407,13 @@
       "power": 45,
       "accuracy": 100,
       "pp": 25,
-      "description": "发射光之弹丸"
+      "description": "发射光之弹丸 [特效: 20%几率降低对手物攻]",
+      "debuff": {
+        "stat": "attack",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 30,
@@ -360,7 +423,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "提升物防和法防30%",
+      "description": "提升物防和法防30% [特效: 提升自身物防和法防]",
       "buff": {
         "defense": 1.3,
         "spDefense": 1.3
@@ -374,7 +437,8 @@
       "power": 80,
       "accuracy": 90,
       "pp": 15,
-      "description": "圣光力量冲击"
+      "description": "圣光力量冲击 [特效: 恢复10%生命值]",
+      "heal": 0.1
     },
     {
       "id": 32,
@@ -384,7 +448,7 @@
       "power": 105,
       "accuracy": 85,
       "pp": 8,
-      "description": "天降审判之光",
+      "description": "天降审判之光 [特效: 恢复10%生命值]",
       "heal": 0.1
     },
     {
@@ -395,7 +459,8 @@
       "power": 125,
       "accuracy": 80,
       "pp": 5,
-      "description": "至高圣光终极裁决"
+      "description": "至高圣光终极裁决 [特效: 恢复10%生命值]",
+      "heal": 0.1
     },
     {
       "id": 34,
@@ -405,7 +470,13 @@
       "power": 45,
       "accuracy": 100,
       "pp": 25,
-      "description": "暗影之爪撕裂"
+      "description": "暗影之爪撕裂 [特效: 20%几率降低对手物防]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 35,
@@ -415,7 +486,7 @@
       "power": 65,
       "accuracy": 95,
       "pp": 20,
-      "description": "暗影中发动突袭，必先制",
+      "description": "暗影中发动突袭，必先制 [特效: 必定先制]",
       "priority": true
     },
     {
@@ -426,7 +497,11 @@
       "power": 85,
       "accuracy": 90,
       "pp": 15,
-      "description": "凝聚暗影利刺攻击"
+      "description": "凝聚暗影利刺攻击 [特效: 12%几率使对手眩晕]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.12
+      }
     },
     {
       "id": 37,
@@ -436,7 +511,7 @@
       "power": 105,
       "accuracy": 85,
       "pp": 8,
-      "description": "黑夜笼罩降低命中",
+      "description": "黑夜笼罩降低命中 [特效: 100%几率降低对手物攻]",
       "debuff": {
         "stat": "attack",
         "statMult": 0.7,
@@ -451,7 +526,7 @@
       "power": 125,
       "accuracy": 80,
       "pp": 5,
-      "description": "暗影致命一击",
+      "description": "暗影致命一击 [特效: 将造成伤害的20%转化为生命值]",
       "drain": 0.2
     },
     {
@@ -462,7 +537,7 @@
       "power": 105,
       "accuracy": 90,
       "pp": 8,
-      "description": "聚集天雷必定先制",
+      "description": "聚集天雷必定先制 [特效: 必定先制]",
       "priority": true
     },
     {
@@ -473,7 +548,8 @@
       "power": 135,
       "accuracy": 75,
       "pp": 5,
-      "description": "引发万雷齐鸣的毁灭雷劫"
+      "description": "引发万雷齐鸣的毁灭雷劫 [特效: 自身受到15%反弹伤害]",
+      "recoil": 0.15
     },
     {
       "id": 41,
@@ -483,7 +559,13 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "释放温暖的光芒"
+      "description": "释放温暖的光芒 [特效: 20%几率降低对手物攻]",
+      "debuff": {
+        "stat": "attack",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 42,
@@ -493,7 +575,7 @@
       "power": 130,
       "accuracy": 80,
       "pp": 5,
-      "description": "至高神圣之力，回复20%HP",
+      "description": "至高神圣之力，回复20%HP [特效: 恢复20%生命值]",
       "heal": 0.2
     },
     {
@@ -504,7 +586,13 @@
       "power": 40,
       "accuracy": 100,
       "pp": 25,
-      "description": "暗影缠绕的牙齿撕咬"
+      "description": "暗影缠绕的牙齿撕咬 [特效: 20%几率降低对手物防]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 44,
@@ -514,7 +602,7 @@
       "power": 130,
       "accuracy": 80,
       "pp": 5,
-      "description": "吞噬一切，吸收30%伤害",
+      "description": "吞噬一切，吸收30%伤害 [特效: 将造成伤害的30%转化为生命值]",
       "drain": 0.3
     },
     {
@@ -525,7 +613,7 @@
       "power": 100,
       "accuracy": 85,
       "pp": 8,
-      "description": "小火猴专属·召唤猴王之火",
+      "description": "小火猴专属·召唤猴王之火 [特效: 50%几率使对手灼伤, 提升自身物攻]",
       "burn": {
         "turns": 3,
         "damage": 15,
@@ -543,7 +631,7 @@
       "power": 140,
       "accuracy": 75,
       "pp": 3,
-      "description": "炎帝猩专属·至高火焰，灼烧大地",
+      "description": "炎帝猩专属·至高火焰，灼烧大地 [特效: 60%几率使对手灼伤, 自身受到10%反弹伤害]",
       "burn": {
         "turns": 4,
         "damage": 20,
@@ -559,7 +647,7 @@
       "power": 55,
       "accuracy": 100,
       "pp": 20,
-      "description": "水灵蛙专属·弹射水弹",
+      "description": "水灵蛙专属·弹射水弹 [特效: 100%几率降低对手速度]",
       "debuff": {
         "stat": "speed",
         "statMult": 0.8,
@@ -574,7 +662,7 @@
       "power": 90,
       "accuracy": 90,
       "pp": 10,
-      "description": "碧波蛙专属·水龙卷席卷",
+      "description": "碧波蛙专属·水龙卷席卷 [特效: 100%几率降低对手物防]",
       "debuff": {
         "stat": "defense",
         "statMult": 0.75,
@@ -589,7 +677,7 @@
       "power": 140,
       "accuracy": 75,
       "pp": 3,
-      "description": "海皇蛙专属·深海怒涛毁天灭地",
+      "description": "海皇蛙专属·深海怒涛毁天灭地 [特效: 100%几率降低对手法防]",
       "debuff": {
         "stat": "spDefense",
         "statMult": 0.6,
@@ -604,7 +692,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "叶小芽专属·精灵之舞恢复HP并提升法攻",
+      "description": "叶小芽专属·精灵之舞恢复HP并提升法攻 [特效: 提升自身法攻, 恢复25%生命值]",
       "heal": 0.25,
       "buff": {
         "spAttack": 1.3
@@ -618,7 +706,7 @@
       "power": 90,
       "accuracy": 90,
       "pp": 10,
-      "description": "翠叶龙专属·龙息般的叶刃风暴",
+      "description": "翠叶龙专属·龙息般的叶刃风暴 [特效: 100%几率使对手中毒]",
       "poison": {
         "turns": 2,
         "hpPercent": 0.08
@@ -632,7 +720,7 @@
       "power": 140,
       "accuracy": 75,
       "pp": 3,
-      "description": "森林守护专属·世界树的终极怒吼",
+      "description": "森林守护专属·世界树的终极怒吼 [特效: 100%几率使对手中毒, 提升自身物防和法防]",
       "poison": {
         "turns": 4,
         "hpPercent": 0.1
@@ -650,7 +738,7 @@
       "power": 50,
       "accuracy": 100,
       "pp": 20,
-      "description": "雷电鼠专属·放出可爱电火花",
+      "description": "雷电鼠专属·放出可爱电火花 [特效: 30%几率使对手麻痹]",
       "paralyze": {
         "turns": 2,
         "speedMult": 0.6,
@@ -665,7 +753,7 @@
       "power": 95,
       "accuracy": 90,
       "pp": 10,
-      "description": "雷霆豹专属·闪电般突袭",
+      "description": "雷霆豹专属·闪电般突袭 [特效: 40%几率使对手麻痹, 必定先制]",
       "priority": true,
       "paralyze": {
         "turns": 1,
@@ -681,7 +769,7 @@
       "power": 145,
       "accuracy": 70,
       "pp": 3,
-      "description": "万雷神君专属·天降万雷审判一切",
+      "description": "万雷神君专属·天降万雷审判一切 [特效: 60%几率使对手麻痹]",
       "paralyze": {
         "turns": 3,
         "speedMult": 0.3,
@@ -696,7 +784,17 @@
       "power": 50,
       "accuracy": 100,
       "pp": 99,
-      "description": "无技能可用时的挣扎"
+      "description": "无技能可用时的挣扎 [特效: 20%几率降低对手物防, 容易击中要害]",
+      "critUp": {
+        "multiplier": 2,
+        "turns": 1
+      },
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.9,
+        "turns": 2,
+        "chance": 0.2
+      }
     },
     {
       "id": 62,
@@ -706,7 +804,7 @@
       "power": 55,
       "accuracy": 100,
       "pp": 20,
-      "description": "光羽雀专属·光羽激射",
+      "description": "光羽雀专属·光羽激射 [特效: 提升自身速度]",
       "buff": {
         "speed": 1.15
       }
@@ -719,7 +817,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 8,
-      "description": "光翼天使专属·圣洁光环提升全属性",
+      "description": "光翼天使专属·圣洁光环提升全属性 [特效: 提升自身物攻和物防和法攻和法防]",
       "buff": {
         "attack": 1.2,
         "defense": 1.2,
@@ -735,7 +833,7 @@
       "power": 145,
       "accuracy": 70,
       "pp": 3,
-      "description": "圣光大天使专属·神圣天罚净化一切",
+      "description": "圣光大天使专属·神圣天罚净化一切 [特效: 恢复25%生命值, 清除自身所有负面状态]",
       "heal": 0.25,
       "clearDebuff": true
     },
@@ -747,7 +845,7 @@
       "power": 50,
       "accuracy": 100,
       "pp": 20,
-      "description": "暗影蝠专属·吸血咬击",
+      "description": "暗影蝠专属·吸血咬击 [特效: 将造成伤害的25%转化为生命值]",
       "drain": 0.25
     },
     {
@@ -758,9 +856,9 @@
       "power": 90,
       "accuracy": 90,
       "pp": 10,
-      "description": "暗影刺客专属·影刃连续斩击",
+      "description": "暗影刺客专属·影刃连续斩击 [特效: 容易击中要害]",
       "critUp": {
-        "multiplier": 3.0,
+        "multiplier": 3,
         "turns": 1
       }
     },
@@ -772,7 +870,7 @@
       "power": 145,
       "accuracy": 70,
       "pp": 3,
-      "description": "深渊魔君专属·虚无吞噬万物",
+      "description": "深渊魔君专属·虚无吞噬万物 [特效: 100%几率降低对手法防, 将造成伤害的35%转化为生命值]",
       "drain": 0.35,
       "debuff": {
         "stat": "spDefense",
@@ -788,7 +886,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "硬化身体大幅提升物防",
+      "description": "硬化身体大幅提升物防 [特效: 提升自身物防]",
       "buff": {
         "defense": 1.5
       }
@@ -801,7 +899,8 @@
       "power": 70,
       "accuracy": 100,
       "pp": 15,
-      "description": "释放龙族怒焰"
+      "description": "释放龙族怒焰 [特效: 必定先制]",
+      "priority": true
     },
     {
       "id": 72,
@@ -811,7 +910,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "极速移动大幅提升速度",
+      "description": "极速移动大幅提升速度 [特效: 提升自身速度]",
       "buff": {
         "speed": 1.5
       }
@@ -824,7 +923,7 @@
       "power": 0,
       "accuracy": 90,
       "pp": 10,
-      "description": "释放剧毒",
+      "description": "释放剧毒 [特效: 100%几率使对手中毒]",
       "poison": {
         "turns": 4,
         "hpPercent": 0.1
@@ -838,7 +937,7 @@
       "power": 70,
       "accuracy": 95,
       "pp": 15,
-      "description": "冰冻射线可能冻住对手",
+      "description": "冰冻射线可能冻住对手 [特效: 30%几率使对手冰冻]",
       "freeze": {
         "turns": 2,
         "chance": 0.3
@@ -852,7 +951,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 8,
-      "description": "烈焰净化清除负面状态并回复",
+      "description": "烈焰净化清除负面状态并回复 [特效: 恢复20%生命值, 清除自身所有负面状态]",
       "heal": 0.2,
       "clearDebuff": true
     },
@@ -864,7 +963,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "蓄力提升物攻和法攻",
+      "description": "蓄力提升物攻和法攻 [特效: 提升自身物攻和法攻]",
       "buff": {
         "attack": 1.4,
         "spAttack": 1.4
@@ -878,7 +977,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "咆哮降低对手物攻",
+      "description": "咆哮降低对手物攻 [特效: 100%几率降低对手物攻]",
       "debuff": {
         "stat": "attack",
         "statMult": 0.7,
@@ -893,7 +992,7 @@
       "power": 0,
       "accuracy": 80,
       "pp": 8,
-      "description": "催眠对手使其眩晕",
+      "description": "催眠对手使其眩晕 [特效: 100%几率使对手眩晕]",
       "stun": {
         "turns": 1
       }
@@ -906,12 +1005,12 @@
       "power": 0,
       "accuracy": 100,
       "pp": 8,
-      "description": "提升速度和暴击率",
+      "description": "提升速度和暴击率 [特效: 提升自身速度, 容易击中要害]",
       "buff": {
         "speed": 1.3
       },
       "critUp": {
-        "multiplier": 2.0,
+        "multiplier": 2,
         "turns": 3
       }
     },
@@ -923,11 +1022,11 @@
       "power": 0,
       "accuracy": 90,
       "pp": 15,
-      "description": "释放电磁波使对手麻痹",
+      "description": "释放电磁波使对手麻痹 [特效: 100%几率使对手麻痹]",
       "paralyze": {
         "turns": 3,
         "speedMult": 0.4,
-        "chance": 1.0
+        "chance": 1
       }
     },
     {
@@ -938,7 +1037,7 @@
       "power": 90,
       "accuracy": 95,
       "pp": 15,
-      "description": "释放强力冰霜",
+      "description": "释放强力冰霜 [特效: 20%几率使对手冰冻]",
       "freeze": {
         "turns": 2,
         "chance": 0.2
@@ -952,7 +1051,7 @@
       "power": 120,
       "accuracy": 80,
       "pp": 10,
-      "description": "发射极光束",
+      "description": "发射极光束 [特效: 30%几率使对手冰冻]",
       "freeze": {
         "turns": 3,
         "chance": 0.3
@@ -966,7 +1065,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "冰雪铠甲",
+      "description": "冰雪铠甲 [特效: 提升自身物防和法防]",
       "buff": {
         "defense": 1.5,
         "spDefense": 1.5
@@ -980,7 +1079,7 @@
       "power": 150,
       "accuracy": 75,
       "pp": 5,
-      "description": "极光冰麟专属·冰雪风暴",
+      "description": "极光冰麟专属·冰雪风暴 [特效: 50%几率使对手冰冻]",
       "freeze": {
         "turns": 3,
         "chance": 0.5
@@ -994,7 +1093,7 @@
       "power": 75,
       "accuracy": 95,
       "pp": 15,
-      "description": "急冻的拳头",
+      "description": "急冻的拳头 [特效: 20%几率使对手冰冻]",
       "freeze": {
         "turns": 1,
         "chance": 0.2
@@ -1008,7 +1107,13 @@
       "power": 100,
       "accuracy": 90,
       "pp": 10,
-      "description": "粉碎坚冰的重击"
+      "description": "粉碎坚冰的重击 [特效: 10%几率降低对手速度]",
+      "debuff": {
+        "stat": "speed",
+        "statMult": 0.8,
+        "turns": 2,
+        "chance": 0.1
+      }
     },
     {
       "id": 87,
@@ -1018,7 +1123,7 @@
       "power": 90,
       "accuracy": 90,
       "pp": 15,
-      "description": "召唤沙暴",
+      "description": "召唤沙暴 [特效: 30%几率使对手灼伤]",
       "burn": {
         "turns": 3,
         "damage": 10,
@@ -1033,7 +1138,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "展开炎沙领域",
+      "description": "展开炎沙领域 [特效: 提升自身物攻和法攻]",
       "buff": {
         "attack": 1.3,
         "spAttack": 1.3
@@ -1047,7 +1152,7 @@
       "power": 150,
       "accuracy": 75,
       "pp": 5,
-      "description": "炎沙暴龙专属·焚毁一切的沙暴",
+      "description": "炎沙暴龙专属·焚毁一切的沙暴 [特效: 50%几率使对手灼伤]",
       "burn": {
         "turns": 4,
         "damage": 20,
@@ -1062,7 +1167,8 @@
       "power": 40,
       "accuracy": 100,
       "pp": 30,
-      "description": "发射尖刺"
+      "description": "发射尖刺 [特效: 将造成伤害的15%转化为生命值]",
+      "drain": 0.15
     },
     {
       "id": 91,
@@ -1072,7 +1178,12 @@
       "power": 110,
       "accuracy": 85,
       "pp": 10,
-      "description": "巨大的地刺攻击"
+      "description": "巨大的地刺攻击 [特效: 10%几率使对手中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.05,
+        "chance": 0.1
+      }
     },
     {
       "id": 92,
@@ -1082,7 +1193,8 @@
       "power": 95,
       "accuracy": 100,
       "pp": 15,
-      "description": "发出梦幻的光波"
+      "description": "发出梦幻的光波 [特效: 恢复10%生命值]",
+      "heal": 0.1
     },
     {
       "id": 93,
@@ -1092,7 +1204,7 @@
       "power": 150,
       "accuracy": 80,
       "pp": 5,
-      "description": "虹光梦凤专属·梦境审判",
+      "description": "虹光梦凤专属·梦境审判 [特效: 恢复20%生命值]",
       "heal": 0.2
     },
     {
@@ -1103,7 +1215,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "隐入迷雾",
+      "description": "隐入迷雾 [特效: 提升自身速度]",
       "buff": {
         "speed": 1.5
       }
@@ -1116,7 +1228,7 @@
       "power": 100,
       "accuracy": 85,
       "pp": 10,
-      "description": "降下厄运",
+      "description": "降下厄运 [特效: 100%几率降低对手物攻]",
       "debuff": {
         "stat": "attack",
         "statMult": 0.5,
@@ -1131,7 +1243,12 @@
       "power": 85,
       "accuracy": 95,
       "pp": 15,
-      "description": "高速旋转的齿轮"
+      "description": "高速旋转的齿轮 [特效: 15%几率使对手麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.5,
+        "chance": 0.15
+      }
     },
     {
       "id": 97,
@@ -1141,7 +1258,7 @@
       "power": 150,
       "accuracy": 75,
       "pp": 5,
-      "description": "量子机神专属·高能爆破",
+      "description": "量子机神专属·高能爆破 [特效: 50%几率使对手麻痹]",
       "paralyze": {
         "turns": 2,
         "speedMult": 0.4,
@@ -1156,7 +1273,7 @@
       "power": 0,
       "accuracy": 100,
       "pp": 10,
-      "description": "深渊的凝视",
+      "description": "深渊的凝视 [特效: 100%几率降低对手物防]",
       "debuff": {
         "stat": "defense",
         "statMult": 0.5,
@@ -1171,7 +1288,7 @@
       "power": 160,
       "accuracy": 70,
       "pp": 3,
-      "description": "深渊冥龙专属·毁灭一切的龙息",
+      "description": "深渊冥龙专属·毁灭一切的龙息 [特效: 将造成伤害的30%转化为生命值]",
       "drain": 0.3
     },
     {
@@ -1182,7 +1299,729 @@
       "power": 110,
       "accuracy": 90,
       "pp": 10,
-      "description": "夹杂暗影的火焰"
+      "description": "夹杂暗影的火焰 [特效: 10%几率使对手灼伤]",
+      "burn": {
+        "turns": 2,
+        "damage": 22,
+        "chance": 0.1
+      }
+    },
+    {
+      "id": 101,
+      "name": "星尘冲击",
+      "type": "dark",
+      "category": "special",
+      "power": 55,
+      "accuracy": 100,
+      "pp": 20,
+      "description": "星尘浮游专属·星尘能量冲击 [特效: 16%几率使对手眩晕]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.16000000000000003
+      }
+    },
+    {
+      "id": 102,
+      "name": "吞噬漩涡",
+      "type": "dark",
+      "category": "special",
+      "power": 90,
+      "accuracy": 95,
+      "pp": 10,
+      "description": "深渊吞噬者专属·产生吞噬漩涡，吸收伤害的20% [特效: 将造成伤害的20%转化为生命值]",
+      "drain": 0.2
+    },
+    {
+      "id": 103,
+      "name": "黑洞湮灭",
+      "type": "dark",
+      "category": "special",
+      "power": 140,
+      "accuracy": 80,
+      "pp": 5,
+      "description": "虚空行者专属·释放黑洞湮灭一切，可能降低敌方速度 [特效: 100%几率降低对手速度]",
+      "debuff": {
+        "stat": "speed",
+        "statMult": 0.6,
+        "turns": 3
+      }
+    },
+    {
+      "id": 104,
+      "name": "棱镜折射",
+      "type": "light",
+      "category": "special",
+      "power": 55,
+      "accuracy": 100,
+      "pp": 20,
+      "description": "晶棱角专属·折射出耀眼光芒，提升自身防御 [特效: 提升自身物防]",
+      "buff": {
+        "defense": 1.2
+      }
+    },
+    {
+      "id": 105,
+      "name": "七彩光束",
+      "type": "light",
+      "category": "special",
+      "power": 90,
+      "accuracy": 95,
+      "pp": 10,
+      "description": "闪耀棱柱专属·七彩光束轰击，可能降低敌方攻击 [特效: 100%几率降低对手物攻]",
+      "debuff": {
+        "stat": "attack",
+        "statMult": 0.8,
+        "turns": 2
+      }
+    },
+    {
+      "id": 106,
+      "name": "大天使之耀",
+      "type": "light",
+      "category": "special",
+      "power": 140,
+      "accuracy": 80,
+      "pp": 5,
+      "description": "光辉大天使专属·绽放天使之耀，恢复自身20%HP [特效: 恢复20%生命值]",
+      "heal": 0.2
+    },
+    {
+      "id": 107,
+      "name": "剧毒污泥",
+      "type": "water",
+      "category": "special",
+      "power": 55,
+      "accuracy": 100,
+      "pp": 20,
+      "description": "污泥怪专属·喷射剧毒污泥 [特效: 100%几率使对手中毒]",
+      "poison": {
+        "turns": 2,
+        "hpPercent": 0.05
+      }
+    },
+    {
+      "id": 108,
+      "name": "沼泽地狱",
+      "type": "water",
+      "category": "special",
+      "power": 90,
+      "accuracy": 90,
+      "pp": 10,
+      "description": "剧毒沼王专属·将敌人拖入沼泽 [特效: 100%几率使对手中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.08
+      }
+    },
+    {
+      "id": 109,
+      "name": "瘟疫爆发",
+      "type": "water",
+      "category": "special",
+      "power": 140,
+      "accuracy": 80,
+      "pp": 5,
+      "description": "疫病之源专属·爆发恐怖瘟疫，剧毒侵蚀 [特效: 100%几率使对手中毒]",
+      "poison": {
+        "turns": 5,
+        "hpPercent": 0.12
+      }
+    },
+    {
+      "id": 110,
+      "name": "催眠之音",
+      "type": "normal",
+      "category": "status",
+      "power": 0,
+      "accuracy": 90,
+      "pp": 15,
+      "description": "音符精灵专属·催眠音符，使敌方麻痹 [特效: 100%几率使对手麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.5,
+        "chance": 1
+      }
+    },
+    {
+      "id": 111,
+      "name": "幻音震荡",
+      "type": "normal",
+      "category": "special",
+      "power": 90,
+      "accuracy": 100,
+      "pp": 10,
+      "description": "幻音歌者专属·强烈音波震荡，降低敌方防御 [特效: 100%几率降低对手物防]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.7,
+        "turns": 3
+      }
+    },
+    {
+      "id": 112,
+      "name": "绝望安魂曲",
+      "type": "normal",
+      "category": "special",
+      "power": 140,
+      "accuracy": 80,
+      "pp": 5,
+      "description": "夜莺专属·吟唱绝望的安魂曲，吸收伤害30% [特效: 将造成伤害的30%转化为生命值]",
+      "drain": 0.3
+    },
+    {
+      "id": 113,
+      "name": "齿轮撞击",
+      "type": "electric",
+      "category": "physical",
+      "power": 60,
+      "accuracy": 100,
+      "pp": 20,
+      "description": "发条鼠专属·高速齿轮撞击 [特效: 20%几率使对手麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.5,
+        "chance": 0.2
+      }
+    },
+    {
+      "id": 114,
+      "name": "机械压制",
+      "type": "electric",
+      "category": "physical",
+      "power": 95,
+      "accuracy": 90,
+      "pp": 10,
+      "description": "齿轮巨兵专属·重型机械压制，必定先制 [特效: 必定先制]",
+      "priority": true
+    },
+    {
+      "id": 115,
+      "name": "时间停止",
+      "type": "electric",
+      "category": "special",
+      "power": 140,
+      "accuracy": 75,
+      "pp": 5,
+      "description": "时光领主专属·停止时间流动，使敌方严重麻痹 [特效: 80%几率使对手麻痹]",
+      "paralyze": {
+        "turns": 3,
+        "speedMult": 0.2,
+        "chance": 0.8
+      }
+    },
+    {
+      "id": 116,
+      "name": "焰龙雏爆裂",
+      "type": "fire",
+      "category": "physical",
+      "power": 80,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "焰龙雏专属·引动天地之力的独门绝技 [特效: 必定先制攻击]",
+      "priority": true
+    },
+    {
+      "id": 117,
+      "name": "烈焰巨龙爆裂",
+      "type": "fire",
+      "category": "physical",
+      "power": 127,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "烈焰巨龙专属·引动天地之力的独门绝技 [特效: 50%几率使对手深度麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.3,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 118,
+      "name": "苍翠古木真诀",
+      "type": "grass",
+      "category": "special",
+      "power": 153,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "苍翠古木专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 119,
+      "name": "九尾炎狐惩戒",
+      "type": "fire",
+      "category": "physical",
+      "power": 80,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "九尾炎狐专属·引动天地之力的独门绝技 [特效: 必定先制攻击]",
+      "priority": true
+    },
+    {
+      "id": 120,
+      "name": "地火玄武真诀",
+      "type": "fire",
+      "category": "physical",
+      "power": 97,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "地火玄武专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
+    },
+    {
+      "id": 121,
+      "name": "水泡鱼风暴",
+      "type": "water",
+      "category": "physical",
+      "power": 93,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "水泡鱼专属·引动天地之力的独门绝技 [特效: 40%几率大幅降低对手防御]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.5,
+        "turns": 2,
+        "chance": 0.4
+      }
+    },
+    {
+      "id": 122,
+      "name": "蓝宝石审判",
+      "type": "water",
+      "category": "physical",
+      "power": 104,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "蓝宝石专属·引动天地之力的独门绝技 [特效: 恢复自身20%最大生命值]",
+      "heal": 0.2
+    },
+    {
+      "id": 123,
+      "name": "冰灵贝怒吼",
+      "type": "water",
+      "category": "special",
+      "power": 153,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "冰灵贝专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 124,
+      "name": "极寒之主审判",
+      "type": "water",
+      "category": "physical",
+      "power": 104,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "极寒之主专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
+    },
+    {
+      "id": 125,
+      "name": "藤蔓蛇惩戒",
+      "type": "grass",
+      "category": "special",
+      "power": 115,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "藤蔓蛇专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
+    },
+    {
+      "id": 126,
+      "name": "青叶蟒真诀",
+      "type": "grass",
+      "category": "physical",
+      "power": 98,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "青叶蟒专属·引动天地之力的独门绝技 [特效: 50%几率使对手深度中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.1,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 127,
+      "name": "花骨朵审判",
+      "type": "grass",
+      "category": "physical",
+      "power": 123,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "花骨朵专属·引动天地之力的独门绝技 [特效: 30%几率使对手绝对冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.3
+      }
+    },
+    {
+      "id": 128,
+      "name": "荆棘花爆裂",
+      "type": "grass",
+      "category": "special",
+      "power": 99,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "荆棘花专属·引动天地之力的独门绝技 [特效: 将造成伤害的30%转化为自身生命值]",
+      "drain": 0.3
+    },
+    {
+      "id": 129,
+      "name": "闪电魔方奥义",
+      "type": "electric",
+      "category": "physical",
+      "power": 95,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "闪电魔方专属·引动天地之力的独门绝技 [特效: 50%几率使对手严重灼伤]",
+      "burn": {
+        "turns": 3,
+        "damage": 20,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 130,
+      "name": "雷电矩阵奥义",
+      "type": "electric",
+      "category": "physical",
+      "power": 129,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "雷电矩阵专属·引动天地之力的独门绝技 [特效: 30%几率使对手绝对冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.3
+      }
+    },
+    {
+      "id": 131,
+      "name": "光斑守护",
+      "type": "light",
+      "category": "physical",
+      "power": 80,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "光斑专属·引动天地之力的独门绝技 [特效: 必定先制攻击]",
+      "priority": true
+    },
+    {
+      "id": 132,
+      "name": "波波审判",
+      "type": "normal",
+      "category": "special",
+      "power": 128,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "波波专属·引动天地之力的独门绝技 [特效: 40%几率大幅降低对手防御]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.5,
+        "turns": 2,
+        "chance": 0.4
+      }
+    },
+    {
+      "id": 133,
+      "name": "大比鸟真诀",
+      "type": "normal",
+      "category": "special",
+      "power": 128,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "大比鸟专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
+    },
+    {
+      "id": 134,
+      "name": "龙卷战鹰守护",
+      "type": "normal",
+      "category": "special",
+      "power": 124,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "龙卷战鹰专属·引动天地之力的独门绝技 [特效: 50%几率使对手严重灼伤]",
+      "burn": {
+        "turns": 3,
+        "damage": 20,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 135,
+      "name": "冰晶鹿审判",
+      "type": "water",
+      "category": "special",
+      "power": 98,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "冰晶鹿专属·引动天地之力的独门绝技 [特效: 30%几率使对手绝对冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.3
+      }
+    },
+    {
+      "id": 136,
+      "name": "沙蜥绝息",
+      "type": "fire",
+      "category": "physical",
+      "power": 127,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "沙蜥专属·引动天地之力的独门绝技 [特效: 50%几率使对手深度麻痹]",
+      "paralyze": {
+        "turns": 2,
+        "speedMult": 0.3,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 137,
+      "name": "梦蝶真诀",
+      "type": "light",
+      "category": "special",
+      "power": 106,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "梦蝶专属·引动天地之力的独门绝技 [特效: 50%几率使对手深度中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.1,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 138,
+      "name": "齿轮鼠风暴",
+      "type": "electric",
+      "category": "physical",
+      "power": 80,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "齿轮鼠专属·引动天地之力的独门绝技 [特效: 必定先制攻击]",
+      "priority": true
+    },
+    {
+      "id": 139,
+      "name": "熔岩蛇审判",
+      "type": "dark",
+      "category": "physical",
+      "power": 127,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "熔岩蛇专属·引动天地之力的独门绝技 [特效: 将造成伤害的30%转化为自身生命值]",
+      "drain": 0.3
+    },
+    {
+      "id": 140,
+      "name": "霜角麋之魂",
+      "type": "water",
+      "category": "special",
+      "power": 125,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "霜角麋专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
+    },
+    {
+      "id": 141,
+      "name": "雪原兔怒吼",
+      "type": "water",
+      "category": "physical",
+      "power": 121,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "雪原兔专属·引动天地之力的独门绝技 [特效: 将造成伤害的30%转化为自身生命值]",
+      "drain": 0.3
+    },
+    {
+      "id": 142,
+      "name": "冰原战兔风暴",
+      "type": "water",
+      "category": "special",
+      "power": 129,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "冰原战兔专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 143,
+      "name": "烈沙龙蜥守护",
+      "type": "fire",
+      "category": "special",
+      "power": 96,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "烈沙龙蜥专属·引动天地之力的独门绝技 [特效: 30%几率使对手绝对冰冻]",
+      "freeze": {
+        "turns": 1,
+        "chance": 0.3
+      }
+    },
+    {
+      "id": 144,
+      "name": "仙人球守护",
+      "type": "grass",
+      "category": "special",
+      "power": 102,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "仙人球专属·引动天地之力的独门绝技 [特效: 50%几率使对手严重灼伤]",
+      "burn": {
+        "turns": 3,
+        "damage": 20,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 145,
+      "name": "沙棘巨人爆裂",
+      "type": "grass",
+      "category": "special",
+      "power": 108,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "沙棘巨人专属·引动天地之力的独门绝技 [特效: 40%几率大幅降低对手防御]",
+      "debuff": {
+        "stat": "defense",
+        "statMult": 0.5,
+        "turns": 2,
+        "chance": 0.4
+      }
+    },
+    {
+      "id": 146,
+      "name": "幻彩蛾奥义",
+      "type": "light",
+      "category": "special",
+      "power": 128,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "幻彩蛾专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 147,
+      "name": "迷雾精惩戒",
+      "type": "dark",
+      "category": "special",
+      "power": 96,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "迷雾精专属·引动天地之力的独门绝技 [特效: 50%几率使对手严重灼伤]",
+      "burn": {
+        "turns": 3,
+        "damage": 20,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 148,
+      "name": "幻境巫师真诀",
+      "type": "dark",
+      "category": "special",
+      "power": 127,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "幻境巫师专属·引动天地之力的独门绝技 [特效: 50%几率使对手严重灼伤]",
+      "burn": {
+        "turns": 3,
+        "damage": 20,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 149,
+      "name": "钢铁巨鼠奥义",
+      "type": "electric",
+      "category": "special",
+      "power": 124,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "钢铁巨鼠专属·引动天地之力的独门绝技 [特效: 恢复自身20%最大生命值]",
+      "heal": 0.2
+    },
+    {
+      "id": 150,
+      "name": "电路虫之魂",
+      "type": "electric",
+      "category": "physical",
+      "power": 132,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "电路虫专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 151,
+      "name": "芯片蜂绝息",
+      "type": "electric",
+      "category": "special",
+      "power": 91,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "芯片蜂专属·引动天地之力的独门绝技 [特效: 50%几率使对手深度中毒]",
+      "poison": {
+        "turns": 3,
+        "hpPercent": 0.1,
+        "chance": 0.5
+      }
+    },
+    {
+      "id": 152,
+      "name": "地裂巨蟒惩戒",
+      "type": "dark",
+      "category": "special",
+      "power": 150,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "地裂巨蟒专属·引动天地之力的独门绝技 [特效: 自身承受20%反弹伤害]",
+      "recoil": 0.2
+    },
+    {
+      "id": 153,
+      "name": "灰烬蝙蝠惩戒",
+      "type": "fire",
+      "category": "special",
+      "power": 113,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "灰烬蝙蝠专属·引动天地之力的独门绝技 [特效: 恢复自身20%最大生命值]",
+      "heal": 0.2
+    },
+    {
+      "id": 154,
+      "name": "暗焰魔翼怒吼",
+      "type": "fire",
+      "category": "special",
+      "power": 107,
+      "accuracy": 95,
+      "pp": 5,
+      "description": "暗焰魔翼专属·引动天地之力的独门绝技 [特效: 25%几率使对手眩晕一回合]",
+      "stun": {
+        "turns": 1,
+        "chance": 0.25
+      }
     }
   ]
 }

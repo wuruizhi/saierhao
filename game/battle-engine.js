@@ -51,8 +51,8 @@ function calculateDamage(attacker, defender, skill) {
   return { damage: Math.max(1, damage), critical, typeMultiplier };
 }
 
-// Process status effects at turn start (burn, poison damage)
-function processTurnStartStatus(pet) {
+// Process status effects at turn start (burn, poison damage, drain)
+function processTurnStartStatus(pet, otherPet = null) {
   const messages = [];
   if (!pet.statusEffects) return messages;
 
@@ -66,6 +66,15 @@ function processTurnStartStatus(pet) {
       const dmg = Math.floor(pet.max_hp * (effect.hpPercent || 0.08));
       pet.current_hp = Math.max(0, pet.current_hp - dmg);
       messages.push(`${pet.nickname}中毒了，受到${dmg}点伤害！`);
+    }
+    if (effect.type === 'drain') {
+      const dmg = Math.floor(pet.max_hp * (effect.hpPercent || 0.125));
+      pet.current_hp = Math.max(0, pet.current_hp - dmg);
+      messages.push(`${pet.nickname}被寄生了，流失了${dmg}点HP！`);
+      if (otherPet && otherPet.current_hp > 0) {
+        otherPet.current_hp = Math.min(otherPet.max_hp, otherPet.current_hp + dmg);
+        messages.push(`${otherPet.nickname}吸取了${dmg}点HP！`);
+      }
     }
   }
   return messages;
@@ -154,8 +163,14 @@ function getOriginalStat(pet, stat) {
 }
 
 function executePveTurn(playerPet, enemyPet, playerSkillId) {
+  // Validate that pet knows the skill
+  const knownSkills = Array.isArray(playerPet.skills) ? playerPet.skills : JSON.parse(playerPet.skills || '[]');
+  if (!knownSkills.includes(playerSkillId)) {
+    return { battleEnd: false, error: '非法操作：精灵未学会该技能！' };
+  }
+
   const skill = skillsData.skills.find(s => s.id === playerSkillId);
-  if (!skill) return { error: '技能不存在' };
+  if (!skill) return { battleEnd: false, error: '技能不存在' };
 
   const results = [];
 
@@ -170,8 +185,8 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   ensureOrigStats(enemyPet);
 
   // ---- TURN START: Process status effects ----
-  const playerStartMsgs = processTurnStartStatus(playerPet);
-  const enemyStartMsgs = processTurnStartStatus(enemyPet);
+  const playerStartMsgs = processTurnStartStatus(playerPet, enemyPet);
+  const enemyStartMsgs = processTurnStartStatus(enemyPet, playerPet);
   [...playerStartMsgs, ...enemyStartMsgs].forEach(msg => {
     results.push({ isPlayerAttacking: null, skillName: null, message: msg, statusEffect: true });
   });
@@ -209,9 +224,11 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   } else {
     const result1 = executeAttack(attacker1, defender1, skill1, isPlayer1);
     results.push(result1);
-    if (defender1.current_hp <= 0) {
-      return { results, playerPet, enemyPet, battleEnd: true, playerWin: isPlayer1 };
-    }
+  }
+
+  let battleEndEarly = playerPet.current_hp <= 0 || enemyPet.current_hp <= 0;
+  if (battleEndEarly) {
+    return { results, playerPet, enemyPet, battleEnd: true, playerWin: enemyPet.current_hp <= 0 };
   }
 
   // Second attack
@@ -257,7 +274,11 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
     ensureOrigStats(attacker);
     for (const [stat, multiplier] of Object.entries(skill.buff)) {
       const dbStat = stat === 'spAttack' ? 'sp_attack' : stat === 'spDefense' ? 'sp_defense' : stat;
-      attacker[dbStat] = Math.floor(attacker[dbStat] * multiplier);
+      const baseStat = getOriginalStat(attacker, dbStat);
+      if (attacker[dbStat] < baseStat * 4) {
+        attacker[dbStat] = Math.floor(attacker[dbStat] * multiplier);
+        if (attacker[dbStat] > baseStat * 4) attacker[dbStat] = Math.floor(baseStat * 4);
+      }
     }
   }
 
@@ -265,8 +286,8 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   let shieldMsg = '';
   if (skill.shield) {
     const shieldHp = Math.floor(attacker.max_hp * skill.shield.hpPercent);
-    attacker._shieldHp = (attacker._shieldHp || 0) + shieldHp;
-    shieldMsg = ` 获得了${shieldHp}点护盾！`;
+    attacker._shieldHp = Math.min(attacker.max_hp, (attacker._shieldHp || 0) + shieldHp);
+    shieldMsg = ` 获得了护盾！`;
   }
 
   // Apply critUp to self
@@ -402,11 +423,20 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
 
 function applyDebuff(defender, skill) {
   if (!skill.debuff) return;
+  if (skill.debuff.chance !== undefined && Math.random() >= skill.debuff.chance) return;
+  
   ensureOrigStats(defender);
   const { stat, statMult, turns } = skill.debuff;
   const dbStat = stat === 'spAttack' ? 'sp_attack' : stat === 'spDefense' ? 'sp_defense' : stat;
-  defender[dbStat] = Math.floor(defender[dbStat] * statMult);
+  
   if (!defender.statusEffects) defender.statusEffects = [];
+  const existing = defender.statusEffects.find(e => e.type === 'debuff' && e.stat === dbStat);
+  if (existing) {
+    existing.turns = Math.max(existing.turns, turns || 3);
+    return;
+  }
+  
+  defender[dbStat] = Math.floor(defender[dbStat] * statMult);
   defender.statusEffects.push({ type: 'debuff', stat: dbStat, turns: turns || 3 });
 }
 
@@ -415,20 +445,33 @@ function applyStatusEffect(defender, skill) {
   ensureOrigStats(defender);
 
   if (skill.burn && shouldApplyEffect(skill.burn)) {
-    defender.statusEffects.push({ type: 'burn', turns: skill.burn.turns, damage: skill.burn.damage });
+    const existing = defender.statusEffects.find(e => e.type === 'burn');
+    if (existing) existing.turns = Math.max(existing.turns, skill.burn.turns);
+    else defender.statusEffects.push({ type: 'burn', turns: skill.burn.turns, damage: skill.burn.damage });
   }
   if (skill.freeze && shouldApplyEffect(skill.freeze)) {
-    defender.statusEffects.push({ type: 'freeze', turns: skill.freeze.turns, chance: skill.freeze.skipChance ?? 0.5 });
+    const existing = defender.statusEffects.find(e => e.type === 'freeze');
+    if (existing) existing.turns = Math.max(existing.turns, skill.freeze.turns);
+    else defender.statusEffects.push({ type: 'freeze', turns: skill.freeze.turns, chance: skill.freeze.skipChance ?? 0.5 });
   }
   if (skill.poison && shouldApplyEffect(skill.poison)) {
-    defender.statusEffects.push({ type: 'poison', turns: skill.poison.turns, hpPercent: skill.poison.hpPercent });
+    const existing = defender.statusEffects.find(e => e.type === 'poison');
+    if (existing) existing.turns = Math.max(existing.turns, skill.poison.turns);
+    else defender.statusEffects.push({ type: 'poison', turns: skill.poison.turns, hpPercent: skill.poison.hpPercent });
   }
   if (skill.paralyze && shouldApplyEffect(skill.paralyze)) {
-    defender.speed = Math.floor(defender.speed * skill.paralyze.speedMult);
-    defender.statusEffects.push({ type: 'paralyze', turns: skill.paralyze.turns, speedMult: skill.paralyze.speedMult });
+    const existing = defender.statusEffects.find(e => e.type === 'paralyze');
+    if (existing) {
+      existing.turns = Math.max(existing.turns, skill.paralyze.turns);
+    } else {
+      defender.speed = Math.floor(defender.speed * skill.paralyze.speedMult);
+      defender.statusEffects.push({ type: 'paralyze', turns: skill.paralyze.turns, speedMult: skill.paralyze.speedMult });
+    }
   }
   if (skill.stun && shouldApplyEffect(skill.stun)) {
-    defender.statusEffects.push({ type: 'stun', turns: skill.stun.turns });
+    const existing = defender.statusEffects.find(e => e.type === 'stun');
+    if (existing) existing.turns = Math.max(existing.turns, skill.stun.turns);
+    else defender.statusEffects.push({ type: 'stun', turns: skill.stun.turns });
   }
 }
 

@@ -35,6 +35,9 @@ function createShopRouter(db) {
     if (!Number.isInteger(buyQuantity) || buyQuantity < 1) {
       return res.status(400).json({ error: '购买数量必须为正整数' });
     }
+    if (buyQuantity > 99) {
+      return res.status(400).json({ error: '单次最多购买99个' });
+    }
 
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
     if (!player) return res.status(404).json({ error: '玩家不存在' });

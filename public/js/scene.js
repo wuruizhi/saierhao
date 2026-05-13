@@ -403,7 +403,13 @@ function handleViewportClick(e) {
 }
 
 function movePlayerTo(targetX, targetY, callback) {
-  if (!playerAvatar || playerMoving) return;
+  if (!playerAvatar) return;
+  
+  if (playerMoveAnim) {
+    cancelAnimationFrame(playerMoveAnim);
+    playerMoveAnim = null;
+  }
+  
   playerMoving = true;
   
   if (window.ws) {
@@ -562,9 +568,11 @@ async function startSceneBattle(spawnId) {
     setupBattle(data.playerPet, data.wildPet);
     if (data.wildPet.isBoss) {
       const log = document.getElementById('battle-log');
-      log.innerHTML = `<p style="color:#ffd700;font-weight:bold">👑 Boss ${data.wildPet.bossName} 出现了！</p>`;
+      log.innerHTML = `<p style="color:#ffd700;font-weight:bold">👑 Boss ${data.wildPet.bossName || data.wildPet.petDef?.name} 出现了！不可捕捉！</p>`;
+      document.getElementById('btn-capture').style.display = 'none';
+    } else {
+      document.getElementById('btn-capture').style.display = '';
     }
-    document.getElementById('btn-capture').style.display = '';
   } catch(e) { toast(e.message,'error'); }
 }
 
@@ -630,6 +638,19 @@ async function doCapture(capsuleId) {
       currentBattleId = null;
       toast(`捕获成功！${r.inTeam?'已加入队伍':'已存入仓库'}`);
       setTimeout(() => returnFromBattle(), 2000);
+    } else if (r.battleEnd) {
+      currentBattleId = null;
+      const endMsg = document.createElement('p');
+      endMsg.textContent = '😢 我方精灵全部倒下，战斗失败...';
+      endMsg.style.color = 'var(--hp-red)';
+      log.appendChild(endMsg); log.scrollTop = log.scrollHeight;
+      setTimeout(() => returnFromBattle(), 2000);
+    } else if (r.petFainted && r.nextPet && window.renderBattlePlayerPet) {
+      const switchMsg = document.createElement('p');
+      switchMsg.textContent = `${r.nextPet.nickname}上场！`;
+      switchMsg.style.color = 'var(--exp-blue)';
+      log.appendChild(switchMsg); log.scrollTop = log.scrollHeight;
+      window.renderBattlePlayerPet(r.nextPet);
     } else if (r.playerPet) {
       updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp);
     }

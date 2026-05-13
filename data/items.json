@@ -91,7 +91,10 @@
     "water": { "name": "渊鲲精元", "icon": "💧", "hatchPetId": 22, "hatchTime": 300, "skipCost": 500 },
     "grass": { "name": "古树精元", "icon": "🌿", "hatchPetId": 25, "hatchTime": 300, "skipCost": 500 },
     "electric": { "name": "天雷精元", "icon": "⚡", "hatchPetId": 28, "hatchTime": 600, "skipCost": 1000 },
-    "dark": { "name": "虚空精元", "icon": "🌑", "hatchPetId": 31, "hatchTime": 900, "skipCost": 2000 }
+    "dark": { "name": "虚空精元", "icon": "🌑", "hatchPetId": 31, "hatchTime": 900, "skipCost": 2000 },
+    "dream": { "name": "织梦精元", "icon": "🦋", "hatchPetId": 69, "hatchTime": 900, "skipCost": 2000 },
+    "prism": { "name": "晶棱精元", "icon": "🔆", "hatchPetId": 104, "hatchTime": 900, "skipCost": 2000 },
+    "melody": { "name": "安魂精元", "icon": "🎼", "hatchPetId": 110, "hatchTime": 900, "skipCost": 2000 }
   },
   "furniture": [
     { "id": "base_bed", "name": "太空睡眠舱", "price": 15000, "icon": "🛏️", "description": "赛尔号船员的标准睡眠舱，提供舒适的休息环境。" },
@@ -101,4 +104,3 @@
     { "id": "base_lamp", "name": "等离子灯", "price": 8000, "icon": "🏮", "description": "散发着幽蓝光芒的氛围灯。" }
   ]
 }
-

@@ -101,7 +101,26 @@ function createAdminRouter(db, pvpManager) {
     const pet = db.prepare('SELECT * FROM player_pets WHERE id = ? AND player_id = ?').get(petInstanceId, player.id);
     if (!pet) return res.status(404).json({ error: '精灵不存在' });
 
-    db.prepare('UPDATE player_pets SET level = ? WHERE id = ?').run(level, petInstanceId);
+    if (level > pet.level) {
+      const { addExp } = require('../game/pet-manager');
+      const petsData = require('../data/pets.json');
+      let neededExp = 0;
+      for (let l = pet.level + 1; l <= level; l++) {
+        if (petsData.expTable[l]) neededExp += petsData.expTable[l];
+      }
+      addExp(db, petInstanceId, neededExp - pet.exp);
+    } else if (level < pet.level) {
+      const { calculateStats } = require('../game/pet-manager');
+      const ivs = pet.ivs ? JSON.parse(pet.ivs) : {};
+      const evs = pet.evs ? JSON.parse(pet.evs) : {};
+      const newStats = calculateStats(pet.pet_id, level, ivs, evs);
+      db.prepare(`
+        UPDATE player_pets SET level = ?, exp = 0, current_hp = ?, max_hp = ?, 
+        attack = ?, defense = ?, speed = ?, sp_attack = ?, sp_defense = ?
+        WHERE id = ?
+      `).run(level, newStats.hp, newStats.hp, newStats.attack, newStats.defense, newStats.speed, newStats.spAttack, newStats.spDefense, petInstanceId);
+    }
+    
     res.json({ success: true, message: `精灵等级已设置为 ${level}` });
   });
 
@@ -187,7 +206,7 @@ function createAdminRouter(db, pvpManager) {
 
     const teamCount = db.prepare('SELECT COUNT(*) as c FROM player_pets WHERE player_id = ? AND in_team = 1').get(player.id).c;
     const inTeam = teamCount < 6;
-    const instanceId = createPetInstance(db, player.id, petId, level, inTeam, teamCount);
+    const instanceId = createPetInstance(db, player.id, petId, level, inTeam, inTeam ? teamCount : -1);
     res.json({ success: true, message: `已赠予精灵 #${petId} Lv.${level}${inTeam ? '(队伍)' : '(仓库)'}`, instanceId });
   });
 

@@ -26,6 +26,7 @@ const API = {
   chooseStarter(id) { return this.request('POST', '/player/choose-starter', { petId: id }); },
   getTeam() { return this.request('GET', '/player/team'); },
   swapPet(id, toTeam) { return this.request('POST', '/player/swap-pet', { petInstanceId: id, toTeam }); },
+  changeSkills(id, skills) { return this.request('POST', '/player/change-skills', { petInstanceId: id, skills }); },
   heal() { return this.request('POST', '/player/heal'); },
   pokedex() { return this.request('GET', '/player/pokedex'); },
   useCandy(petInstanceId, candyId, quantity) { return this.request('POST', '/player/use-candy', { petInstanceId, candyId, quantity }); },

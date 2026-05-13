@@ -1882,3 +1882,30 @@ input:checked + .toggle-slider:before {
   font-size: 13px;
   font-weight: bold;
 }
+
+/* SVG Icon Styles */
+.nav-svg-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 4px var(--neon-cyan));
+  color: var(--neon-cyan);
+}
+.hub-nav-btn.active .nav-svg-icon {
+  filter: drop-shadow(0 0 8px var(--neon-pink));
+  color: var(--neon-pink);
+}
+.type-svg-icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  display: inline-block;
+  margin-right: 4px;
+}
+.action-svg-icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
