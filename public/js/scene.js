@@ -511,10 +511,15 @@ async function interactWithNpc(npc) {
       if (stepDef && stepDef.type === 'npc_talk' && stepDef.targetId === npc.id) {
          let q = [];
          (stepDef.startDialogues || []).forEach(d => {
+           let spriteUrl = null;
+           if (d.avatar === 'player') spriteUrl = '/img/player.png?v=15';
+           else if (d.avatar && d.avatar.startsWith('npc_')) spriteUrl = `/img/npcs/${d.avatar}.png`;
+           else if (d.avatar && d.avatar.startsWith('boss_')) spriteUrl = `/img/pets/${d.avatar.split('_')[1]}.png`;
+           else if (d.avatar === 'rogers') spriteUrl = '/img/npcs/npc_engineer.png'; // Fallback
            q.push({
              name: d.character,
              text: d.text,
-             spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null
+             spriteUrl: spriteUrl
            });
          });
          let idx = 0;
@@ -526,17 +531,35 @@ async function interactWithNpc(npc) {
              API.advanceStoryQuest(currentMapId).then(() => {
                toast('剧情已推进！');
                if (window.loadStoryQuests) window.loadStoryQuests();
+               
+               const onComplete = () => {
+                 if (window.checkAndPlayPlanetDialogue) {
+                   window.checkAndPlayPlanetDialogue(currentMapId, stepDef.step + 1);
+                 }
+               };
+
                if (stepDef.endDialogues && stepDef.endDialogues.length > 0) {
                  let eq = [];
-                 stepDef.endDialogues.forEach(d => eq.push({ name: d.character, text: d.text, spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null }));
+                 stepDef.endDialogues.forEach(d => {
+                   let spriteUrl = null;
+                   if (d.avatar === 'player') spriteUrl = '/img/player.png?v=15';
+                   else if (d.avatar && d.avatar.startsWith('npc_')) spriteUrl = `/img/npcs/${d.avatar}.png`;
+                   else if (d.avatar && d.avatar.startsWith('boss_')) spriteUrl = `/img/pets/${d.avatar.split('_')[1]}.png`;
+                   else if (d.avatar === 'rogers') spriteUrl = '/img/npcs/npc_engineer.png'; // Fallback
+                   eq.push({ name: d.character, text: d.text, spriteUrl: spriteUrl });
+                 });
                  let eidx = 0;
                  const playEndNext = () => {
                    if (eidx < eq.length) {
                      const d = eq[eidx++];
                      showDialogue(d.name, d.text, d.spriteUrl, playEndNext);
+                   } else {
+                     onComplete();
                    }
                  };
                  playEndNext();
+               } else {
+                 onComplete();
                }
              }).catch(e => toast(e.message, 'error'));
            }
@@ -547,6 +570,9 @@ async function interactWithNpc(npc) {
            API.advanceStoryQuest(currentMapId).then(() => {
                toast('剧情已推进！');
                if (window.loadStoryQuests) window.loadStoryQuests();
+               if (window.checkAndPlayPlanetDialogue) {
+                 window.checkAndPlayPlanetDialogue(currentMapId, stepDef.step + 1);
+               }
            });
          }
          return;

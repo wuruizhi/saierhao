@@ -210,6 +210,7 @@ function createBattleRouter(db, sceneManager) {
         activeBattles.delete(battleId);
         incrementQuestProgress(db, battle.playerId, 'battle', 1);
         
+        let storyEndDialogues = null;
         // Story Quest Hook
         try {
           const stmt = db.prepare("SELECT * FROM player_story_quests WHERE player_id = ? AND status = 'active'");
@@ -237,6 +238,10 @@ function createBattleRouter(db, sceneManager) {
                 const newProgress = quest.progress + 1;
                 if (newProgress >= stepData.targetCount) {
                   // Step completed
+                  if (stepData.endDialogues && stepData.endDialogues.length > 0) {
+                    storyEndDialogues = stepData.endDialogues;
+                  }
+                  
                   const nextStepData = planetData.steps.find(s => s.step === quest.quest_step + 1);
                   if (nextStepData) {
                     db.prepare('UPDATE player_story_quests SET quest_step = ?, progress = 0 WHERE id = ?').run(quest.quest_step + 1, quest.id);
@@ -279,6 +284,7 @@ function createBattleRouter(db, sceneManager) {
           moneyGain,
           levelResult,
           bossReward,
+          storyEndDialogues,
           wildPetDef: petsData.pets.find(p => p.id === battle.wildPet.pet_id)
         });
       } else {

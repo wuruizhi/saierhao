@@ -1336,13 +1336,32 @@ input:checked + .toggle-slider:before {
 .player-part {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 32px; pointer-events: none; z-index: 10;
+  pointer-events: none; z-index: 10;
 }
-.player-part-back { z-index: 1; margin-top: 2px; font-size: 44px; }
-.player-part-body { z-index: 11; margin-top: 16px; font-size: 30px; }
-.player-part-head { z-index: 12; margin-top: -28px; font-size: 36px; }
-.player-part-accessory { z-index: 13; margin-top: -6px; margin-left: 2px; font-size: 26px; }
+.player-part .part-icon {
+  display: inline-block; line-height: 1; transition: transform 0.2s;
+  transform-origin: center center;
+}
+
+.player-part-back { z-index: 1; }
+.player-part-body { z-index: 11; }
+.player-part-head { z-index: 12; }
+.player-part-accessory { z-index: 13; }
 .player-sprite { z-index: 5; position: relative; }
+
+/* Item-specific placements replaced by unified image placements */
+
+/* HEAD ITEMS */
+.player-part-head .part-icon { font-size: 64px; transform: translate(0px, -24px); }
+
+/* BODY ITEMS */
+.player-part-body .part-icon { font-size: 56px; transform: translate(0px, 14px); }
+
+/* BACK ITEMS */
+.player-part-back .part-icon { font-size: 80px; transform: translate(0px, 0px); z-index: 1; }
+
+/* ACCESSORY ITEMS */
+.player-part-accessory .part-icon { font-size: 48px; transform: translate(0px, -8px); z-index: 13; }
 
 /* ===== ACHIEVEMENT SYSTEM ===== */
 .achievement-header {

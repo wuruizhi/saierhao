@@ -709,10 +709,16 @@ async function checkAndPlayPlanetDialogue(mapId, step) {
     // Play dialogue sequence
     let q = [];
     dialogues.forEach(d => {
+      let spriteUrl = null;
+      if (d.avatar === 'player') spriteUrl = '/img/player.png?v=15';
+      else if (d.avatar && d.avatar.startsWith('npc_')) spriteUrl = `/img/npcs/${d.avatar}.png`;
+      else if (d.avatar && d.avatar.startsWith('boss_')) spriteUrl = `/img/pets/${d.avatar.split('_')[1]}.png`;
+      else if (d.avatar === 'rogers') spriteUrl = '/img/npcs/npc_engineer.png'; // Fallback
+      
       q.push({
         name: d.character,
         text: d.text,
-        spriteUrl: d.avatar === 'player' ? '/img/player.png?v=15' : null
+        spriteUrl: spriteUrl
       });
     });
     
@@ -771,6 +777,13 @@ async function startExplore(mapId){
 }
 
 // ===== SHOP =====
+function renderIconHtml(icon) {
+  if (icon && icon.startsWith('/img/')) {
+    return `<img src="${icon}" style="width:1.2em;height:1.2em;object-fit:contain;vertical-align:-0.2em;">`;
+  }
+  return icon;
+}
+
 let shopDataCache = null;
 let shopActiveGroup = 'supply';
 let shopActiveSub = 0;
@@ -873,7 +886,7 @@ async function loadBag() {
           const el = document.createElement('div');
           el.className = 'shop-item';
           el.innerHTML = `
-            <span class="shop-item-icon">${item.def.icon}</span>
+            <span class="shop-item-icon">${renderIconHtml(item.def.icon)}</span>
             <div class="shop-item-info">
               <div class="shop-item-name">${item.def.name}</div>
               <div class="shop-item-desc">${item.def.description || ''}</div>
@@ -906,7 +919,7 @@ function renderShopItems() {
     const row = document.createElement('div');
     row.className = 'shop-item';
     row.innerHTML = `
-      <span class="shop-item-icon">${item.icon}</span>
+      <span class="shop-item-icon">${renderIconHtml(item.icon)}</span>
       <div class="shop-item-info">
         <span class="shop-item-name">${item.name}</span>
         <span class="shop-item-desc">${item.description || ''}</span>
@@ -978,7 +991,7 @@ function renderWardrobeGrid() {
     const div = document.createElement('div');
     div.className = `wardrobe-item-card ${isEquipped ? 'equipped' : ''}`;
     div.innerHTML = `
-      <span class="wardrobe-item-icon">${item.icon}</span>
+      <span class="wardrobe-item-icon">${renderIconHtml(item.icon)}</span>
       <div class="wardrobe-item-name">${item.name}</div>
       ${isEquipped ? '<div class="wardrobe-equipped-badge">已装备</div>' : ''}
     `;
@@ -1020,7 +1033,8 @@ function applyEquipsToWrapper(wrapper, equips) {
       if (itemDef) {
         const div = document.createElement('div');
         div.className = `player-part player-part-${part}`;
-        div.textContent = itemDef.icon;
+        div.dataset.itemId = itemDef.id;
+        div.innerHTML = `<span class="part-icon">${renderIconHtml(itemDef.icon)}</span>`;
         wrapper.appendChild(div);
       }
     }
@@ -1230,7 +1244,30 @@ async function doBattleAction(skillId){
         if (localStorage.getItem('saierhao_auto_heal') === 'true') {
           try { await API.heal(); toast('战斗结束，精灵体力已自动恢复！', 'success'); } catch(e){}
         }
-        retFn();
+        
+        if (r.storyEndDialogues && r.storyEndDialogues.length > 0) {
+          let eq = [];
+          r.storyEndDialogues.forEach(d => {
+            let spriteUrl = null;
+            if (d.avatar === 'player') spriteUrl = '/img/player.png?v=15';
+            else if (d.avatar && d.avatar.startsWith('npc_')) spriteUrl = `/img/npcs/${d.avatar}.png`;
+            else if (d.avatar && d.avatar.startsWith('boss_')) spriteUrl = `/img/pets/${d.avatar.split('_')[1]}.png`;
+            else if (d.avatar === 'rogers') spriteUrl = '/img/npcs/npc_engineer.png';
+            eq.push({ name: d.character, text: d.text, spriteUrl: spriteUrl });
+          });
+          let eidx = 0;
+          const playEndNext = () => {
+            if (eidx < eq.length) {
+              const d = eq[eidx++];
+              showDialogue(d.name, d.text, d.spriteUrl, playEndNext);
+            } else {
+              retFn();
+            }
+          };
+          playEndNext();
+        } else {
+          retFn();
+        }
       }, r.playerWin&&r.levelResult?.evolved?4000:2500);
       return;
     }
@@ -2042,8 +2079,22 @@ async function loadStoryQuests() {
         hasActiveStory = true;
         activeQuestTitle = `${pData.planetName} - 剧情任务`;
         activeQuestDesc = stepDef ? stepDef.description : '正在探索...';
-        activeQuestProgress = `进度: ${q.progress}/${stepDef ? stepDef.targetCount : 0}`;
-        statusHtml = `<span style="color:var(--neon-cyan)">进行中 (${q.progress}/${stepDef ? stepDef.targetCount : 0})</span>`;
+        
+        // Show meaningful progress text based on step type
+        let progressText = '';
+        if (stepDef) {
+          if (stepDef.type === 'npc_talk') {
+            progressText = '💬 前往与NPC对话';
+          } else if (stepDef.type === 'dialogue') {
+            progressText = '📖 剧情进行中';
+          } else if (stepDef.type === 'boss_battle') {
+            progressText = `⚔️ 击败Boss (${q.progress}/${stepDef.targetCount})`;
+          } else {
+            progressText = `进度: ${q.progress}/${stepDef.targetCount}`;
+          }
+        }
+        activeQuestProgress = progressText;
+        statusHtml = `<span style="color:var(--neon-cyan)">${progressText}</span>`;
       }
 
       card.innerHTML = `
@@ -2107,9 +2158,20 @@ function showDialogue(name, text, spriteUrl, callback) {
   }
 }
 
+let _dialogueAdvanceHandler = null;
+
 function playNextDialogue() {
+  const overlay = document.getElementById('dialogue-overlay');
+  
+  // Clean up previous handler if any
+  if (_dialogueAdvanceHandler) {
+    overlay.removeEventListener('click', _dialogueAdvanceHandler);
+    overlay.removeEventListener('touchend', _dialogueAdvanceHandler);
+    _dialogueAdvanceHandler = null;
+  }
+  
   if (dialogueQueue.length === 0) {
-    document.getElementById('dialogue-overlay').classList.remove('active');
+    overlay.classList.remove('active');
     isDialoguePlaying = false;
     return;
   }
@@ -2117,28 +2179,41 @@ function playNextDialogue() {
   isDialoguePlaying = true;
   const dialog = dialogueQueue.shift();
   
-  const overlay = document.getElementById('dialogue-overlay');
   const nameEl = document.getElementById('dialogue-name');
   const textEl = document.getElementById('dialogue-text');
   const avatarEl = document.getElementById('dialogue-avatar');
   
   nameEl.textContent = dialog.name;
-  textEl.innerHTML = dialog.text; // allow basic HTML like <span style="color:red">
-  avatarEl.style.backgroundImage = dialog.spriteUrl ? `url(${dialog.spriteUrl})` : 'none';
+  textEl.innerHTML = dialog.text;
+  
+  // Set avatar with fallback
+  if (dialog.spriteUrl) {
+    avatarEl.style.backgroundImage = `url(${dialog.spriteUrl})`;
+    avatarEl.style.backgroundSize = 'contain';
+    avatarEl.style.backgroundRepeat = 'no-repeat';
+    avatarEl.style.backgroundPosition = 'center';
+  } else {
+    avatarEl.style.backgroundImage = 'none';
+  }
   
   overlay.classList.add('active');
   
-  // Click to advance
-  const advance = () => {
-    overlay.removeEventListener('click', advance);
+  // Click/touch to advance
+  _dialogueAdvanceHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    overlay.removeEventListener('click', _dialogueAdvanceHandler);
+    overlay.removeEventListener('touchend', _dialogueAdvanceHandler);
+    _dialogueAdvanceHandler = null;
     if (dialog.callback) dialog.callback();
     playNextDialogue();
   };
   
   // Slight delay to prevent immediate clicking if triggered by a click
   setTimeout(() => {
-    overlay.addEventListener('click', advance);
-  }, 200);
+    overlay.addEventListener('click', _dialogueAdvanceHandler);
+    overlay.addEventListener('touchend', _dialogueAdvanceHandler);
+  }, 300);
 }
 window.showDialogue = showDialogue;
 

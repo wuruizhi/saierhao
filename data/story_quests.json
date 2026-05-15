@@ -5,52 +5,52 @@
       "steps": [
         {
           "step": 0,
-          "name": "智者的指引",
-          "description": "前往【熔岩入口】，寻找烈焰智者，了解火山喷发的原因。",
+          "name": "异常的求救信号",
+          "description": "赛尔号收到了一段来自火焰星的断续信号，前往【熔岩入口】寻找发信人。",
           "type": "npc_talk",
           "targetId": "npc_elder_fire",
           "startDialogues": [
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "智者您好，船长说火山异常喷发，是不是出了什么事？"
+              "text": "就是这里了……探测器显示信号源在附近。"
             },
             {
-              "character": "烈焰智者",
-              "avatar": "npc_elder_fire",
-              "text": "年轻的赛尔啊……火山深处的封印正在松动。海盗的钻探机破坏了地脉。"
+              "character": "受伤的矿工",
+              "avatar": "npc_miner",
+              "text": "救命……海盗……他们不是来挖矿的！"
             },
             {
-              "character": "烈焰智者",
-              "avatar": "npc_elder_fire",
-              "text": "火系精灵们因此陷入了狂暴，必须先让它们冷静下来！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "你受伤了！海盗到底在找什么？"
+            },
+            {
+              "character": "受伤的矿工",
+              "avatar": "npc_miner",
+              "text": "他们在找‘火之石板’，那是封印地核能量的钥匙！快去阻止他们，周围的精灵已经被污染狂暴化了！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "平息狂暴",
+          "name": "杀出重围",
           "description": "在【熔岩入口】或【烈焰峡谷】击败3只狂暴的火系精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
-          "startDialogues": [
-            {
-              "character": "玩家",
-              "avatar": "player",
-              "text": "看来只能用战斗让它们清醒了！"
-            }
-          ],
+          "startDialogues": [],
           "endDialogues": [
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "呼……终于让它们安静了。"
+              "text": "呼……精灵们恢复理智了。必须赶快深入峡谷！"
             }
           ],
           "rewards": {
@@ -60,37 +60,43 @@
         },
         {
           "step": 2,
-          "name": "迷路的矿工",
-          "description": "前往【烈焰峡谷】，向迷路的矿工打听海盗钻探机的下落。",
+          "name": "智者的秘密",
+          "description": "前往【烈焰峡谷】，向烈焰智者询问‘火之石板’的下落。",
           "type": "npc_talk",
           "targetId": "npc_miner",
           "startDialogues": [
             {
+              "character": "烈焰智者",
+              "avatar": "npc_elder_fire",
+              "text": "年轻的赛尔，我感受到了你身上的纯粹能量。"
+            },
+            {
               "character": "玩家",
               "avatar": "player",
-              "text": "你没事吧？"
+              "text": "智者，海盗正在寻找火之石板，我们必须阻止他们！"
             },
             {
-              "character": "迷路的矿工",
-              "avatar": "npc_miner",
-              "text": "太可怕了！海盗抢走了我的超级钻探机，他们去了火山核心！"
+              "character": "烈焰智者",
+              "avatar": "npc_elder_fire",
+              "text": "太迟了……他们已经用一种黑色的能量炸开了核心入口。那种黑暗气息，不像是海盗能拥有的。"
             },
             {
-              "character": "迷路的矿工",
-              "avatar": "npc_miner",
-              "text": "快去阻止他们，否则地心能量会被抽干的！"
+              "character": "烈焰智者",
+              "avatar": "npc_elder_fire",
+              "text": "去火山核心吧，炎皇正在独自对抗那股黑暗！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 500,
-            "exp": 200
-          }
+            "money": 800,
+            "exp": 300
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "炎帝的认可",
-          "description": "进入【火山核心】，击败焱龙帝·炎皇，获得火之印记。",
+          "name": "炎皇的决意",
+          "description": "进入【火山核心】，帮助焱龙帝·炎皇击退海盗。",
           "type": "boss_battle",
           "targetId": 21,
           "targetCount": 1,
@@ -98,29 +104,29 @@
             {
               "character": "焱龙帝·炎皇",
               "avatar": "boss_21",
-              "text": "吼！贪婪的铁皮人，休想带走无尽能源！"
+              "text": "咳……这股黑暗力量，竟然能侵蚀我的火焰！"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "我们是来阻止海盗的，请相信我！"
+              "text": "炎皇！我来帮你！"
             },
             {
               "character": "焱龙帝·炎皇",
               "avatar": "boss_21",
-              "text": "那就用实力来证明吧！"
+              "text": "小心！那些被黑暗污染的火焰已经失去了控制，证明你有驾驭这烈焰的资格吧！"
             }
           ],
           "endDialogues": [
             {
               "character": "焱龙帝·炎皇",
               "avatar": "boss_21",
-              "text": "海盗已被赶跑，这个【火之印记】交给你了。"
+              "text": "你做的很好。海盗虽然逃了，但他们带走了一块石板碎片。这【火之印记】交给你，去寻找其他星球的守护者，事情远没有那么简单。"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "谢谢你，炎帝猩！"
+              "text": "我明白了，这股黑暗力量一定还有更大的阴谋！"
             }
           ],
           "rewards": {
@@ -137,31 +143,38 @@
       "steps": [
         {
           "step": 0,
-          "name": "异样的海流",
-          "description": "在【浅海沙滩】找到老水手，打听水质污染的情况。",
+          "name": "黑色的海潮",
+          "description": "抵达【浅海沙滩】，向老水手打听海洋星的异常。",
           "type": "npc_talk",
           "targetId": "npc_sailor",
           "startDialogues": [
             {
               "character": "老水手",
               "avatar": "npc_sailor",
-              "text": "最近海里的水质越来越差了，鱼儿们都在发狂。"
+              "text": "唉，这大海已经不是从前的大海了。昨天退潮时，海水竟然变成了深紫色！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "深紫色的海水？难道和火焰星的黑暗气息有关？"
             },
             {
               "character": "老水手",
               "avatar": "npc_sailor",
-              "text": "我看到几个鬼鬼祟祟的家伙在往海里倒紫黑色的液体……你得去教训一下那些变异的精灵。"
+              "text": "不知道，但我看到海盗把一些奇怪的装置扔进了海里。现在浅海的精灵全疯了！"
             }
           ],
+          "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "拯救生命",
-          "description": "在【浅海沙滩】或【珊瑚迷宫】击退3只被污染变异的水系精灵。",
+          "name": "净化水域",
+          "description": "在【浅海沙滩】击败3只变异的水系精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -170,7 +183,7 @@
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "精灵们恢复理智了，但污染源还在更深处。"
+              "text": "水质污染得太严重了，必须找到海盗的装置。"
             }
           ],
           "rewards": {
@@ -180,31 +193,38 @@
         },
         {
           "step": 2,
-          "name": "人鱼的求救",
-          "description": "潜入【珊瑚迷宫】，寻找人鱼公主。",
+          "name": "人鱼的眼泪",
+          "description": "潜入【珊瑚迷宫】，寻找人鱼公主了解情况。",
           "type": "npc_talk",
           "targetId": "npc_mermaid",
           "startDialogues": [
             {
               "character": "人鱼公主",
               "avatar": "npc_mermaid",
-              "text": "海神大人被污染控制了心智！他现在就在深海遗迹！"
+              "text": "呜呜呜……海神大人他……他被黑色的锁链困住了！"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "不用担心，我一定会让他清醒过来的！"
+              "text": "又是那股黑暗力量吗？海盗到底用了什么手段？"
+            },
+            {
+              "character": "人鱼公主",
+              "avatar": "npc_mermaid",
+              "text": "海盗首领带来了一颗黑色的珠子，它不仅污染了水源，还在抽取海神大人的生命力！求求你救救他！"
             }
           ],
+          "endDialogues": [],
           "rewards": {
-            "money": 500,
-            "exp": 200
-          }
+            "money": 800,
+            "exp": 300
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "海神之怒",
-          "description": "抵达【深海遗迹】，击败渊鲲王·海神，获得水之印记。",
+          "name": "挣脱锁链",
+          "description": "抵达【深海遗迹】，击败暴走的渊鲲王·海神！",
           "type": "boss_battle",
           "targetId": 24,
           "targetCount": 1,
@@ -212,14 +232,24 @@
             {
               "character": "渊鲲王·海神",
               "avatar": "boss_24",
-              "text": "肮脏的入侵者，休想污染这片圣洁的海域！"
+              "text": "杀戮……毁灭……将一切卷入深渊……！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "他完全失去理智了，只能先用战斗消耗那股黑暗能量！"
             }
           ],
           "endDialogues": [
             {
               "character": "渊鲲王·海神",
               "avatar": "boss_24",
-              "text": "污染退去了...谢谢你，勇敢的赛尔。这是【水之印记】。"
+              "text": "咳……感谢你击碎了那颗黑暗之珠。海盗自称这股力量来自‘虚空’。"
+            },
+            {
+              "character": "渊鲲王·海神",
+              "avatar": "boss_24",
+              "text": "带着这枚【水之印记】去丛林星吧，那里是生命的源泉，决不能让虚空染指。"
             }
           ],
           "rewards": {
@@ -236,25 +266,37 @@
       "steps": [
         {
           "step": 0,
-          "name": "丛林危机",
-          "description": "前往【林间小道】，向游侠了解森林枯萎的原因。",
+          "name": "枯萎的生命树",
+          "description": "前往【林间小道】，向游侠了解森林的现状。",
           "type": "npc_talk",
           "targetId": "npc_ranger",
           "startDialogues": [
             {
               "character": "游侠",
               "avatar": "npc_ranger",
-              "text": "森林里的植物正在枯萎，海盗设立了毒气发生器。请你先去收集一些草系精灵身上的光之露珠！"
+              "text": "你来晚了。虚空的腐化已经蔓延到了这颗星球。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "海盗已经来过了吗？"
+            },
+            {
+              "character": "游侠",
+              "avatar": "npc_ranger",
+              "text": "不，这次不仅仅是海盗。我看到一群浑身散发着黑气的人……他们把毒气发生器种在了生命树的根部。先去帮我收集一些光之露珠延缓枯萎吧。"
             }
           ],
+          "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "收集露珠",
+          "name": "微光希望",
           "description": "在丛林星击败3只草系精灵，收集光之露珠。",
           "type": "battle",
           "targetId": null,
@@ -264,7 +306,7 @@
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "露珠收集完毕！继续前进。"
+              "text": "收集够了！赶紧送去深处。"
             }
           ],
           "rewards": {
@@ -274,31 +316,38 @@
         },
         {
           "step": 2,
-          "name": "仙子的指引",
-          "description": "进入【蘑菇森林】，找到花仙子。",
+          "name": "花仙子的指引",
+          "description": "进入【蘑菇森林】，将露珠交给花仙子。",
           "type": "npc_talk",
           "targetId": "npc_fairy",
           "startDialogues": [
             {
               "character": "花仙子",
               "avatar": "npc_fairy",
-              "text": "毒气已经蔓延到这里了，咳咳……"
+              "text": "谢谢你，光之露珠能稍微净化空气。但真正的危机在古树之心。"
             },
             {
               "character": "花仙子",
               "avatar": "npc_fairy",
-              "text": "多亏了你的光之露珠，我感觉好多了。毒气源头在古树之心，森灵大人有危险！"
+              "text": "森灵大人正在用全部力量对抗虚空腐化，他快撑不住了。那群黑衣人自称是‘虚空教团’！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "虚空教团？海盗原来和他们勾结在了一起！我这就去古树之心！"
             }
           ],
+          "endDialogues": [],
           "rewards": {
-            "money": 500,
-            "exp": 200
-          }
+            "money": 800,
+            "exp": 300
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "森灵苏醒",
-          "description": "前往【古树之心】，击败蛮荒古树·森灵，获得草之印记。",
+          "name": "古树的悲鸣",
+          "description": "前往【古树之心】，唤醒蛮荒古树·森灵。",
           "type": "boss_battle",
           "targetId": 27,
           "targetCount": 1,
@@ -306,14 +355,24 @@
             {
               "character": "蛮荒古树·森灵",
               "avatar": "boss_27",
-              "text": "是谁...打扰了森林的沉睡...你们也是来夺取生机的吗..."
+              "text": "不要过来……我……快控制不住……毁灭的冲动了……"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "森灵大人！坚持住，我这就帮你打散腐化！"
             }
           ],
           "endDialogues": [
             {
               "character": "蛮荒古树·森灵",
               "avatar": "boss_27",
-              "text": "原来是带来生机的使者...这【草之印记】属于你了。"
+              "text": "孩子，你身上的星辰之光非常温暖。虚空教团的目标是收集五大星球的本源，开启深渊之门。"
+            },
+            {
+              "character": "蛮荒古树·森灵",
+              "avatar": "boss_27",
+              "text": "收下【草之印记】，去雷霆星警告雷帝，不要中了他们的圈套。"
             }
           ],
           "rewards": {
@@ -330,30 +389,37 @@
       "steps": [
         {
           "step": 0,
-          "name": "磁场失控",
+          "name": "引雷之塔",
           "description": "在【雷鸣平原】寻找雷电工程师。",
           "type": "npc_talk",
           "targetId": "npc_engineer",
           "startDialogues": [
             {
-              "character": "雷电工程师",
-              "avatar": "npc_engineer",
-              "text": "磁场完全紊乱了，我的仪器都失效了！海盗在这里建造了引雷塔！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "这里的雷电怎么会如此狂暴，连天空都变成了暗红色？"
             },
             {
               "character": "雷电工程师",
               "avatar": "npc_engineer",
-              "text": "去击败一些狂暴的电系精灵，帮我收集静电线圈来修复仪器。"
+              "text": "虚空教团建造了‘逆源引雷塔’！他们不仅在抽取雷霆星的能量，还在向地核注入虚空物质！"
+            },
+            {
+              "character": "雷电工程师",
+              "avatar": "npc_engineer",
+              "text": "我的仪器都烧毁了，你能帮我收集静电线圈，重启雷达吗？"
             }
           ],
+          "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "收集线圈",
+          "name": "重启雷达",
           "description": "在雷霆星击败3只电系精灵，收集静电线圈。",
           "type": "battle",
           "targetId": null,
@@ -363,7 +429,7 @@
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "线圈收集完毕，可以继续深入了。"
+              "text": "线圈拿到了，工程师说教团的核心在闪电峡谷。"
             }
           ],
           "rewards": {
@@ -373,31 +439,38 @@
         },
         {
           "step": 2,
-          "name": "神殿之门",
-          "description": "在【闪电峡谷】与神殿守卫对话。",
+          "name": "守卫的陨落",
+          "description": "在【闪电峡谷】寻找神殿守卫。",
           "type": "npc_talk",
           "targetId": "npc_guard",
           "startDialogues": [
             {
               "character": "神殿守卫",
               "avatar": "npc_guard",
-              "text": "海盗破坏了能量节点，雷帝大人发怒了！必须有人进去平息他的怒火。"
+              "text": "咳咳……你来晚了……雷帝大人他……"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "交给我吧！"
+              "text": "发生了什么？"
+            },
+            {
+              "character": "神殿守卫",
+              "avatar": "npc_guard",
+              "text": "虚空使者用诡计刺伤了雷帝，并将虚空之刃留在了他的体内。雷帝大人为了不波及整颗星球，把自己封锁在了殿堂里……"
             }
           ],
+          "endDialogues": [],
           "rewards": {
-            "money": 500,
-            "exp": 200
-          }
+            "money": 800,
+            "exp": 300
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "雷帝的咆哮",
-          "description": "进入【雷神殿堂】，击败天雷兽·雷帝，获得雷之印记。",
+          "name": "拔出虚空之刃",
+          "description": "进入【雷神殿堂】，击败天雷兽·雷帝！",
           "type": "boss_battle",
           "targetId": 30,
           "targetCount": 1,
@@ -405,14 +478,29 @@
             {
               "character": "天雷兽·雷帝",
               "avatar": "boss_30",
-              "text": "雷霆...粉碎一切！！！"
+              "text": "退后！雷霆……将无差别地粉碎一切！！！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "得想办法在战斗中拔出他背上的那把黑色短刃！"
             }
           ],
           "endDialogues": [
             {
               "character": "天雷兽·雷帝",
               "avatar": "boss_30",
-              "text": "狂暴的雷电平息了...收下【雷之印记】吧！"
+              "text": "狂暴的雷电终于平息了……虚空教团已经集齐了五大本源之四。他们去了光暗星！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "光暗星？传说中封印着最终魔神的地方？"
+            },
+            {
+              "character": "天雷兽·雷帝",
+              "avatar": "boss_30",
+              "text": "没错，带上【雷之印记】，决战的时刻到了！"
             }
           ],
           "rewards": {
@@ -429,31 +517,38 @@
       "steps": [
         {
           "step": 0,
-          "name": "晨曦守护",
-          "description": "在【晨曦之地】向光之祭司了解虚空魔神的情报。",
+          "name": "晨曦的黄昏",
+          "description": "在【晨曦之地】向光之祭司了解最终的危机。",
           "type": "npc_talk",
           "targetId": "npc_priest",
           "startDialogues": [
             {
               "character": "光之祭司",
               "avatar": "npc_priest",
-              "text": "黑暗正在侵蚀这片晨曦，海盗首领企图释放被封印的虚空魔神！"
+              "text": "你终于来了，命运的破局者。光与暗的平衡已经被彻底打破了。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "虚空教团的人在哪里？"
             },
             {
               "character": "光之祭司",
               "avatar": "npc_priest",
-              "text": "快去消灭那些被黑暗控制的精灵，夺回晨星碎片！"
+              "text": "他们正在用前四个星球的本源，献祭给永夜深渊，企图唤醒虚空魔神！你必须先清理外围的虚空衍生物！"
             }
           ],
+          "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "光暗交织",
-          "description": "在光暗星击败3只精灵。",
+          "name": "撕裂黑暗",
+          "description": "在光暗星击败3只虚空衍生物（精灵）。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
@@ -462,7 +557,7 @@
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "碎片收集完毕，光明暂且保住了。"
+              "text": "这些怪物太难缠了。得赶紧去黄昏边界！"
             }
           ],
           "rewards": {
@@ -472,7 +567,7 @@
         },
         {
           "step": 2,
-          "name": "深渊预言",
+          "name": "先知的赌注",
           "description": "在【黄昏边界】找到暗影先知。",
           "type": "npc_talk",
           "targetId": "npc_oracle",
@@ -480,38 +575,65 @@
             {
               "character": "暗影先知",
               "avatar": "npc_oracle",
-              "text": "虚空魔神即将苏醒，宇宙的终结要来了……"
+              "text": "预言中的毁灭已经降临，虚空魔神已经睁开了它的眼睛……"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "只要还有一丝希望，我就绝不退缩！"
+              "text": "哪怕只有万分之一的机会，我也要把它的眼睛闭上！"
+            },
+            {
+              "character": "暗影先知",
+              "avatar": "npc_oracle",
+              "text": "呵呵，勇敢的灵魂。四枚印记在你的胸前共鸣，去吧，深渊就在前方！"
             }
           ],
+          "endDialogues": [],
           "rewards": {
-            "money": 500,
-            "exp": 200
-          }
+            "money": 800,
+            "exp": 300
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "终极决战",
-          "description": "深入【永夜深渊】，击败虚空魔神·混沌，拯救宇宙！",
+          "name": "虚空降临",
+          "description": "深入【永夜深渊】，决战虚空魔神·混沌！",
           "type": "boss_battle",
           "targetId": 33,
           "targetCount": 1,
           "startDialogues": [
             {
+              "character": "虚空教团首领",
+              "avatar": "npc_oracle",
+              "text": "来不及了，卑微的蝼蚁！伟大的混沌已经降临！"
+            },
+            {
               "character": "虚空魔神·混沌",
               "avatar": "boss_33",
-              "text": "吾乃混沌...万物皆归于虚无！"
+              "text": "吾乃混沌……万物皆归于虚无！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "只要星辰之光不灭，宇宙就不会终结！看招！"
             }
           ],
           "endDialogues": [
             {
+              "character": "虚空魔神·混沌",
+              "avatar": "boss_33",
+              "text": "这股光芒……居然……"
+            },
+            {
               "character": "船长罗杰",
               "avatar": "rogers",
-              "text": "太棒了小赛尔！你拯救了宇宙，无尽能源的希望保住了！"
+              "text": "（通讯器）太棒了小赛尔！监测显示虚空能量正在坍缩，你拯救了整个星系！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "船长，虚空教团的首领逃走了，这场战斗恐怕只是个开始……"
             }
           ],
           "rewards": {
@@ -528,32 +650,33 @@
       "steps": [
         {
           "step": 0,
-          "name": "失踪的探险家",
-          "description": "前往【冰晶平原】，向迷失的探险家打听冰霜星的异变。",
+          "name": "极寒的追踪",
+          "description": "赛尔号追踪虚空教团的残党来到了冰霜星。在【冰晶平原】向迷失的探险家打听线索。",
           "type": "npc_talk",
           "targetId": "npc_lost_explorer",
           "startDialogues": [
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "大叔，你没事吧？这里发生了什么？"
+              "text": "大叔，你有没有看到一群穿着黑长袍的人经过这里？"
             },
             {
               "character": "迷失的探险家",
               "avatar": "npc_lost_explorer",
-              "text": "阿嚏！太冷了……深处的冰封古王好像苏醒了！"
+              "text": "阿嚏！黑长袍……我看到了，他们往冰封深处去了！"
             },
             {
               "character": "迷失的探险家",
               "avatar": "npc_lost_explorer",
-              "text": "去问问前方的冰霜女巫吧，她可能知道原因！"
+              "text": "他们还用某种邪恶的法术激怒了原本温顺的冰霜精灵，现在到处都很危险！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
@@ -567,7 +690,7 @@
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "呼，冻死我了，总算清出一条路了。"
+              "text": "呼，冻死我了，必须尽快找到冰霜女巫问清楚。"
             }
           ],
           "rewards": {
@@ -585,24 +708,30 @@
             {
               "character": "冰霜女巫",
               "avatar": "npc_ice_witch",
-              "text": "愚蠢的外来者，你们的到来惊醒了沉睡的王。"
+              "text": "你身上有四大星系守护者的印记……看来你就是那个打破了混沌的赛尔。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "女巫，虚空教团想在阿瑞斯星系（Ares Galaxy）做什么？"
             },
             {
               "character": "冰霜女巫",
               "avatar": "npc_ice_witch",
-              "text": "想要平息他的怒火，就去永冻王座证明你的实力吧。"
+              "text": "他们妄图染指沉睡在此的‘远古封神’的力量。冰封古王已经被他们施加了梦魇的咒语，快去永冻王座！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "冰封古王",
-          "description": "在【永冻王座】击败极光冰麟·冰帝。",
+          "name": "唤醒冰帝",
+          "description": "在【永冻王座】击败极光冰麟·冰帝，解除梦魇！",
           "type": "boss_battle",
           "targetId": 74,
           "targetCount": 1,
@@ -610,14 +739,24 @@
             {
               "character": "冰封古王",
               "avatar": "npc_ice_king",
-              "text": "感受绝对零度的恐惧吧！"
+              "text": "（双眼赤红）滚出我的王座！感受绝对零度的恐惧吧！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "古王！快醒醒，不要被虚空蛊惑！"
             }
           ],
           "endDialogues": [
             {
               "character": "冰封古王",
               "avatar": "npc_ice_king",
-              "text": "你证明了你的勇气，冰霜星再次归于宁静。"
+              "text": "梦魇……消散了……虚空教团夺走了一片‘凛冬碎片’，那是阿瑞斯星系的钥匙之一。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我一定会阻止他们集齐钥匙的！"
             }
           ],
           "rewards": {
@@ -634,7 +773,7 @@
       "steps": [
         {
           "step": 0,
-          "name": "沙丘的秘密",
+          "name": "流沙的阴谋",
           "description": "向【流沙绿洲】的沙丘商人打听遗迹的情报。",
           "type": "npc_talk",
           "targetId": "npc_desert_merchant",
@@ -642,14 +781,20 @@
             {
               "character": "沙丘商人",
               "avatar": "npc_desert_merchant",
-              "text": "嘿嘿，想要情报？去帮我清理掉那些烦人的巨蝎和沙蜥吧！"
+              "text": "嘿嘿，想要虚空教团的情报？没问题，但你得先帮我清理掉那些暴走的巨蝎！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "又是暴走……看来他们已经来过了。"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
@@ -659,7 +804,13 @@
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
+          "endDialogues": [
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "怪物清理完毕，快告诉我情报！"
+            }
+          ],
           "rewards": {
             "money": 1000,
             "exp": 500
@@ -667,7 +818,7 @@
         },
         {
           "step": 2,
-          "name": "沙漠战士",
+          "name": "焦岩的守卫",
           "description": "前往【焦岩峡谷】寻找沙漠战士。",
           "type": "npc_talk",
           "targetId": "npc_sand_warrior",
@@ -675,24 +826,30 @@
             {
               "character": "沙漠战士",
               "avatar": "npc_sand_warrior",
-              "text": "遗迹的大门已经被打开，法老的守卫炎沙暴龙暴走了！"
+              "text": "远古遗迹的大门被炸开了！法老的守卫炎沙暴龙在狂暴中攻击了一切活物！"
             },
             {
               "character": "玩家",
               "avatar": "player",
-              "text": "交给我吧，我会阻止它的！"
+              "text": "肯定是虚空教团干的！我这就去阻止它！"
+            },
+            {
+              "character": "沙漠战士",
+              "avatar": "npc_sand_warrior",
+              "text": "千万小心，它的沙暴能撕碎钢铁！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
           "name": "法老的愤怒",
-          "description": "在【远古遗迹】击败炎沙暴龙·沙皇。",
+          "description": "在【远古遗迹】击败炎沙暴龙·沙皇，夺回遗迹的控制权。",
           "type": "boss_battle",
           "targetId": 79,
           "targetCount": 1,
@@ -700,14 +857,24 @@
             {
               "character": "沙漠法老",
               "avatar": "npc_sand_king",
-              "text": "打扰法老安眠者，将被黄沙吞噬！"
+              "text": "打扰法老安眠者，将被黄沙吞噬！你们这些黑暗的走狗！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "等等，我不是虚空教团的人！"
             }
           ],
           "endDialogues": [
             {
               "character": "沙漠法老",
               "avatar": "npc_sand_king",
-              "text": "干得好，年轻的勇士。黄沙退去了。"
+              "text": "原来如此……他们抢走了‘赤沙之瞳’。那群恶徒去了幻梦星，试图控制织梦者的力量。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我立刻追过去！"
             }
           ],
           "rewards": {
@@ -724,7 +891,7 @@
       "steps": [
         {
           "step": 0,
-          "name": "迷幻花粉",
+          "name": "扭曲的梦境",
           "description": "与【梦境花园】的幻境向导对话。",
           "type": "npc_talk",
           "targetId": "npc_illusion_guide",
@@ -732,24 +899,41 @@
             {
               "character": "幻境向导",
               "avatar": "npc_illusion_guide",
-              "text": "千万别吸入花粉，你会沉睡不醒的。帮我采集一些花粉样本。"
+              "text": "嘘……不要大声说话。这里的花粉被虚空能量污染了，一旦吸入就会陷入永远的噩梦。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "难怪周围的精灵看起来都像在梦游一样攻击人。"
+            },
+            {
+              "character": "幻境向导",
+              "avatar": "npc_illusion_guide",
+              "text": "帮我采集一些未被完全污染的花粉样本，也许我能制作出解药。"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "花妖之梦",
-          "description": "击败3只幻梦星精灵。",
+          "name": "梦游的精灵",
+          "description": "击败3只幻梦星精灵，收集花粉。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
+          "endDialogues": [
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "花粉收集完毕，希望能管用。"
+            }
+          ],
           "rewards": {
             "money": 1000,
             "exp": 500
@@ -757,7 +941,7 @@
         },
         {
           "step": 2,
-          "name": "梦境仙女",
+          "name": "噩梦的源头",
           "description": "前往【幻影迷林】寻找梦境仙女。",
           "type": "npc_talk",
           "targetId": "npc_dream_fairy",
@@ -765,18 +949,29 @@
             {
               "character": "梦境仙女",
               "avatar": "npc_dream_fairy",
-              "text": "噩梦之主控制了织梦神，所有人的梦境都变成了噩梦！"
+              "text": "太可怕了……虚空教团唤醒了‘噩梦之主’，它占据了织梦神的身体！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "他们是想把整个阿瑞斯星系拖入噩梦之中吗？"
+            },
+            {
+              "character": "梦境仙女",
+              "avatar": "npc_dream_fairy",
+              "text": "是的，如果不打破梦魇神殿的结界，一切就完了！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "噩梦苏醒",
+          "name": "粉碎噩梦",
           "description": "在【梦魇神殿】击破虹光梦凤·织梦神。",
           "type": "boss_battle",
           "targetId": 84,
@@ -785,14 +980,24 @@
             {
               "character": "噩梦之主",
               "avatar": "npc_nightmare",
-              "text": "在无尽的噩梦中沉沦吧！"
+              "text": "欢迎来到……无尽的虚空之梦！在这里，你将体会到最深沉的绝望！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "就算是在梦里，我也能把你打得落花流水！"
             }
           ],
           "endDialogues": [
             {
               "character": "织梦者",
               "avatar": "npc_dream_weaver",
-              "text": "梦与现实恢复了平衡，谢谢你打破了噩梦。"
+              "text": "噩梦……终于退散了。虚空教团不仅抢走了‘梦之羽’，还留下了一个坐标……"
+            },
+            {
+              "character": "织梦者",
+              "avatar": "npc_dream_weaver",
+              "text": "他们准备前往机械星和魔界星，完成最后两把钥匙的收集！"
             }
           ],
           "rewards": {
@@ -809,32 +1014,49 @@
       "steps": [
         {
           "step": 0,
-          "name": "智械危机",
-          "description": "在【废弃工厂】听取改造人叛军的求救。",
+          "name": "生锈的齿轮",
+          "description": "在【废弃工厂】询问流浪机械师。",
           "type": "npc_talk",
           "targetId": "npc_cyborg_rebel",
           "startDialogues": [
             {
-              "character": "改造人叛军",
-              "avatar": "npc_cyborg_rebel",
-              "text": "AI 核心失控了！它们造出了一大批机器怪物，快帮忙干掉几个！"
+              "character": "流浪机械师",
+              "avatar": "npc_mech_engineer",
+              "text": "滴滴……系统错误……虚空病毒已感染中央处理器……"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "是赛博格病毒！虚空教团竟然连机械精灵都能控制！"
+            },
+            {
+              "character": "流浪机械师",
+              "avatar": "npc_mech_engineer",
+              "text": "请消灭周边被感染的机械卫兵，否则病毒会通过网络传遍全宇宙！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "摧毁机甲",
-          "description": "击败3只机械星精灵。",
+          "name": "杀毒程序",
+          "description": "击退3只失控的机械星精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
+          "endDialogues": [
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "周围的机器暂时安全了，必须切断网络核心。"
+            }
+          ],
           "rewards": {
             "money": 1000,
             "exp": 500
@@ -842,42 +1064,63 @@
         },
         {
           "step": 2,
-          "name": "数据走廊",
-          "description": "前往【数据走廊】找到机械工程师。",
+          "name": "超频危机",
+          "description": "在【合金要塞】寻找抵抗军首领。",
           "type": "npc_talk",
           "targetId": "npc_mech_engineer",
           "startDialogues": [
             {
-              "character": "机械工程师",
-              "avatar": "npc_mech_engineer",
-              "text": "超级AI接管了中央主脑，我们必须重启它的核心逻辑！"
+              "character": "抵抗军首领",
+              "avatar": "npc_cyborg_rebel",
+              "text": "你终于来了！虚空教团把病毒直接注入了钢铁战龙的核心！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "钢铁战龙？那是机械星的守护神啊！"
+            },
+            {
+              "character": "抵抗军首领",
+              "avatar": "npc_cyborg_rebel",
+              "text": "如果它进入超频自爆程序，整个机械星都会被炸平！快去中枢神殿阻止它！"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "核心重置",
-          "description": "在【中央主脑】击溃量子机神·欧米茄。",
+          "name": "代码重置",
+          "description": "在【中枢神殿】击破合金战神·钢龙，强制重启其核心！",
           "type": "boss_battle",
           "targetId": 89,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "超级AI",
-              "avatar": "npc_mech_overlord",
-              "text": "警告：检测到未授权的重启尝试。启动最高防御机制。"
+              "character": "合金战神·钢龙",
+              "avatar": "boss_89",
+              "text": "警告：正在执行虚空指令。歼灭模式已启动。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "强制关机键在哪？只能硬来了！"
             }
           ],
           "endDialogues": [
             {
-              "character": "超级AI",
-              "avatar": "npc_mech_overlord",
-              "text": "系统重置完成。和平模式已激活。"
+              "character": "合金战神·钢龙",
+              "avatar": "boss_89",
+              "text": "系统重启完成……病毒已清除。谢谢你，赛尔。"
+            },
+            {
+              "character": "合金战神·钢龙",
+              "avatar": "boss_89",
+              "text": "他们夺走了‘机械核心’。加上前三把钥匙，他们只差最后一步了……魔界星！"
             }
           ],
           "rewards": {
@@ -894,32 +1137,49 @@
       "steps": [
         {
           "step": 0,
-          "name": "灰烬中的低语",
-          "description": "在【地壳裂缝】向灰烬精灵询问情况。",
+          "name": "魔界的异动",
+          "description": "在【幽暗冥府】向魔界守门人打探消息。",
           "type": "npc_talk",
           "targetId": "npc_fire_spirit",
           "startDialogues": [
             {
-              "character": "灰烬精灵",
-              "avatar": "npc_fire_spirit",
-              "text": "深渊的封印正在崩坏……快去阻止那些狂暴的暗影生物！"
+              "character": "魔界守门人",
+              "avatar": "npc_abyss_guard",
+              "text": "生者不该踏入此地……但这股比魔界更邪恶的虚空气息，已经先你一步进去了。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "他们想要干什么？"
+            },
+            {
+              "character": "魔界守门人",
+              "avatar": "npc_abyss_guard",
+              "text": "复活‘炼狱魔王’！他们想将魔王作为容器，容纳阿瑞斯星系的最终神力！去证明你的实力，我才能放你通行。"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 500,
             "exp": 200
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "深渊阻击战",
-          "description": "击退3只熔核星精灵。",
+          "name": "冥府试炼",
+          "description": "在魔界星击败3只恶魔精灵。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
+          "endDialogues": [
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "考验通过了！赶快去炼狱深渊！"
+            }
+          ],
           "rewards": {
             "money": 1000,
             "exp": 500
@@ -927,46 +1187,72 @@
         },
         {
           "step": 2,
-          "name": "熔岩守望者",
-          "description": "前往【熔岩之河】寻找熔岩守望者。",
+          "name": "深渊的祭典",
+          "description": "在【猩红血池】找到暗夜游侠。",
           "type": "npc_talk",
           "targetId": "npc_lava_keeper",
           "startDialogues": [
             {
-              "character": "熔岩守望者",
-              "avatar": "npc_lava_keeper",
-              "text": "深渊领主正在召唤末日冥龙，一旦它完全苏醒，整个星系都将毁灭！"
+              "character": "暗夜游侠",
+              "avatar": "npc_mutant_hunter",
+              "text": "太晚了，他们已经把四把钥匙插入了祭坛。炼狱魔王已经苏醒了！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "就算苏醒了，我也要把它再打回去！"
+            },
+            {
+              "character": "暗夜游侠",
+              "avatar": "npc_mutant_hunter",
+              "text": "带着我的暗影护符去吧，它能保护你不受虚空烈焰的灼烧。"
             }
           ],
           "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
-          }
+          },
+          "targetCount": 1
         },
         {
           "step": 3,
-          "name": "终焉之战",
-          "description": "在【深渊祭坛】击败深渊冥龙·末日。",
+          "name": "魔王陨落",
+          "description": "在【炼狱深渊】击败深渊恐惧·魔王！",
           "type": "boss_battle",
           "targetId": 94,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "深渊领主",
-              "avatar": "npc_abyss_lord",
-              "text": "渺小的虫子，见证真正的末日吧！"
+              "character": "深渊恐惧·魔王",
+              "avatar": "boss_94",
+              "text": "哈哈哈！阿瑞斯的远古神力，如今已在我体内沸腾！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "借来的力量，终究不属于你！"
             }
           ],
           "endDialogues": [
             {
-              "character": "深渊领主",
-              "avatar": "npc_abyss_lord",
-              "text": "不可能……深渊的力量怎么会被打败……"
+              "character": "深渊恐惧·魔王",
+              "avatar": "boss_94",
+              "text": "不……这不可能！这股力量……正在撕裂我！"
+            },
+            {
+              "character": "船长罗杰",
+              "avatar": "rogers",
+              "text": "（通讯器）做的好！阿瑞斯星系的危机解除了！虚空教团的计划再次破产。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "船长，但我有种不好的预感，他们可能还有后手……雅典娜星系！"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 10000,
             "items": {
               "capsule_legend": 1
             }
@@ -978,81 +1264,109 @@
       "steps": [
         {
           "step": 0,
-          "name": "深空异音",
-          "description": "向【星屑回廊】的观星者询问情况。",
+          "name": "星尘的异响",
+          "description": "赛尔号追寻虚空能量的残骸来到了雅典娜星系。前往【星屑回廊】调查异响。",
           "type": "npc_talk",
           "targetId": "npc_stargazer",
           "startDialogues": [
             {
-              "character": "观星者",
+              "character": "星尘观测者",
               "avatar": "npc_stargazer",
-              "text": "星尘深处传来了不安的异响，某种古老的黑暗正在苏醒……你去陨石群中收集些星尘碎片，也许能找到线索。"
+              "text": "不好，雅典娜星系的屏障被打破了！虚空教团在这里释放了真正的虚空行者！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "真正的虚空？我们之前打败的那些是什么？"
+            },
+            {
+              "character": "星尘观测者",
+              "avatar": "npc_stargazer",
+              "text": "那些只是被污染的幻影，而这次，他们要从陨石群中打通连接虚无的通道！快去收集星尘碎片修补裂缝！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 1000,
-            "exp": 500
-          }
+            "money": 500,
+            "exp": 200
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "清理浮游",
-          "description": "在星屑回廊击败3只星尘浮游，收集星尘碎片。",
+          "name": "收集星尘",
+          "description": "在【星屑回廊】击败3只星尘浮游，收集星尘碎片。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
-          "rewards": {
-            "money": 2000,
-            "exp": 1000
-          }
-        },
-        {
-          "step": 2,
-          "name": "虚空旅人",
-          "description": "前往【陨石荒原】寻找虚空旅人。",
-          "type": "npc_talk",
-          "targetId": "npc_void_walker",
-          "startDialogues": [
+          "endDialogues": [
             {
-              "character": "虚空旅人",
-              "avatar": "npc_void_walker",
-              "text": "不好！那是虚空行者的气息！他正试图打开连接虚无的通道，快去陨石荒原阻止他！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "碎片收集完毕！但裂缝好像还在扩大！"
             }
           ],
-          "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
           }
         },
         {
+          "step": 2,
+          "name": "虚空行者",
+          "description": "前往【陨石荒原】，找到虚空裂缝！",
+          "type": "npc_talk",
+          "targetId": "npc_void_walker",
+          "startDialogues": [
+            {
+              "character": "虚空斥候",
+              "avatar": "npc_void_walker",
+              "text": "愚蠢的赛尔，虚无的黑洞已经成型。你们的光明，终将被黑暗吞没！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我绝不会让你们得逞！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          },
+          "targetCount": 1
+        },
+        {
           "step": 3,
-          "name": "黑洞降临",
-          "description": "在【虚空之眼】击败虚空行者·黑洞。",
+          "name": "黑洞崩塌",
+          "description": "在【虚空裂口】击败噬星魔·虚空行者，阻止黑洞成型！",
           "type": "boss_battle",
           "targetId": 103,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "深渊守卫",
-              "avatar": "npc_abyss_guard",
-              "text": "无知的光明……你们终将被虚无的黑洞所吞噬！"
+              "character": "噬星魔·虚空行者",
+              "avatar": "boss_99",
+              "text": "吾乃黑洞的意志……感受重力的撕裂吧！"
             }
           ],
           "endDialogues": [
             {
-              "character": "深渊守卫",
-              "avatar": "npc_abyss_guard",
-              "text": "黑洞的引力竟然被……打散了。这不可能……"
+              "character": "噬星魔·虚空行者",
+              "avatar": "boss_99",
+              "text": "我的身体……居然在崩坏……这不可能……"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "裂缝关闭了。但是虚空能量好像流向了旁边的棱镜星球！"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 3000,
             "items": {
-              "capsule_ultra": 1
+              "capsule_master": 1
             }
           }
         }
@@ -1062,81 +1376,114 @@
       "steps": [
         {
           "step": 0,
-          "name": "刺眼之光",
-          "description": "向【晶化谷】的采晶人询问情况。",
+          "name": "折射的黑暗",
+          "description": "前往【晶辉大殿】询问光之贤者。",
           "type": "npc_talk",
           "targetId": "npc_crystal_miner",
           "startDialogues": [
             {
-              "character": "采晶人",
-              "avatar": "npc_crystal_miner",
-              "text": "这里的棱镜光线越来越刺眼了，似乎是有什么纯粹的光之生物在躁动。去清理一下周围暴走的晶棱角吧。"
+              "character": "光之贤者",
+              "avatar": "npc_light_weaver",
+              "text": "这里是纯粹的光之世界，但虚空能量侵入后，所有的棱镜都在折射出狂暴的光芒。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "难道光也会被污染吗？"
+            },
+            {
+              "character": "光之贤者",
+              "avatar": "npc_light_weaver",
+              "text": "光若过于炽烈，便会化为审判的烈焰。去清理一下周围暴走的晶棱角，让光线柔和下来！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 1000,
-            "exp": 500
-          }
+            "money": 500,
+            "exp": 200
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "清理棱晶",
+          "name": "柔和之光",
           "description": "击败3只晶棱角，平息暴走的光芒。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
-          "rewards": {
-            "money": 2000,
-            "exp": 1000
-          }
-        },
-        {
-          "step": 2,
-          "name": "织光者",
-          "description": "前往【折射迷宫】寻找织光者。",
-          "type": "npc_talk",
-          "targetId": "npc_light_weaver",
-          "startDialogues": [
+          "endDialogues": [
             {
-              "character": "织光者",
-              "avatar": "npc_light_weaver",
-              "text": "感谢你平息了光芒。可是，耀光矩阵深处的光辉大天使似乎被某种力量折射出了狂暴的一面，快去看看！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "这里的光线没那么刺眼了。我们继续前进！"
             }
           ],
-          "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
           }
         },
         {
+          "step": 2,
+          "name": "大天使的陨落",
+          "description": "前往【耀光矩阵】寻找大天使的下落。",
+          "type": "npc_talk",
+          "targetId": "npc_light_weaver",
+          "startDialogues": [
+            {
+              "character": "天使近卫",
+              "avatar": "npc_archangel_projection",
+              "text": "糟了！光辉大天使被虚空能量直接命中，现在他认为所有的外来者都是‘杂质’，正在执行无差别的审判！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "看来只能用武力让他清醒一下了！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          },
+          "targetCount": 1
+        },
+        {
           "step": 3,
-          "name": "大天使之怒",
-          "description": "在【耀光矩阵】击败光辉大天使·折射。",
+          "name": "光之审判",
+          "description": "在【至高圣坛】击破神圣裁决·大天使！",
           "type": "boss_battle",
           "targetId": 106,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "大天使投影",
-              "avatar": "npc_archangel_projection",
-              "text": "审判之光将净化一切杂质！承受大天使的愤怒吧！"
+              "character": "神圣裁决·大天使",
+              "avatar": "boss_104",
+              "text": "杂质！污秽！接受这净世的审判吧！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "你的光已经偏执了，醒醒吧！"
             }
           ],
           "endDialogues": [
             {
-              "character": "大天使投影",
-              "avatar": "npc_archangel_projection",
-              "text": "这刺眼的光芒……终于变得柔和了。谢谢你，勇敢的赛尔。"
+              "character": "神圣裁决·大天使",
+              "avatar": "boss_104",
+              "text": "呼……多谢你，赛尔。偏执的光比黑暗更可怕。"
+            },
+            {
+              "character": "神圣裁决·大天使",
+              "avatar": "boss_104",
+              "text": "但虚空教团趁乱偷走了‘纯白之钥’，他们一定是去腐坏沼泽找‘疫病之源’了！"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 3000,
             "items": {
-              "capsule_ultra": 1
+              "capsule_master": 1
             }
           }
         }
@@ -1146,81 +1493,109 @@
       "steps": [
         {
           "step": 0,
-          "name": "致命瘴气",
-          "description": "向【腐坏沼泽】的沼泽隐士询问情况。",
+          "name": "致命毒瘴",
+          "description": "在【毒雾边境】询问防化兵。",
           "type": "npc_talk",
           "targetId": "npc_swamp_hermit",
           "startDialogues": [
             {
-              "character": "沼泽隐士",
-              "avatar": "npc_swamp_hermit",
-              "text": "咳咳……沼泽里的毒瘴越来越浓了，连我的防毒面具都快撑不住了。去击退几只变异的污泥怪，让空气流通一下！"
+              "character": "防化兵",
+              "avatar": "npc_plague_doctor",
+              "text": "咳咳……你居然没戴防毒面具！这里的毒瘴浓度已经爆表了！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我在寻找虚空教团的踪迹！"
+            },
+            {
+              "character": "防化兵",
+              "avatar": "npc_plague_doctor",
+              "text": "他们刚往腐坏沼泽深处去了！顺便帮我清理几只挡路的污泥怪吧！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 1000,
-            "exp": 500
-          }
+            "money": 500,
+            "exp": 200
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "清理污泥",
+          "name": "清理道路",
           "description": "在腐坏沼泽击退3只污泥怪。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
-          "rewards": {
-            "money": 2000,
-            "exp": 1000
-          }
-        },
-        {
-          "step": 2,
-          "name": "变异猎手",
-          "description": "前往【酸雨密林】寻找变异猎手。",
-          "type": "npc_talk",
-          "targetId": "npc_mutant_hunter",
-          "startDialogues": [
+          "endDialogues": [
             {
-              "character": "变异猎手",
-              "avatar": "npc_mutant_hunter",
-              "text": "毒瘴的源头是那只古老的‘疫病之源’，它从沉睡中苏醒了！如果不阻止它，整个星球都会化为毒水！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "好了，道路通畅了。沼泽中心有什么东西在蠕动！"
             }
           ],
-          "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
           }
         },
         {
+          "step": 2,
+          "name": "瘟疫之主",
+          "description": "在【剧毒泥潭】追踪虚空教团。",
+          "type": "npc_talk",
+          "targetId": "npc_mutant_hunter",
+          "startDialogues": [
+            {
+              "character": "虚空法师",
+              "avatar": "npc_void_walker",
+              "text": "呵呵，太迟了。古老的‘疫病之源’已经吸收了纯白之钥，变成了终极的瘟疫炸弹！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "一旦炸弹爆炸，整个雅典娜星系都会变成毒沼的！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          },
+          "targetCount": 1
+        },
+        {
           "step": 3,
-          "name": "疫病之源",
-          "description": "在【疫病源头】击败疫病之源·瘟疫。",
+          "name": "毒源净化",
+          "description": "在【万毒之渊】击败万毒之主·瘟疫，拆除瘟疫炸弹！",
           "type": "boss_battle",
           "targetId": 109,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "瘟疫医生",
-              "avatar": "npc_plague_doctor",
+              "character": "万毒之主·瘟疫",
+              "avatar": "boss_109",
               "text": "咕噜咕噜……拥抱这甜美的瘟疫吧……"
             }
           ],
           "endDialogues": [
             {
-              "character": "瘟疫医生",
-              "avatar": "npc_plague_doctor",
-              "text": "咳咳……瘟疫……也会有终结的一天吗……"
+              "character": "万毒之主·瘟疫",
+              "avatar": "boss_109",
+              "text": "咳咳……毒液……消散了……"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "成功拆除！等等，为什么远处的幻音星传来了悲鸣？"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 3000,
             "items": {
-              "capsule_legend": 1
+              "capsule_master": 1
             }
           }
         }
@@ -1230,81 +1605,119 @@
       "steps": [
         {
           "step": 0,
-          "name": "无声之哀",
-          "description": "与【寂静荒野】的静默僧侣交流。",
+          "name": "悲伤的安魂曲",
+          "description": "前往【回音山谷】，向音符精灵了解情况。",
           "type": "npc_talk",
           "targetId": "npc_silent_monk",
           "startDialogues": [
             {
-              "character": "静默僧侣",
-              "avatar": "npc_silent_monk",
-              "text": "嘘……你听，风中的安魂曲。太悲伤了，连音符精灵们都开始哭泣。去安慰它们一下吧。"
+              "character": "音符精灵",
+              "avatar": "npc_bard",
+              "text": "（哭泣）嘘……你听，风中的安魂曲。太悲伤了，大家都在哭泣。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "这歌声确实让人感到无比绝望。是谁在唱歌？"
+            },
+            {
+              "character": "音符精灵",
+              "avatar": "npc_bard",
+              "text": "是‘夜莺’……虚空教团夺走了她的希望之歌，换成了绝望和声！请帮我们平复一下情绪吧。"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 1000,
-            "exp": 500
-          }
+            "money": 500,
+            "exp": 200
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "平息音符",
+          "name": "安抚音符",
           "description": "与3只音符精灵交手，平复它们悲伤的情绪。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
-          "rewards": {
-            "money": 2000,
-            "exp": 1000
-          }
-        },
-        {
-          "step": 2,
-          "name": "流浪吟游",
-          "description": "前往【回音山谷】寻找流浪吟游。",
-          "type": "npc_talk",
-          "targetId": "npc_bard",
-          "startDialogues": [
+          "endDialogues": [
             {
-              "character": "流浪吟游",
-              "avatar": "npc_bard",
-              "text": "那首绝望安魂曲是由‘夜莺’唱出的……她失去了声音的共鸣，只剩下绝望。用你的战斗唤醒她吧！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "大家都冷静下来了。我们去找夜莺吧！"
             }
           ],
-          "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
           }
         },
         {
+          "step": 2,
+          "name": "绝望之歌",
+          "description": "在【寂静舞台】找到夜莺的指挥者。",
+          "type": "npc_talk",
+          "targetId": "npc_bard",
+          "startDialogues": [
+            {
+              "character": "虚空指挥家",
+              "avatar": "npc_maestro",
+              "text": "多美的旋律啊，这就是宇宙临终前的挽歌！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "快停下你的指挥！夜莺在痛苦地挣扎！"
+            },
+            {
+              "character": "虚空指挥家",
+              "avatar": "npc_maestro",
+              "text": "她已经完全沉浸在绝望中了，没有人能唤醒她！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          },
+          "targetCount": 1
+        },
+        {
           "step": 3,
-          "name": "安魂曲之终",
-          "description": "在【协奏圣殿】击败绝望安魂曲·夜莺。",
+          "name": "唤醒希望",
+          "description": "在【绝望音乐厅】击败绝望歌姬·夜莺，用战斗唤醒她！",
           "type": "boss_battle",
           "targetId": 112,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "疯狂指挥家",
-              "avatar": "npc_maestro",
+              "character": "绝望歌姬·夜莺",
+              "avatar": "boss_114",
               "text": "在这个没有回音的宇宙里……我的歌声……你听得到吗？"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我听到了！这不是你真正的声音！"
             }
           ],
           "endDialogues": [
             {
-              "character": "疯狂指挥家",
-              "avatar": "npc_maestro",
-              "text": "谢谢你……我终于听到了……充满希望的和弦……"
+              "character": "绝望歌姬·夜莺",
+              "avatar": "boss_114",
+              "text": "谢谢你……我终于听到了充满希望的和弦……"
+            },
+            {
+              "character": "绝望歌姬·夜莺",
+              "avatar": "boss_114",
+              "text": "虚空教团的首领收集了所有的绝望，前往了时间的尽头——时空裂隙！"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 3000,
             "items": {
-              "capsule_ultra": 1
+              "capsule_master": 1
             }
           }
         }
@@ -1314,81 +1727,124 @@
       "steps": [
         {
           "step": 0,
-          "name": "时间停滞",
-          "description": "向【停滞钟摆】的时空旅人询问情况。",
+          "name": "停滞的沙漏",
+          "description": "前往【时之沙暴】，找到时间守护者。",
           "type": "npc_talk",
           "targetId": "npc_time_traveler",
           "startDialogues": [
             {
-              "character": "时空旅人",
-              "avatar": "npc_time_traveler",
-              "text": "指针不动了！时间的齿轮卡壳了！发条鼠们到处乱窜，快帮我制止它们，不然整个时空都会崩溃！"
+              "character": "时间守护者",
+              "avatar": "npc_keeper_of_time",
+              "text": "指针不动了！时间的齿轮卡壳了！虚空教团想把宇宙的时间定格在毁灭的那一刻！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "我们该怎么做？"
+            },
+            {
+              "character": "时间守护者",
+              "avatar": "npc_keeper_of_time",
+              "text": "快帮我制止那些到处乱窜的发条鼠，它们偷走了重置时间的齿轮！"
             }
           ],
           "endDialogues": [],
           "rewards": {
-            "money": 1000,
-            "exp": 500
-          }
+            "money": 500,
+            "exp": 200
+          },
+          "targetCount": 1
         },
         {
           "step": 1,
-          "name": "修理齿轮",
+          "name": "找回齿轮",
           "description": "击败3只发条鼠，收集散落的齿轮。",
           "type": "battle",
           "targetId": null,
           "targetCount": 3,
           "startDialogues": [],
-          "endDialogues": [],
-          "rewards": {
-            "money": 2000,
-            "exp": 1000
-          }
-        },
-        {
-          "step": 2,
-          "name": "钟表匠",
-          "description": "前往【齿轮迷城】寻找钟表匠。",
-          "type": "npc_talk",
-          "targetId": "npc_clock_maker",
-          "startDialogues": [
+          "endDialogues": [
             {
-              "character": "钟表匠",
-              "avatar": "npc_clock_maker",
-              "text": "这些齿轮是用来修复时间引擎的！但是‘时光领主’已经开启了无限的时间循环，他想把这一刻永远定格！"
+              "character": "玩家",
+              "avatar": "player",
+              "text": "齿轮找齐了！快去修复时间引擎！"
             }
           ],
-          "endDialogues": [],
           "rewards": {
             "money": 1000,
             "exp": 500
           }
         },
         {
+          "step": 2,
+          "name": "最后的阻碍",
+          "description": "在【无限回廊】遇到虚空教团最终首领！",
+          "type": "npc_talk",
+          "targetId": "npc_clock_maker",
+          "startDialogues": [
+            {
+              "character": "虚空教团首领",
+              "avatar": "npc_abyss_lord",
+              "text": "真是顽强的生命啊……从第一星系追到了这里。"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "你们的阴谋到此为止了！"
+            },
+            {
+              "character": "虚空教团首领",
+              "avatar": "npc_abyss_lord",
+              "text": "可惜，‘时光领主’已经开启了无限的时间循环，他想把这一刻永远定格。你们赢不了的！"
+            }
+          ],
+          "endDialogues": [],
+          "rewards": {
+            "money": 1000,
+            "exp": 500
+          },
+          "targetCount": 1
+        },
+        {
           "step": 3,
-          "name": "时光重置",
-          "description": "在【永恒沙漏】击败时光领主·无限。",
+          "name": "打破循环",
+          "description": "在【时间尽头】击败永恒钟摆·时光领主，让时间重新转动！",
           "type": "boss_battle",
           "targetId": 115,
           "targetCount": 1,
           "startDialogues": [
             {
-              "character": "时间看守",
-              "avatar": "npc_keeper_of_time",
+              "character": "永恒钟摆·时光领主",
+              "avatar": "boss_119",
               "text": "你们的未来充满了毁灭，不如在无限的停滞中享受永恒吧！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "没有未来的永恒，只是一座坟墓！接招吧！"
             }
           ],
           "endDialogues": [
             {
-              "character": "时间看守",
-              "avatar": "npc_keeper_of_time",
+              "character": "永恒钟摆·时光领主",
+              "avatar": "boss_119",
               "text": "时间的齿轮……终于又开始转动了。未来……真的值得期待吗……"
+            },
+            {
+              "character": "船长罗杰",
+              "avatar": "rogers",
+              "text": "（通讯器）赛尔！全宇宙的监测数据恢复正常了！虚空教团的首脑也被我们一网打尽！"
+            },
+            {
+              "character": "玩家",
+              "avatar": "player",
+              "text": "太棒了船长！我们彻底粉碎了虚空的阴谋！宇宙迎来了新的明天！"
             }
           ],
           "rewards": {
-            "money": 5000,
+            "money": 20000,
             "items": {
-              "capsule_legend": 1
+              "capsule_legend": 3
             }
           }
         }

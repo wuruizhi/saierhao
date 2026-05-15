@@ -1,106 +1,702 @@
 {
   "capsules": [
-    { "id": "capsule_normal", "name": "普通胶囊", "price": 100, "captureBonus": 10, "icon": "🔵", "description": "最基础的精灵胶囊。捕获率基础+10%，适用于低等级或血量较低的野生精灵。" },
-    { "id": "capsule_great", "name": "高级胶囊", "price": 500, "captureBonus": 25, "icon": "🟢", "description": "改良型精灵胶囊。捕获率基础+25%，适用于中等级精灵，推荐削减目标HP后使用。" },
-    { "id": "capsule_ultra", "name": "超级胶囊", "price": 2000, "captureBonus": 50, "icon": "🟡", "description": "高科技精灵胶囊。捕获率基础+50%，对高等级和稀有精灵效果显著。" },
-    { "id": "capsule_master", "name": "大师胶囊", "price": 10000, "captureBonus": 100, "icon": "🟣", "description": "传说级胶囊，100%捕获率！对任何野生精灵必定成功捕获，Boss除外（Boss不可捕获）。" },
-    { "id": "capsule_legend", "name": "传说胶囊", "price": 50000, "captureBonus": 100, "icon": "👑", "description": "至尊胶囊，100%捕获率且捕获后精灵直升30级！最珍贵的收藏道具，Boss除外。" }
+    {
+      "id": "capsule_normal",
+      "name": "普通胶囊",
+      "price": 100,
+      "captureBonus": 10,
+      "icon": "🔵",
+      "description": "最基础的精灵胶囊。捕获率基础+10%，适用于低等级或血量较低的野生精灵。"
+    },
+    {
+      "id": "capsule_great",
+      "name": "高级胶囊",
+      "price": 500,
+      "captureBonus": 25,
+      "icon": "🟢",
+      "description": "改良型精灵胶囊。捕获率基础+25%，适用于中等级精灵，推荐削减目标HP后使用。"
+    },
+    {
+      "id": "capsule_ultra",
+      "name": "超级胶囊",
+      "price": 2000,
+      "captureBonus": 50,
+      "icon": "🟡",
+      "description": "高科技精灵胶囊。捕获率基础+50%，对高等级和稀有精灵效果显著。"
+    },
+    {
+      "id": "capsule_master",
+      "name": "大师胶囊",
+      "price": 10000,
+      "captureBonus": 100,
+      "icon": "🟣",
+      "description": "传说级胶囊，100%捕获率！对任何野生精灵必定成功捕获，Boss除外（Boss不可捕获）。"
+    },
+    {
+      "id": "capsule_legend",
+      "name": "传说胶囊",
+      "price": 50000,
+      "captureBonus": 100,
+      "icon": "👑",
+      "description": "至尊胶囊，100%捕获率且捕获后精灵直升30级！最珍贵的收藏道具，Boss除外。"
+    }
   ],
   "candies": [
-    { "id": "candy_s", "name": "经验糖果 S", "price": 200, "exp": 50, "icon": "🍬", "description": "小型经验糖果，使用后精灵获得50点经验值。适合低等级精灵快速成长。" },
-    { "id": "candy_m", "name": "经验糖果 M", "price": 800, "exp": 200, "icon": "🍭", "description": "中型经验糖果，使用后精灵获得200点经验值。性价比较高的成长道具。" },
-    { "id": "candy_l", "name": "经验糖果 L", "price": 3000, "exp": 1000, "icon": "🧁", "description": "大型经验糖果，使用后精灵获得1000点经验值。可快速提升中等级精灵。" },
-    { "id": "candy_xl", "name": "经验糖果 XL", "price": 10000, "exp": 5000, "icon": "🎂", "description": "超大经验糖果，使用后精灵获得5000点经验值。高等级精灵的进阶必备。" },
-    { "id": "candy_xxl", "name": "经验糖果 XXL", "price": 50000, "exp": 30000, "icon": "💎", "description": "钻石经验糖果，使用后精灵获得30000点经验值。可一次性大幅提升等级。" },
-    { "id": "candy_ultimate", "name": "终极经验糖", "price": 100000, "exp": 100000, "icon": "🌟", "description": "终极经验糖果，使用后精灵获得100000点经验值！几乎可以从1级直接升到满级。" }
+    {
+      "id": "candy_s",
+      "name": "经验糖果 S",
+      "price": 200,
+      "exp": 50,
+      "icon": "🍬",
+      "description": "小型经验糖果，使用后精灵获得50点经验值。适合低等级精灵快速成长。"
+    },
+    {
+      "id": "candy_m",
+      "name": "经验糖果 M",
+      "price": 800,
+      "exp": 200,
+      "icon": "🍭",
+      "description": "中型经验糖果，使用后精灵获得200点经验值。性价比较高的成长道具。"
+    },
+    {
+      "id": "candy_l",
+      "name": "经验糖果 L",
+      "price": 3000,
+      "exp": 1000,
+      "icon": "🧁",
+      "description": "大型经验糖果，使用后精灵获得1000点经验值。可快速提升中等级精灵。"
+    },
+    {
+      "id": "candy_xl",
+      "name": "经验糖果 XL",
+      "price": 10000,
+      "exp": 5000,
+      "icon": "🎂",
+      "description": "超大经验糖果，使用后精灵获得5000点经验值。高等级精灵的进阶必备。"
+    },
+    {
+      "id": "candy_xxl",
+      "name": "经验糖果 XXL",
+      "price": 50000,
+      "exp": 30000,
+      "icon": "💎",
+      "description": "钻石经验糖果，使用后精灵获得30000点经验值。可一次性大幅提升等级。"
+    },
+    {
+      "id": "candy_ultimate",
+      "name": "终极经验糖",
+      "price": 100000,
+      "exp": 100000,
+      "icon": "🌟",
+      "description": "终极经验糖果，使用后精灵获得100000点经验值！几乎可以从1级直接升到满级。"
+    }
   ],
   "boosters": [
-    { "id": "booster_hp", "name": "HP强化剂", "price": 3000, "icon": "❤️", "description": "永久提升精灵HP上限10%。效果可叠加，多次使用可大幅提升生存能力。", "stat": "hp", "multiplier": 1.1 },
-    { "id": "booster_attack", "name": "物攻强化剂", "price": 3000, "icon": "⚔️", "description": "永久提升精灵物理攻击力10%。适合物理系精灵，搭配物理技能效果更佳。", "stat": "attack", "multiplier": 1.1 },
-    { "id": "booster_spattack", "name": "法攻强化剂", "price": 3000, "icon": "🔮", "description": "永久提升精灵法术攻击力10%。适合法术系精灵，可提升特殊技能伤害。", "stat": "spAttack", "multiplier": 1.1 },
-    { "id": "booster_defense", "name": "物防强化剂", "price": 3000, "icon": "🛡️", "description": "永久提升精灵物理防御力10%。增强精灵对物理攻击的抵抗能力。", "stat": "defense", "multiplier": 1.1 },
-    { "id": "booster_spdefense", "name": "法防强化剂", "price": 3000, "icon": "🔰", "description": "永久提升精灵法术防御力10%。增强精灵对法术攻击的抵抗能力。", "stat": "spDefense", "multiplier": 1.1 },
-    { "id": "booster_speed", "name": "速度强化剂", "price": 3000, "icon": "💨", "description": "永久提升精灵速度10%。速度决定出手顺序，高速精灵可抢先攻击。", "stat": "speed", "multiplier": 1.1 },
-    { "id": "booster_all", "name": "全能强化剂", "price": 20000, "icon": "🏆", "description": "永久全面提升所有属性8%。一瓶搞定所有属性，终极培养道具。", "stat": "all", "multiplier": 1.08 },
-    { "id": "booster_mega", "name": "究极强化剂", "price": 50000, "icon": "💥", "description": "永久全面提升所有属性20%！最强培养道具，可让精灵实力飞跃式增长。", "stat": "all", "multiplier": 1.2 }
+    {
+      "id": "booster_hp",
+      "name": "HP强化剂",
+      "price": 3000,
+      "icon": "❤️",
+      "description": "永久提升精灵HP上限10%。效果可叠加，多次使用可大幅提升生存能力。",
+      "stat": "hp",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_attack",
+      "name": "物攻强化剂",
+      "price": 3000,
+      "icon": "⚔️",
+      "description": "永久提升精灵物理攻击力10%。适合物理系精灵，搭配物理技能效果更佳。",
+      "stat": "attack",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_spattack",
+      "name": "法攻强化剂",
+      "price": 3000,
+      "icon": "🔮",
+      "description": "永久提升精灵法术攻击力10%。适合法术系精灵，可提升特殊技能伤害。",
+      "stat": "spAttack",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_defense",
+      "name": "物防强化剂",
+      "price": 3000,
+      "icon": "🛡️",
+      "description": "永久提升精灵物理防御力10%。增强精灵对物理攻击的抵抗能力。",
+      "stat": "defense",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_spdefense",
+      "name": "法防强化剂",
+      "price": 3000,
+      "icon": "🔰",
+      "description": "永久提升精灵法术防御力10%。增强精灵对法术攻击的抵抗能力。",
+      "stat": "spDefense",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_speed",
+      "name": "速度强化剂",
+      "price": 3000,
+      "icon": "💨",
+      "description": "永久提升精灵速度10%。速度决定出手顺序，高速精灵可抢先攻击。",
+      "stat": "speed",
+      "multiplier": 1.1
+    },
+    {
+      "id": "booster_all",
+      "name": "全能强化剂",
+      "price": 20000,
+      "icon": "🏆",
+      "description": "永久全面提升所有属性8%。一瓶搞定所有属性，终极培养道具。",
+      "stat": "all",
+      "multiplier": 1.08
+    },
+    {
+      "id": "booster_mega",
+      "name": "究极强化剂",
+      "price": 50000,
+      "icon": "💥",
+      "description": "永久全面提升所有属性20%！最强培养道具，可让精灵实力飞跃式增长。",
+      "stat": "all",
+      "multiplier": 1.2
+    }
   ],
   "others": [
-    { "id": "hatch_speed", "name": "孵化加速剂", "price": 500, "icon": "⏩", "description": "使用后精元立即完成孵化，无需等待。对已开始孵化的精元使用。" },
-    { "id": "level_boost", "name": "等级直升卡", "price": 20000, "icon": "📈", "description": "使用后精灵直接提升10个等级！可突破进化等级限制，快速获得更强力的形态。" },
-    { "id": "evolve_stone", "name": "进化石", "price": 30000, "icon": "✨", "description": "使精灵直接进化为下一形态。需要精灵具备进化条件（有下一进化形态）。" },
-    { "id": "reset_stats", "name": "属性重置卡", "price": 10000, "icon": "🔄", "description": "重置精灵所有强化属性到基础值。如果强化方向出错可以使用此道具重新培养。" },
-    { "id": "gene_resequencer", "name": "基因重组药剂", "price": 25000, "icon": "🧬", "description": "重新随机生成精灵的个体值(IV)，改变其潜能。高风险高回报的终极道具。" }
+    {
+      "id": "hatch_speed",
+      "name": "孵化加速剂",
+      "price": 500,
+      "icon": "⏩",
+      "description": "使用后精元立即完成孵化，无需等待。对已开始孵化的精元使用。"
+    },
+    {
+      "id": "level_boost",
+      "name": "等级直升卡",
+      "price": 20000,
+      "icon": "📈",
+      "description": "使用后精灵直接提升10个等级！可突破进化等级限制，快速获得更强力的形态。"
+    },
+    {
+      "id": "evolve_stone",
+      "name": "进化石",
+      "price": 30000,
+      "icon": "✨",
+      "description": "使精灵直接进化为下一形态。需要精灵具备进化条件（有下一进化形态）。"
+    },
+    {
+      "id": "reset_stats",
+      "name": "属性重置卡",
+      "price": 10000,
+      "icon": "🔄",
+      "description": "重置精灵所有强化属性到基础值。如果强化方向出错可以使用此道具重新培养。"
+    },
+    {
+      "id": "gene_resequencer",
+      "name": "基因重组药剂",
+      "price": 25000,
+      "icon": "🧬",
+      "description": "重新随机生成精灵的个体值(IV)，改变其潜能。高风险高回报的终极道具。"
+    }
   ],
   "wardrobe": [
-    { "id": "hat_novice", "part": "head", "name": "赛尔头盔", "price": 0, "icon": "🪖", "description": "每一位赛尔的基础配备，保护头部安全。" },
-    { "id": "hat_cap", "part": "head", "name": "鸭舌帽", "price": 1000, "icon": "🧢", "description": "休闲的鸭舌帽，增添一丝运动气息。" },
-    { "id": "hat_crown", "part": "head", "name": "王者王冠", "price": 50000, "icon": "👑", "description": "璀璨的王冠，彰显你的尊贵身份。" },
-    { "id": "hat_magic", "part": "head", "name": "魔法帽", "price": 15000, "icon": "🎩", "description": "充满神秘气息的魔法师帽子。" },
-    { "id": "hat_ribbon", "part": "head", "name": "可爱领结", "price": 2000, "icon": "🎀", "description": "少女心满满的粉色蝴蝶结头饰。" },
-    { "id": "hat_cowboy", "part": "head", "name": "牛仔帽", "price": 4000, "icon": "🤠", "description": "狂野西部的象征，充满冒险气息。" },
-    { "id": "hat_ninja", "part": "head", "name": "忍者头巾", "price": 6000, "icon": "🥷", "description": "隐匿于黑暗之中的夜行者头饰。" },
-    { "id": "hat_pirate", "part": "head", "name": "海盗帽", "price": 8000, "icon": "🏴‍☠️", "description": "在大海上驰骋的海盗王专属帽子。" },
-    { "id": "hat_astronaut", "part": "head", "name": "宇航头盔", "price": 12000, "icon": "👩‍🚀", "description": "探索深空必备的高端宇航头盔。" },
-    { "id": "hat_party", "part": "head", "name": "派对帽", "price": 500, "icon": "🥳", "description": "戴上它，随时随地开启派对模式！" },
-    { "id": "hat_chef", "part": "head", "name": "厨神高帽", "price": 3000, "icon": "🧑‍🍳", "description": "星际餐厅顶级主厨的象征。" },
-    { "id": "hat_detective", "part": "head", "name": "名侦探帽", "price": 5000, "icon": "🕵️", "description": "真相永远只有一个！" },
-    { "id": "hat_winter", "part": "head", "name": "冬日绒帽", "price": 1500, "icon": "🧶", "description": "保暖又可爱的毛线帽。" },
-    { "id": "hat_graduation", "part": "head", "name": "学士帽", "price": 2500, "icon": "🎓", "description": "智慧的结晶，赛尔学院毕业证明。" },
-    
-    { "id": "body_novice", "part": "body", "name": "新手战服", "price": 0, "icon": "🥋", "description": "舒适耐用的基础战服，适合日常行动。" },
-    { "id": "body_suit", "part": "body", "name": "星际战衣", "price": 5000, "icon": "👕", "description": "高科技打造的赛尔号标准战衣。" },
-    { "id": "body_dress", "part": "body", "name": "华丽礼服", "price": 8000, "icon": "👗", "description": "出席重要场合的华丽服饰。" },
-    { "id": "body_armor", "part": "body", "name": "重型装甲", "price": 12000, "icon": "🦺", "description": "坚固的防护装甲，给人安全感。" },
-    { "id": "body_labcoat", "part": "body", "name": "科学白大褂", "price": 6000, "icon": "🥼", "description": "疯狂科学家的标准实验服。" },
-    { "id": "body_swimsuit", "part": "body", "name": "夏日泳装", "price": 3000, "icon": "🩱", "description": "清凉一夏，海滩度假必备。" },
-    { "id": "body_ninja", "part": "body", "name": "忍者夜行衣", "price": 7500, "icon": "👘", "description": "轻便无声，适合执行秘密任务。" },
-    { "id": "body_tuxedo", "part": "body", "name": "绅士燕尾服", "price": 15000, "icon": "🤵", "description": "参加星际晚宴的最高规格礼服。" },
-    { "id": "body_spacesuit", "part": "body", "name": "重型宇航服", "price": 18000, "icon": "🧑‍🚀", "description": "在极端环境下生存的顶级防护服。" },
-    { "id": "body_casual", "part": "body", "name": "潮流卫衣", "price": 2000, "icon": "🧥", "description": "街头风格，舒适且酷炫。" },
-    { "id": "body_king", "part": "body", "name": "国王锦袍", "price": 35000, "icon": "🫅", "description": "只有真正的统治者才配穿戴的奢华锦袍。" },
-    { "id": "body_robot", "part": "body", "name": "机械外骨骼", "price": 25000, "icon": "🤖", "description": "大幅增强力量的赛博朋克外骨骼。" },
-
-    { "id": "back_wings", "part": "back", "name": "天使之翼", "price": 20000, "icon": "👼", "description": "洁白的羽翼，虽然不能真飞但很拉风。" },
-    { "id": "back_cape", "part": "back", "name": "英雄披风", "price": 15000, "icon": "🦸", "description": "迎风飘扬的红色披风，帅气逼人。" },
-    { "id": "back_rocket", "part": "back", "name": "火箭背包", "price": 25000, "icon": "🚀", "description": "助推你的星际探索之旅！" },
-    { "id": "back_shield", "part": "back", "name": "星际护盾", "price": 18000, "icon": "🛡️", "description": "能够抵御流星碎片的能量护盾。" },
-    { "id": "back_guitar", "part": "back", "name": "摇滚电吉他", "price": 8000, "icon": "🎸", "description": "背上它，你就是全场最靓的仔。" },
-    { "id": "back_butterfly", "part": "back", "name": "蝴蝶仙翼", "price": 12000, "icon": "🦋", "description": "散发着彩色磷光的梦幻翅膀。" },
-    { "id": "back_sword", "part": "back", "name": "巨阙重剑", "price": 16000, "icon": "⚔️", "description": "虽然拔不出来，但是背着非常有压迫感。" },
-    { "id": "back_backpack", "part": "back", "name": "探险家行囊", "price": 3000, "icon": "🎒", "description": "装满了各种野外求生工具的背包。" },
-    { "id": "back_demon", "part": "back", "name": "恶魔之翼", "price": 22000, "icon": "🦇", "description": "深渊中诞生的暗黑双翼。" },
-    { "id": "back_scroll", "part": "back", "name": "奥义卷轴", "price": 9000, "icon": "📜", "description": "记载着失传忍术的巨大卷轴。" },
-    { "id": "back_ufo", "part": "back", "name": "悬浮飞碟", "price": 30000, "icon": "🛸", "description": "一直在背后默默跟随着你的微型UFO。" },
-
-    { "id": "acc_glasses", "part": "accessory", "name": "智能眼镜", "price": 2000, "icon": "👓", "description": "能够分析数据的智能护目镜。" },
-    { "id": "acc_sword", "part": "accessory", "name": "光剑挂件", "price": 5000, "icon": "🗡️", "description": "虽然不能用来砍人，但是挂在腰间很酷。" },
-    { "id": "acc_headphone", "part": "accessory", "name": "电竞耳机", "price": 3500, "icon": "🎧", "description": "隔音效果极佳的耳机，享受音乐与战斗。" },
-    { "id": "acc_ring", "part": "accessory", "name": "神秘光环", "price": 10000, "icon": "💫", "description": "环绕着神奇能量的光环。" },
-    { "id": "acc_sunglasses", "part": "accessory", "name": "黑客墨镜", "price": 3000, "icon": "🕶️", "description": "戴上它，你就是黑客帝国的主角。" },
-    { "id": "acc_mask", "part": "accessory", "name": "战术面罩", "price": 4000, "icon": "😷", "description": "过滤毒气，隐藏身份。" },
-    { "id": "acc_medal", "part": "accessory", "name": "勇者星章", "price": 15000, "icon": "🏅", "description": "星际联盟颁发的最高荣誉勋章。" },
-    { "id": "acc_watch", "part": "accessory", "name": "时空腕表", "price": 20000, "icon": "⌚", "description": "据说可以控制时间的神秘装置。" },
-    { "id": "acc_star", "part": "accessory", "name": "随行伴星", "price": 25000, "icon": "⭐", "description": "一颗真正的微缩恒星在围绕着你旋转。" },
-    { "id": "acc_fire", "part": "accessory", "name": "烈焰环绕", "price": 18000, "icon": "🔥", "description": "永不熄灭的神奇火焰特效。" },
-    { "id": "acc_snow", "part": "accessory", "name": "冰霜雪花", "price": 18000, "icon": "❄️", "description": "即使在火山也能让你感受到清凉的雪花特效。" },
-    { "id": "acc_magic", "part": "accessory", "name": "悬浮魔法书", "price": 22000, "icon": "📖", "description": "自动翻页的魔法典籍，充满智慧的光芒。" },
-    { "id": "acc_pet", "part": "accessory", "name": "趴头小猫", "price": 12000, "icon": "🐈", "description": "一只喜欢趴在赛尔头顶睡觉的宇宙小猫。" }
+    {
+      "id": "hat_novice",
+      "part": "head",
+      "name": "赛尔头盔",
+      "price": 0,
+      "icon": "/img/wardrobe/hat_novice.png",
+      "description": "每一位赛尔的基础配备，保护头部安全。"
+    },
+    {
+      "id": "hat_cap",
+      "part": "head",
+      "name": "鸭舌帽",
+      "price": 1000,
+      "icon": "/img/wardrobe/hat_cap.png",
+      "description": "休闲的鸭舌帽，增添一丝运动气息。"
+    },
+    {
+      "id": "hat_crown",
+      "part": "head",
+      "name": "王者王冠",
+      "price": 50000,
+      "icon": "/img/wardrobe/hat_crown.png",
+      "description": "璀璨的王冠，彰显你的尊贵身份。"
+    },
+    {
+      "id": "hat_magic",
+      "part": "head",
+      "name": "魔法帽",
+      "price": 15000,
+      "icon": "/img/wardrobe/hat_magic.png",
+      "description": "充满神秘气息的魔法师帽子。"
+    },
+    {
+      "id": "hat_ribbon",
+      "part": "head",
+      "name": "可爱领结",
+      "price": 2000,
+      "icon": "/img/wardrobe/hat_ribbon.png",
+      "description": "少女心满满的粉色蝴蝶结头饰。"
+    },
+    {
+      "id": "hat_cowboy",
+      "part": "head",
+      "name": "牛仔帽",
+      "price": 4000,
+      "icon": "/img/wardrobe/hat_cowboy.png",
+      "description": "狂野西部的象征，充满冒险气息。"
+    },
+    {
+      "id": "hat_ninja",
+      "part": "head",
+      "name": "忍者头巾",
+      "price": 6000,
+      "icon": "/img/wardrobe/hat_ninja.png",
+      "description": "隐匿于黑暗之中的夜行者头饰。"
+    },
+    {
+      "id": "hat_pirate",
+      "part": "head",
+      "name": "海盗帽",
+      "price": 8000,
+      "icon": "/img/wardrobe/hat_pirate.png",
+      "description": "在大海上驰骋的海盗王专属帽子。"
+    },
+    {
+      "id": "hat_astronaut",
+      "part": "head",
+      "name": "宇航头盔",
+      "price": 12000,
+      "icon": "/img/wardrobe/hat_astronaut.png",
+      "description": "探索深空必备的高端宇航头盔。"
+    },
+    {
+      "id": "hat_party",
+      "part": "head",
+      "name": "派对帽",
+      "price": 500,
+      "icon": "/img/wardrobe/hat_party.png",
+      "description": "戴上它，随时随地开启派对模式！"
+    },
+    {
+      "id": "hat_chef",
+      "part": "head",
+      "name": "厨神高帽",
+      "price": 3000,
+      "icon": "/img/wardrobe/hat_chef.png",
+      "description": "星际餐厅顶级主厨的象征。"
+    },
+    {
+      "id": "hat_detective",
+      "part": "head",
+      "name": "名侦探帽",
+      "price": 5000,
+      "icon": "/img/wardrobe/hat_detective.png",
+      "description": "真相永远只有一个！"
+    },
+    {
+      "id": "hat_winter",
+      "part": "head",
+      "name": "冬日绒帽",
+      "price": 1500,
+      "icon": "/img/wardrobe/hat_winter.png",
+      "description": "保暖又可爱的毛线帽。"
+    },
+    {
+      "id": "hat_graduation",
+      "part": "head",
+      "name": "学士帽",
+      "price": 2500,
+      "icon": "/img/wardrobe/hat_graduation.png",
+      "description": "智慧的结晶，赛尔学院毕业证明。"
+    },
+    {
+      "id": "body_novice",
+      "part": "body",
+      "name": "新手战服",
+      "price": 0,
+      "icon": "/img/wardrobe/body_novice.png",
+      "description": "舒适耐用的基础战服，适合日常行动。"
+    },
+    {
+      "id": "body_suit",
+      "part": "body",
+      "name": "星际战衣",
+      "price": 5000,
+      "icon": "/img/wardrobe/body_suit.png",
+      "description": "高科技打造的赛尔号标准战衣。"
+    },
+    {
+      "id": "body_dress",
+      "part": "body",
+      "name": "华丽礼服",
+      "price": 8000,
+      "icon": "/img/wardrobe/body_dress.png",
+      "description": "出席重要场合的华丽服饰。"
+    },
+    {
+      "id": "body_armor",
+      "part": "body",
+      "name": "重型装甲",
+      "price": 12000,
+      "icon": "/img/wardrobe/body_armor.png",
+      "description": "坚固的防护装甲，给人安全感。"
+    },
+    {
+      "id": "body_labcoat",
+      "part": "body",
+      "name": "科学白大褂",
+      "price": 6000,
+      "icon": "/img/wardrobe/body_labcoat.png",
+      "description": "疯狂科学家的标准实验服。"
+    },
+    {
+      "id": "body_swimsuit",
+      "part": "body",
+      "name": "夏日泳装",
+      "price": 3000,
+      "icon": "/img/wardrobe/body_swimsuit.png",
+      "description": "清凉一夏，海滩度假必备。"
+    },
+    {
+      "id": "body_ninja",
+      "part": "body",
+      "name": "忍者夜行衣",
+      "price": 7500,
+      "icon": "/img/wardrobe/body_ninja.png",
+      "description": "轻便无声，适合执行秘密任务。"
+    },
+    {
+      "id": "body_tuxedo",
+      "part": "body",
+      "name": "绅士燕尾服",
+      "price": 15000,
+      "icon": "/img/wardrobe/body_tuxedo.png",
+      "description": "参加星际晚宴的最高规格礼服。"
+    },
+    {
+      "id": "body_spacesuit",
+      "part": "body",
+      "name": "重型宇航服",
+      "price": 18000,
+      "icon": "/img/wardrobe/body_spacesuit.png",
+      "description": "在极端环境下生存的顶级防护服。"
+    },
+    {
+      "id": "body_casual",
+      "part": "body",
+      "name": "潮流卫衣",
+      "price": 2000,
+      "icon": "/img/wardrobe/body_casual.png",
+      "description": "街头风格，舒适且酷炫。"
+    },
+    {
+      "id": "body_king",
+      "part": "body",
+      "name": "国王锦袍",
+      "price": 35000,
+      "icon": "/img/wardrobe/body_king.png",
+      "description": "只有真正的统治者才配穿戴的奢华锦袍。"
+    },
+    {
+      "id": "body_robot",
+      "part": "body",
+      "name": "机械外骨骼",
+      "price": 25000,
+      "icon": "/img/wardrobe/body_robot.png",
+      "description": "大幅增强力量的赛博朋克外骨骼。"
+    },
+    {
+      "id": "back_wings",
+      "part": "back",
+      "name": "天使之翼",
+      "price": 20000,
+      "icon": "/img/wardrobe/back_wings.png",
+      "description": "洁白的羽翼，虽然不能真飞但很拉风。"
+    },
+    {
+      "id": "back_cape",
+      "part": "back",
+      "name": "英雄披风",
+      "price": 15000,
+      "icon": "/img/wardrobe/back_cape.png",
+      "description": "迎风飘扬的红色披风，帅气逼人。"
+    },
+    {
+      "id": "back_rocket",
+      "part": "back",
+      "name": "火箭背包",
+      "price": 25000,
+      "icon": "/img/wardrobe/back_rocket.png",
+      "description": "助推你的星际探索之旅！"
+    },
+    {
+      "id": "back_shield",
+      "part": "back",
+      "name": "星际护盾",
+      "price": 18000,
+      "icon": "/img/wardrobe/back_shield.png",
+      "description": "能够抵御流星碎片的能量护盾。"
+    },
+    {
+      "id": "back_guitar",
+      "part": "back",
+      "name": "摇滚电吉他",
+      "price": 8000,
+      "icon": "/img/wardrobe/back_guitar.png",
+      "description": "背上它，你就是全场最靓的仔。"
+    },
+    {
+      "id": "back_butterfly",
+      "part": "back",
+      "name": "蝴蝶仙翼",
+      "price": 12000,
+      "icon": "/img/wardrobe/back_butterfly.png",
+      "description": "散发着彩色磷光的梦幻翅膀。"
+    },
+    {
+      "id": "back_sword",
+      "part": "back",
+      "name": "巨阙重剑",
+      "price": 16000,
+      "icon": "/img/wardrobe/back_sword.png",
+      "description": "虽然拔不出来，但是背着非常有压迫感。"
+    },
+    {
+      "id": "back_backpack",
+      "part": "back",
+      "name": "探险家行囊",
+      "price": 3000,
+      "icon": "/img/wardrobe/back_backpack.png",
+      "description": "装满了各种野外求生工具的背包。"
+    },
+    {
+      "id": "back_demon",
+      "part": "back",
+      "name": "恶魔之翼",
+      "price": 22000,
+      "icon": "/img/wardrobe/back_demon.png",
+      "description": "深渊中诞生的暗黑双翼。"
+    },
+    {
+      "id": "back_scroll",
+      "part": "back",
+      "name": "奥义卷轴",
+      "price": 9000,
+      "icon": "/img/wardrobe/back_scroll.png",
+      "description": "记载着失传忍术的巨大卷轴。"
+    },
+    {
+      "id": "back_ufo",
+      "part": "back",
+      "name": "悬浮飞碟",
+      "price": 30000,
+      "icon": "/img/wardrobe/back_ufo.png",
+      "description": "一直在背后默默跟随着你的微型UFO。"
+    },
+    {
+      "id": "acc_glasses",
+      "part": "accessory",
+      "name": "智能眼镜",
+      "price": 2000,
+      "icon": "/img/wardrobe/acc_glasses.png",
+      "description": "能够分析数据的智能护目镜。"
+    },
+    {
+      "id": "acc_sword",
+      "part": "accessory",
+      "name": "光剑挂件",
+      "price": 5000,
+      "icon": "/img/wardrobe/acc_sword.png",
+      "description": "虽然不能用来砍人，但是挂在腰间很酷。"
+    },
+    {
+      "id": "acc_headphone",
+      "part": "accessory",
+      "name": "电竞耳机",
+      "price": 3500,
+      "icon": "/img/wardrobe/acc_headphone.png",
+      "description": "隔音效果极佳的耳机，享受音乐与战斗。"
+    },
+    {
+      "id": "acc_ring",
+      "part": "accessory",
+      "name": "神秘光环",
+      "price": 10000,
+      "icon": "/img/wardrobe/acc_ring.png",
+      "description": "环绕着神奇能量的光环。"
+    },
+    {
+      "id": "acc_sunglasses",
+      "part": "accessory",
+      "name": "黑客墨镜",
+      "price": 3000,
+      "icon": "/img/wardrobe/acc_sunglasses.png",
+      "description": "戴上它，你就是黑客帝国的主角。"
+    },
+    {
+      "id": "acc_mask",
+      "part": "accessory",
+      "name": "战术面罩",
+      "price": 4000,
+      "icon": "/img/wardrobe/acc_mask.png",
+      "description": "过滤毒气，隐藏身份。"
+    },
+    {
+      "id": "acc_medal",
+      "part": "accessory",
+      "name": "勇者星章",
+      "price": 15000,
+      "icon": "/img/wardrobe/acc_medal.png",
+      "description": "星际联盟颁发的最高荣誉勋章。"
+    },
+    {
+      "id": "acc_watch",
+      "part": "accessory",
+      "name": "时空腕表",
+      "price": 20000,
+      "icon": "/img/wardrobe/acc_watch.png",
+      "description": "据说可以控制时间的神秘装置。"
+    },
+    {
+      "id": "acc_star",
+      "part": "accessory",
+      "name": "随行伴星",
+      "price": 25000,
+      "icon": "/img/wardrobe/acc_star.png",
+      "description": "一颗真正的微缩恒星在围绕着你旋转。"
+    },
+    {
+      "id": "acc_fire",
+      "part": "accessory",
+      "name": "烈焰环绕",
+      "price": 18000,
+      "icon": "/img/wardrobe/acc_fire.png",
+      "description": "永不熄灭的神奇火焰特效。"
+    },
+    {
+      "id": "acc_snow",
+      "part": "accessory",
+      "name": "冰霜雪花",
+      "price": 18000,
+      "icon": "/img/wardrobe/acc_snow.png",
+      "description": "即使在火山也能让你感受到清凉的雪花特效。"
+    },
+    {
+      "id": "acc_magic",
+      "part": "accessory",
+      "name": "悬浮魔法书",
+      "price": 22000,
+      "icon": "/img/wardrobe/acc_magic.png",
+      "description": "自动翻页的魔法典籍，充满智慧的光芒。"
+    },
+    {
+      "id": "acc_pet",
+      "part": "accessory",
+      "name": "趴头小猫",
+      "price": 12000,
+      "icon": "/img/wardrobe/acc_pet.png",
+      "description": "一只喜欢趴在赛尔头顶睡觉的宇宙小猫。"
+    }
   ],
   "essences": {
-    "fire": { "name": "焱龙精元", "icon": "🔥", "hatchPetId": 19, "hatchTime": 300, "skipCost": 500 },
-    "water": { "name": "渊鲲精元", "icon": "💧", "hatchPetId": 22, "hatchTime": 300, "skipCost": 500 },
-    "grass": { "name": "古树精元", "icon": "🌿", "hatchPetId": 25, "hatchTime": 300, "skipCost": 500 },
-    "electric": { "name": "天雷精元", "icon": "⚡", "hatchPetId": 28, "hatchTime": 600, "skipCost": 1000 },
-    "dark": { "name": "虚空精元", "icon": "🌑", "hatchPetId": 31, "hatchTime": 900, "skipCost": 2000 },
-    "dream": { "name": "织梦精元", "icon": "🦋", "hatchPetId": 69, "hatchTime": 900, "skipCost": 2000 },
-    "prism": { "name": "晶棱精元", "icon": "🔆", "hatchPetId": 104, "hatchTime": 900, "skipCost": 2000 },
-    "melody": { "name": "安魂精元", "icon": "🎼", "hatchPetId": 110, "hatchTime": 900, "skipCost": 2000 }
+    "fire": {
+      "name": "焱龙精元",
+      "icon": "🔥",
+      "hatchPetId": 19,
+      "hatchTime": 300,
+      "skipCost": 500
+    },
+    "water": {
+      "name": "渊鲲精元",
+      "icon": "💧",
+      "hatchPetId": 22,
+      "hatchTime": 300,
+      "skipCost": 500
+    },
+    "grass": {
+      "name": "古树精元",
+      "icon": "🌿",
+      "hatchPetId": 25,
+      "hatchTime": 300,
+      "skipCost": 500
+    },
+    "electric": {
+      "name": "天雷精元",
+      "icon": "⚡",
+      "hatchPetId": 28,
+      "hatchTime": 600,
+      "skipCost": 1000
+    },
+    "dark": {
+      "name": "虚空精元",
+      "icon": "🌑",
+      "hatchPetId": 31,
+      "hatchTime": 900,
+      "skipCost": 2000
+    },
+    "dream": {
+      "name": "织梦精元",
+      "icon": "🦋",
+      "hatchPetId": 69,
+      "hatchTime": 900,
+      "skipCost": 2000
+    },
+    "prism": {
+      "name": "晶棱精元",
+      "icon": "🔆",
+      "hatchPetId": 104,
+      "hatchTime": 900,
+      "skipCost": 2000
+    },
+    "melody": {
+      "name": "安魂精元",
+      "icon": "🎼",
+      "hatchPetId": 110,
+      "hatchTime": 900,
+      "skipCost": 2000
+    }
   },
   "furniture": [
-    { "id": "base_bed", "name": "太空睡眠舱", "price": 15000, "icon": "🛏️", "description": "赛尔号船员的标准睡眠舱，提供舒适的休息环境。" },
-    { "id": "base_desk", "name": "全息工作台", "price": 10000, "icon": "🖥️", "description": "处理星际数据的高科技工作台。" },
-    { "id": "base_plant", "name": "太空盆栽", "price": 5000, "icon": "🪴", "description": "能在微重力环境下生长的奇特植物。" },
-    { "id": "base_trophy", "name": "黄金奖杯", "price": 30000, "icon": "🏆", "description": "象征荣耀的奖杯，摆在基地里非常气派。" },
-    { "id": "base_lamp", "name": "等离子灯", "price": 8000, "icon": "🏮", "description": "散发着幽蓝光芒的氛围灯。" }
+    {
+      "id": "base_bed",
+      "name": "太空睡眠舱",
+      "price": 15000,
+      "icon": "🛏️",
+      "description": "赛尔号船员的标准睡眠舱，提供舒适的休息环境。"
+    },
+    {
+      "id": "base_desk",
+      "name": "全息工作台",
+      "price": 10000,
+      "icon": "🖥️",
+      "description": "处理星际数据的高科技工作台。"
+    },
+    {
+      "id": "base_plant",
+      "name": "太空盆栽",
+      "price": 5000,
+      "icon": "🪴",
+      "description": "能在微重力环境下生长的奇特植物。"
+    },
+    {
+      "id": "base_trophy",
+      "name": "黄金奖杯",
+      "price": 30000,
+      "icon": "🏆",
+      "description": "象征荣耀的奖杯，摆在基地里非常气派。"
+    },
+    {
+      "id": "base_lamp",
+      "name": "等离子灯",
+      "price": 8000,
+      "icon": "🏮",
+      "description": "散发着幽蓝光芒的氛围灯。"
+    }
   ]
 }
