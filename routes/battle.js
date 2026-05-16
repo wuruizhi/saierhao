@@ -114,6 +114,13 @@ function createBattleRouter(db, sceneManager) {
 
     const wildPet = createWildPet(wildPetData.petId, wildPetData.level);
 
+    // Random weather (20% chance of random weather)
+    const WEATHERS = ['sun', 'rain', 'sandstorm', 'hail'];
+    let weather = null;
+    if (Math.random() < 0.2) {
+      weather = WEATHERS[Math.floor(Math.random() * WEATHERS.length)];
+    }
+
     // Store active battle
     const battleId = `pve_${req.userId}_${Date.now()}`;
     const firstAliveIndex = teamPets.findIndex(p => p.current_hp > 0);
@@ -132,7 +139,8 @@ function createBattleRouter(db, sceneManager) {
       wildPetOriginal: { ...wildPet },
       isBoss,
       essenceId,
-      bossName: wildPetData.bossName || null
+      bossName: wildPetData.bossName || null,
+      weather
     });
 
     const petDef = petsData.pets.find(p => p.id === wildPet.pet_id);
@@ -148,7 +156,8 @@ function createBattleRouter(db, sceneManager) {
         ...activeTeamPet,
         skills: JSON.parse(activeTeamPet.skills),
         petDef: petsData.pets.find(p => p.id === activeTeamPet.pet_id)
-      }
+      },
+      weather
     });
     
     incrementQuestProgress(db, player.id, 'explore', 1);
@@ -167,7 +176,7 @@ function createBattleRouter(db, sceneManager) {
       return res.status(400).json({ error: '该精灵未装备此技能' });
     }
 
-    const result = executePveTurn(battle.activePet, battle.wildPet, numericSkillId);
+    const result = executePveTurn(battle.activePet, battle.wildPet, numericSkillId, battle.weather);
 
     if (result.battleEnd) {
       if (result.playerWin) {

@@ -229,6 +229,12 @@ function initDB() {
   try { db.exec('ALTER TABLE player_pets ADD COLUMN ivs TEXT DEFAULT "{}"'); } catch(e) {}
   try { db.exec('ALTER TABLE player_pets ADD COLUMN evs TEXT DEFAULT "{}"'); } catch(e) {}
   try { db.exec('ALTER TABLE player_pets ADD COLUMN in_base INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE player_pets ADD COLUMN nature TEXT DEFAULT ""'); } catch(e) {}
+
+  // Daily check-in
+  try { db.exec('ALTER TABLE players ADD COLUMN checkin_streak INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN last_checkin TEXT DEFAULT ""'); } catch(e) {}
+  try { db.exec('ALTER TABLE players ADD COLUMN total_checkins INTEGER DEFAULT 0'); } catch(e) {}
 
   return db;
 }

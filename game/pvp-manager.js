@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../middleware/auth');
-const { executeAttack, chooseEnemySkill } = require('./battle-engine');
+const { executeAttack, chooseEnemySkill, initPpMap, getAvailableSkillId, deductPp } = require('./battle-engine');
 const { addExp } = require('./pet-manager');
 const petsData = require('../data/pets.json');
 const skillsData = require('../data/skills.json');
@@ -170,7 +170,9 @@ class PvpManager {
     const enrichPet = (p) => ({
       ...p,
       skills: JSON.parse(p.skills),
-      petDef: petsData.pets.find(pd => pd.id === p.pet_id)
+      petDef: petsData.pets.find(pd => pd.id === p.pet_id),
+      statusEffects: [],
+      _ppMap: null // will be initialized on first use
     });
 
     const room = {
@@ -188,7 +190,8 @@ class PvpManager {
         activeIndex: 0,
         action: null
       },
-      turn: 1
+      turn: 1,
+      weather: Math.random() < 0.2 ? ['sun', 'rain', 'sandstorm', 'hail'][Math.floor(Math.random() * 4)] : null
     };
 
     this.pvpRooms.set(roomId, room);
@@ -196,12 +199,15 @@ class PvpManager {
     const battleData = {
       type: 'pvp_start',
       roomId,
-      turn: 1
+      turn: 1,
+      weather: room.weather
     };
 
     this.sendTo(fromId, {
       ...battleData,
       yourPet: room.player1.team[0],
+      yourTeam: room.player1.team,
+      yourActiveIndex: 0,
       opponentPet: this.sanitizePet(room.player2.team[0]),
       opponentName: room.player2.username
     });
@@ -209,6 +215,8 @@ class PvpManager {
     this.sendTo(accepterId, {
       ...battleData,
       yourPet: room.player2.team[0],
+      yourTeam: room.player2.team,
+      yourActiveIndex: 0,
       opponentPet: this.sanitizePet(room.player1.team[0]),
       opponentName: room.player1.username
     });
@@ -281,8 +289,8 @@ class PvpManager {
     this.pvpRooms.set(roomId, room);
 
     const battleData = { type: 'pvp_start', isRanked: true, roomId, turn: 1 };
-    this.sendTo(p1Id, { ...battleData, yourPet: room.player1.team[0], opponentPet: this.sanitizePet(room.player2.team[0]), opponentName: room.player2.username });
-    this.sendTo(p2Id, { ...battleData, yourPet: room.player2.team[0], opponentPet: this.sanitizePet(room.player1.team[0]), opponentName: room.player1.username });
+    this.sendTo(p1Id, { ...battleData, yourPet: room.player1.team[0], yourTeam: room.player1.team, yourActiveIndex: 0, opponentPet: this.sanitizePet(room.player2.team[0]), opponentName: room.player2.username });
+    this.sendTo(p2Id, { ...battleData, yourPet: room.player2.team[0], yourTeam: room.player2.team, yourActiveIndex: 0, opponentPet: this.sanitizePet(room.player1.team[0]), opponentName: room.player1.username });
   }
 
   handlePvpAction(userId, roomId, skillId) {
@@ -317,115 +325,225 @@ class PvpManager {
     }
   }
 
-  handlePvpSwitch(userId, roomId) {
-    if (!this.pvpRooms.has(roomId)) return;
-    this.sendTo(userId, { type: 'pvp_error', message: '当前版本暂不支持对战中切换精灵' });
+  handlePvpSwitch(userId, roomId, petIndex) {
+    const room = this.pvpRooms.get(roomId);
+    if (!room) return;
+
+    const isP1 = room.player1.userId === userId;
+    if (!isP1 && room.player2.userId !== userId) return;
+    const player = isP1 ? room.player1 : room.player2;
+
+    if (player.action) {
+      this.sendTo(userId, { type: 'pvp_error', message: '本回合已选择行动' });
+      return;
+    }
+
+    const idx = Number(petIndex);
+    if (idx === player.activeIndex) {
+      this.sendTo(userId, { type: 'pvp_error', message: '该精灵已经在场上了' });
+      return;
+    }
+    if (idx < 0 || idx >= player.team.length) {
+      this.sendTo(userId, { type: 'pvp_error', message: '无效的精灵选择' });
+      return;
+    }
+    if (player.team[idx].current_hp <= 0) {
+      this.sendTo(userId, { type: 'pvp_error', message: '该精灵已经倒下，无法上场' });
+      return;
+    }
+
+    player.action = { type: 'switch', petIndex: idx };
+
+    if (room.player1.action && room.player2.action) {
+      this.resolvePvpTurn(roomId, room);
+    } else {
+      const otherId = isP1 ? room.player2.userId : room.player1.userId;
+      this.sendTo(otherId, { type: 'pvp_opponent_acting', message: '对方已选择行动，等待你的选择...' });
+      this.sendTo(userId, { type: 'pvp_waiting', message: '等待对方选择行动...' });
+    }
   }
 
   resolvePvpTurn(roomId, room) {
-    const p1Pet = room.player1.team[room.player1.activeIndex];
-    const p2Pet = room.player2.team[room.player2.activeIndex];
-
-    const p1Skills = Array.isArray(p1Pet.skills) ? p1Pet.skills : JSON.parse(p1Pet.skills || '[]');
-    const p2Skills = Array.isArray(p2Pet.skills) ? p2Pet.skills : JSON.parse(p2Pet.skills || '[]');
-
-    let s1Id = room.player1.action.skillId;
-    let s2Id = room.player2.action.skillId;
-    
-    // Validate skills
-    if (!p1Skills.includes(s1Id)) s1Id = p1Skills[0];
-    if (!p2Skills.includes(s2Id)) s2Id = p2Skills[0];
-
-    const skill1 = skillsData.skills.find(s => s.id === s1Id);
-    const skill2 = skillsData.skills.find(s => s.id === s2Id);
-
-    if (!skill1 || !skill2) return;
-
-    // Determine who goes first (respect priority flag)
-    let p1First;
-    if (skill1.priority && !skill2.priority) p1First = true;
-    else if (skill2.priority && !skill1.priority) p1First = false;
-    else p1First = p1Pet.speed >= p2Pet.speed;
-
-    const first = p1First ? { pet: p1Pet, skill: skill1, player: room.player1 }
-                          : { pet: p2Pet, skill: skill2, player: room.player2 };
-    const second = p1First ? { pet: p2Pet, skill: skill2, player: room.player2 }
-                           : { pet: p1Pet, skill: skill1, player: room.player1 };
-
+    const { processTurnStartStatus, tickStatusEffects, canAct } = require('./battle-engine');
     const results = [];
     let battleEnd = false;
     let winnerId = null;
     let p1Switched = false;
     let p2Switched = false;
 
+    // Helper: find next alive pet when current one faints
     const handleDeath = (playerObj) => {
-      let isDead = true;
-      for (let i = playerObj.activeIndex + 1; i < playerObj.team.length; i++) {
-        if (playerObj.team[i].current_hp > 0) {
+      for (let i = 0; i < playerObj.team.length; i++) {
+        if (i !== playerObj.activeIndex && playerObj.team[i].current_hp > 0) {
           playerObj.activeIndex = i;
-          isDead = false;
-          if (playerObj.userId === room.player1.userId) p1Switched = true;
+          if (playerObj === room.player1) p1Switched = true;
           else p2Switched = true;
-          break;
+          return false; // team still alive
         }
       }
-      return isDead;
+      return true; // all fainted
     };
 
-    // ---- TURN START: Process status effects ----
-    const { processTurnStartStatus, tickStatusEffects, canAct } = require('./battle-engine');
+    // ========== PHASE 1: Process voluntary switches ==========
+    if (room.player1.action.type === 'switch') {
+      room.player1.activeIndex = room.player1.action.petIndex;
+      p1Switched = true;
+      results.push({ message: `${room.player1.username}换上了${room.player1.team[room.player1.activeIndex].nickname}！`, switchEvent: true });
+    }
+    if (room.player2.action.type === 'switch') {
+      room.player2.activeIndex = room.player2.action.petIndex;
+      p2Switched = true;
+      results.push({ message: `${room.player2.username}换上了${room.player2.team[room.player2.activeIndex].nickname}！`, switchEvent: true });
+    }
+
+    // Get active pets (after any switches)
+    const p1Pet = room.player1.team[room.player1.activeIndex];
+    const p2Pet = room.player2.team[room.player2.activeIndex];
+
+    // ========== PHASE 2: Turn Start Status Effects ==========
     const p1StartMsgs = processTurnStartStatus(p1Pet, p2Pet);
     const p2StartMsgs = processTurnStartStatus(p2Pet, p1Pet);
     [...p1StartMsgs, ...p2StartMsgs].forEach(msg => {
       results.push({ message: msg, statusEffect: true });
     });
 
-    if (first.pet.current_hp <= 0) {
-      if (handleDeath(first.player)) { battleEnd = true; winnerId = second.player.userId; }
+    // Check deaths from status
+    if (p1Pet.current_hp <= 0) {
+      if (handleDeath(room.player1)) { battleEnd = true; winnerId = room.player2.userId; }
     }
-    if (!battleEnd && second.pet.current_hp <= 0) {
-      if (handleDeath(second.player)) { battleEnd = true; winnerId = first.player.userId; }
+    if (!battleEnd && p2Pet.current_hp <= 0) {
+      if (handleDeath(room.player2)) { battleEnd = true; winnerId = room.player1.userId; }
     }
 
+    // ========== PHASE 3: Attacks ==========
     if (!battleEnd) {
-      // First attack
-      const act1 = canAct(first.pet);
-      if (!act1.canAct) {
-        results.push({ message: act1.reason, statusEffect: true });
-      } else {
-        const r1 = executeAttack(first.pet, second.pet, first.skill, true);
-        results.push({ ...r1, attackerName: first.pet.nickname, defenderName: second.pet.nickname });
-      }
+      const p1Attacks = room.player1.action.type === 'attack';
+      const p2Attacks = room.player2.action.type === 'attack';
 
-      if (first.pet.current_hp <= 0) {
-        if (handleDeath(first.player)) { battleEnd = true; winnerId = second.player.userId; }
-      } else if (second.pet.current_hp <= 0) {
-        if (handleDeath(second.player)) { battleEnd = true; winnerId = first.player.userId; }
-      } else {
-        // Second attack
-        const act2 = canAct(second.pet);
-        if (!act2.canAct) {
-          results.push({ message: act2.reason, statusEffect: true });
-        } else {
-          const r2 = executeAttack(second.pet, first.pet, second.skill, true);
-          results.push({ ...r2, attackerName: second.pet.nickname, defenderName: first.pet.nickname });
-        }
+      if (p1Attacks && p2Attacks) {
+        // Both attack - determine order by speed/priority
+        initPpMap(p1Pet);
+        initPpMap(p2Pet);
+        let s1Id = getAvailableSkillId(p1Pet, room.player1.action.skillId);
+        let s2Id = getAvailableSkillId(p2Pet, room.player2.action.skillId);
+        const skill1 = skillsData.skills.find(s => s.id === s1Id);
+        const skill2 = skillsData.skills.find(s => s.id === s2Id);
 
-        if (first.pet.current_hp <= 0) {
-          if (handleDeath(first.player)) { battleEnd = true; winnerId = second.player.userId; }
-        } else if (second.pet.current_hp <= 0) {
-          if (handleDeath(second.player)) { battleEnd = true; winnerId = first.player.userId; }
+        if (skill1 && skill2) {
+          let p1First;
+          if (skill1.priority && !skill2.priority) p1First = true;
+          else if (skill2.priority && !skill1.priority) p1First = false;
+          else p1First = p1Pet.speed >= p2Pet.speed;
+
+          const first = p1First ? { pet: p1Pet, skill: skill1, player: room.player1 }
+                                : { pet: p2Pet, skill: skill2, player: room.player2 };
+          const second = p1First ? { pet: p2Pet, skill: skill2, player: room.player2 }
+                                 : { pet: p1Pet, skill: skill1, player: room.player1 };
+
+          // First attack
+          const act1 = canAct(first.pet);
+          if (!act1.canAct) {
+            results.push({ message: act1.reason, statusEffect: true });
+          } else {
+            deductPp(first.pet, p1First ? s1Id : s2Id);
+            const r1 = executeAttack(first.pet, second.pet, first.skill, true, room.weather);
+            results.push({ ...r1, attackerName: first.pet.nickname, defenderName: second.pet.nickname });
+          }
+
+          if (first.pet.current_hp <= 0) {
+            if (handleDeath(first.player)) { battleEnd = true; winnerId = second.player.userId; }
+          } else if (second.pet.current_hp <= 0) {
+            if (handleDeath(second.player)) { battleEnd = true; winnerId = first.player.userId; }
+          }
+
+          // Second attack (only if battle not over and both pets alive)
+          if (!battleEnd && second.pet.current_hp > 0 && first.pet.current_hp > 0) {
+            const act2 = canAct(second.pet);
+            if (!act2.canAct) {
+              results.push({ message: act2.reason, statusEffect: true });
+            } else {
+              deductPp(second.pet, p1First ? s2Id : s1Id);
+              const r2 = executeAttack(second.pet, first.pet, second.skill, true, room.weather);
+              results.push({ ...r2, attackerName: second.pet.nickname, defenderName: first.pet.nickname });
+            }
+            if (first.pet.current_hp <= 0) {
+              if (handleDeath(first.player)) { battleEnd = true; winnerId = second.player.userId; }
+            } else if (second.pet.current_hp <= 0) {
+              if (handleDeath(second.player)) { battleEnd = true; winnerId = first.player.userId; }
+            }
+          }
+        }
+      } else if (p1Attacks) {
+        // Only P1 attacks (P2 switched)
+        initPpMap(p1Pet);
+        let s1Id = getAvailableSkillId(p1Pet, room.player1.action.skillId);
+        const skill1 = skillsData.skills.find(s => s.id === s1Id);
+        if (skill1) {
+          const act1 = canAct(p1Pet);
+          if (!act1.canAct) {
+            results.push({ message: act1.reason, statusEffect: true });
+          } else {
+            deductPp(p1Pet, s1Id);
+            const r1 = executeAttack(p1Pet, p2Pet, skill1, true, room.weather);
+            results.push({ ...r1, attackerName: p1Pet.nickname, defenderName: p2Pet.nickname });
+          }
+          if (p1Pet.current_hp <= 0) { if (handleDeath(room.player1)) { battleEnd = true; winnerId = room.player2.userId; } }
+          else if (p2Pet.current_hp <= 0) { if (handleDeath(room.player2)) { battleEnd = true; winnerId = room.player1.userId; } }
+        }
+      } else if (p2Attacks) {
+        // Only P2 attacks (P1 switched)
+        initPpMap(p2Pet);
+        let s2Id = getAvailableSkillId(p2Pet, room.player2.action.skillId);
+        const skill2 = skillsData.skills.find(s => s.id === s2Id);
+        if (skill2) {
+          const act2 = canAct(p2Pet);
+          if (!act2.canAct) {
+            results.push({ message: act2.reason, statusEffect: true });
+          } else {
+            deductPp(p2Pet, s2Id);
+            const r2 = executeAttack(p2Pet, p1Pet, skill2, true, room.weather);
+            results.push({ ...r2, attackerName: p2Pet.nickname, defenderName: p1Pet.nickname });
+          }
+          if (p2Pet.current_hp <= 0) { if (handleDeath(room.player2)) { battleEnd = true; winnerId = room.player1.userId; } }
+          else if (p1Pet.current_hp <= 0) { if (handleDeath(room.player1)) { battleEnd = true; winnerId = room.player2.userId; } }
         }
       }
+      // else: both switched, no attacks
     }
 
-    // ---- TURN END: Tick status durations ----
+    // ========== PHASE 4: Turn End Status Tick ==========
     if (!battleEnd) {
-      const p1EndMsgs = tickStatusEffects(p1Pet);
-      const p2EndMsgs = tickStatusEffects(p2Pet);
+      const curP1 = room.player1.team[room.player1.activeIndex];
+      const curP2 = room.player2.team[room.player2.activeIndex];
+      const p1EndMsgs = tickStatusEffects(curP1);
+      const p2EndMsgs = tickStatusEffects(curP2);
       [...p1EndMsgs, ...p2EndMsgs].forEach(msg => {
         results.push({ message: msg, statusEffect: true });
       });
+
+      // Apply weather end turn damage
+      if (room.weather === 'sandstorm' || room.weather === 'hail') {
+        const immuneTypes = room.weather === 'sandstorm' ? ['ground', 'rock', 'steel', 'earth'] : ['ice'];
+        const weatherName = room.weather === 'sandstorm' ? '沙暴' : '冰雹';
+        [curP1, curP2].forEach((p, idx) => {
+          const pDef = petsData.pets.find(pd => pd.id === p.pet_id);
+          if (pDef && !immuneTypes.includes(pDef.type) && p.current_hp > 0) {
+            const wDmg = Math.max(1, Math.floor(p.max_hp * 0.0625));
+            p.current_hp = Math.max(0, p.current_hp - wDmg);
+            results.push({
+              message: `由于${weatherName}天气的影响，${p.nickname}受到了${wDmg}点伤害！`,
+              statusEffect: true
+            });
+            if (p.current_hp <= 0) {
+              const isP1 = idx === 0;
+              if (handleDeath(isP1 ? room.player1 : room.player2)) {
+                battleEnd = true;
+                winnerId = isP1 ? room.player2.userId : room.player1.userId;
+              }
+            }
+          }
+        });
+      }
     }
 
     room.turn++;
@@ -447,7 +565,9 @@ class PvpManager {
       youSwitched: p1Switched,
       opponentSwitched: p2Switched,
       yourPet: room.player1.team[room.player1.activeIndex],
-      opponentPet: this.sanitizePet(room.player2.team[room.player2.activeIndex])
+      opponentPet: this.sanitizePet(room.player2.team[room.player2.activeIndex]),
+      yourTeam: room.player1.team,
+      yourActiveIndex: room.player1.activeIndex
     });
 
     this.sendTo(room.player2.userId, {
@@ -455,7 +575,9 @@ class PvpManager {
       youSwitched: p2Switched,
       opponentSwitched: p1Switched,
       yourPet: room.player2.team[room.player2.activeIndex],
-      opponentPet: this.sanitizePet(room.player1.team[room.player1.activeIndex])
+      opponentPet: this.sanitizePet(room.player1.team[room.player1.activeIndex]),
+      yourTeam: room.player2.team,
+      yourActiveIndex: room.player2.activeIndex
     });
 
     if (battleEnd) {

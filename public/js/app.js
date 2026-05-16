@@ -10,7 +10,7 @@ const TYPE_ICONS = {
   normal: '<img src="/img/icons/type_normal.svg" class="type-svg-icon">'
 };
 const PLANET_ICONS = ['','🌋','🌊','🌲','⚡','🌗'];
-var currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null;
+var currentBattleId = null, currentUserId = null, currentUsername = null, currentEquips = {}, pvpRoomId = null, pvpInviteFrom = null, pvpTeam = [], pvpActiveIndex = 0, battlePpMap = {};
 let SKILLS_MAP = {};
 function getSkillName(sid) { const s = SKILLS_MAP[sid]; return s ? s.name : `技能#${sid}`; }
 function getSkillDef(sid) { return SKILLS_MAP[sid] || null; }
@@ -457,7 +457,10 @@ function showPetDetail(pet, isTeam){
   else if (totalIV >= 100) { potential = 'B'; potColor = '#3b82f6'; }
   else if (totalIV >= 60) { potential = 'C'; potColor = '#22c55e'; }
 
-  header.innerHTML = `<div class="pet-sprite-container" id="pd-sprite"></div><div class="pet-name">${pet.nickname} <span style="font-size:14px;color:${potColor};border:1px solid ${potColor};border-radius:4px;padding:0 4px;">${potential}级</span></div><div>Lv.${pet.level} · <span class="pet-type-badge type-${pet.petDef?.type||'normal'}">${TYPE_ICONS[pet.petDef?.type]||''} ${TYPE_NAMES[pet.petDef?.type]||''}系</span></div><div style="margin-top:4px;font-size:13px;color:var(--text-secondary)">HP: ${pet.current_hp}/${pet.max_hp}</div>`;
+  const natureStr = pet.nature ? `<span style="margin-left:8px;font-size:13px;color:var(--neon-purple);">性格: ${pet.nature}</span>` : '';
+  const abilityStr = pet.ability || pet.petDef?.ability ? `<div style="margin-top:4px;font-size:13px;color:#facc15;">特性: ${pet.ability || pet.petDef.ability}</div>` : '';
+  
+  header.innerHTML = `<div class="pet-sprite-container" id="pd-sprite"></div><div class="pet-name">${pet.nickname} <span style="font-size:14px;color:${potColor};border:1px solid ${potColor};border-radius:4px;padding:0 4px;">${potential}级</span>${natureStr}</div><div>Lv.${pet.level} · <span class="pet-type-badge type-${pet.petDef?.type||'normal'}">${TYPE_ICONS[pet.petDef?.type]||''} ${TYPE_NAMES[pet.petDef?.type]||''}系</span></div><div style="margin-top:4px;font-size:13px;color:var(--text-secondary)">HP: ${pet.current_hp}/${pet.max_hp}</div>${abilityStr}`;
   renderPetSprite(document.getElementById('pd-sprite'), pet.pet_id, 120);
 
   const stats = document.getElementById('pet-detail-stats');
@@ -1067,16 +1070,38 @@ function renderBattleSkillButtons(pp) {
   grid.innerHTML = '';
   skills.forEach(sid=>{
     const sk = getSkillDef(sid);
+    const maxPp = sk ? (sk.pp || 99) : 99;
+    const curPp = battlePpMap[sid] !== undefined ? battlePpMap[sid] : maxPp;
+    const noPp = curPp <= 0;
     const btn = document.createElement('button');
     btn.className = 'skill-btn';
     if(sk) btn.classList.add(`type-${sk.type}`);
-    btn.innerHTML = `<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'点击使用'}</span>`;
+    if(noPp) btn.style.opacity = '0.4';
+    btn.innerHTML = `<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'点击使用'}</span><span class="skill-pp" style="font-size:11px;color:${noPp?'var(--hp-red)':'var(--text-secondary)'};">${curPp}/${maxPp}</span>`;
+    btn.disabled = noPp;
     btn.addEventListener('click',()=>doBattleAction(sid));
     grid.appendChild(btn);
   });
 }
 
-function setupBattle(pp, wp){
+function setupBattle(pp, wp, weather){
+  const wInd = document.getElementById('battle-weather-indicator');
+  const weatherMap = { 'sun': '☀️ 晴天', 'rain': '🌧️ 雨天', 'sandstorm': '🌪️ 沙暴', 'hail': '❄️ 冰雹' };
+  if (weather && weatherMap[weather]) {
+    wInd.textContent = weatherMap[weather];
+    wInd.style.display = 'block';
+  } else {
+    wInd.style.display = 'none';
+  }
+
+  // Initialize PP map for the player pet
+  const skills = Array.isArray(pp.skills) ? pp.skills : (typeof pp.skills==='string'?JSON.parse(pp.skills):[]);
+  battlePpMap = {};
+  skills.forEach(sid => {
+    const sk = getSkillDef(sid);
+    battlePpMap[sid] = sk ? (sk.pp || 99) : 99;
+  });
+  window._currentBattlePet = pp;
   renderBattlePlayerPet(pp);
   document.getElementById('enemy-name').textContent = `野生 ${wp.nickname||wp.petDef?.name}`;
   document.getElementById('enemy-level').textContent = `Lv.${wp.level}`;
@@ -1216,6 +1241,9 @@ async function doBattleAction(skillId){
   try {
     const r = await API.battleAction(currentBattleId, skillId);
     
+    // Update PP map from server response
+    if (r.playerPpMap) { battlePpMap = r.playerPpMap; }
+    
     await playBattleAnimationSequence(r.results, false);
 
     if(r.playerPet) { updateHpBar('player', r.playerPet.current_hp, r.playerPet.max_hp); renderStatusEffects('player', r.playerPet); }
@@ -1277,12 +1305,20 @@ async function doBattleAction(skillId){
       p.style.color='var(--exp-blue)';
       log.appendChild(p);
       log.scrollTop = log.scrollHeight;
+      // Reset PP for new pet
+      const nextSkills = Array.isArray(r.nextPet.skills) ? r.nextPet.skills : [];
+      battlePpMap = {};
+      nextSkills.forEach(sid => { const sk = getSkillDef(sid); battlePpMap[sid] = sk ? (sk.pp || 99) : 99; });
+      window._currentBattlePet = r.nextPet;
       renderBattlePlayerPet(r.nextPet);
-      document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
+      document.querySelectorAll('.skill-btn').forEach(b=>{ if(b.style.opacity !== '0.4') b.disabled=false; });
       return;
     }
   } catch(err){ toast(err.message,'error'); }
-  document.querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
+  if (window._currentBattlePet) {
+    renderBattleSkillButtons(window._currentBattlePet);
+  }
+  document.querySelectorAll('.skill-btn').forEach(b=>{ if(b.style.opacity !== '0.4') b.disabled=false; });
 }
 
 // Capture - now uses capsule modal
@@ -1339,7 +1375,19 @@ ws.on('pvp_error', (msg)=>toast(msg.message,'error'));
 
 ws.on('pvp_start', (msg) => {
   pvpRoomId = msg.roomId;
+  pvpTeam = msg.yourTeam || [];
+  pvpActiveIndex = msg.yourActiveIndex || 0;
   showScreen('pvp-battle');
+  
+  const wInd = document.getElementById('pvp-weather-indicator');
+  const weatherMap = { 'sun': '☀️ 晴天', 'rain': '🌧️ 雨天', 'sandstorm': '🌪️ 沙暴', 'hail': '❄️ 冰雹' };
+  if (msg.weather && weatherMap[msg.weather]) {
+    wInd.textContent = weatherMap[msg.weather];
+    wInd.style.display = 'block';
+  } else {
+    wInd.style.display = 'none';
+  }
+
   const pp=msg.yourPet, ep=msg.opponentPet;
   document.getElementById('pvp-player-name').textContent=pp.nickname;
   document.getElementById('pvp-player-level').textContent=`Lv.${pp.level}`;
@@ -1349,20 +1397,90 @@ ws.on('pvp_start', (msg) => {
   document.getElementById('pvp-enemy-level').textContent=`Lv.${ep.level}`;
   updateHpBar('pvp-enemy', ep.current_hp, ep.max_hp);
   renderPetSprite(document.getElementById('pvp-enemy-sprite'),ep.pet_id,140);
-  const grid=document.getElementById('pvp-skill-grid');
-  grid.innerHTML='';
-  (pp.skills||[]).forEach(sid=>{
-    const sk = getSkillDef(sid);
-    const btn=document.createElement('button'); btn.className='skill-btn';
-    if(sk) btn.classList.add(`type-${sk.type}`);
-    btn.innerHTML=`<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'使用'}</span>`;
-    btn.addEventListener('click',()=>{ ws.send({type:'pvp_action',roomId:pvpRoomId,skillId:sid}); grid.querySelectorAll('.skill-btn').forEach(b=>b.disabled=true); });
-    grid.appendChild(btn);
-  });
+  renderPvpSkillGrid(pp);
   document.getElementById('pvp-battle-log').innerHTML='<p>PVP 对战开始！</p>';
+  // Enable/disable switch button based on alive team members
+  updatePvpSwitchButton();
 });
 
-ws.on('pvp_waiting', (msg)=>{ const log=document.getElementById('pvp-battle-log'); const p=document.createElement('p'); p.textContent=msg.message; p.style.color='var(--text-secondary)'; log.appendChild(p); });
+function renderPvpSkillGrid(pp) {
+  const grid=document.getElementById('pvp-skill-grid');
+  grid.innerHTML='';
+  const ppMap = pp._ppMap || {};
+  (pp.skills||[]).forEach(sid=>{
+    const sk = getSkillDef(sid);
+    const maxPp = sk ? (sk.pp || 99) : 99;
+    const curPp = ppMap[sid] !== undefined ? ppMap[sid] : maxPp;
+    const noPp = curPp <= 0;
+    const btn=document.createElement('button'); btn.className='skill-btn';
+    if(sk) btn.classList.add(`type-${sk.type}`);
+    if(noPp) btn.style.opacity = '0.4';
+    btn.innerHTML=`<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'使用'}</span><span class="skill-pp" style="font-size:11px;color:${noPp?'var(--hp-red)':'var(--text-secondary)'};">${curPp}/${maxPp}</span>`;
+    btn.disabled = noPp;
+    btn.addEventListener('click',()=>{ ws.send({type:'pvp_action',roomId:pvpRoomId,skillId:sid}); setPvpActionsDisabled(true); });
+    grid.appendChild(btn);
+  });
+}
+
+function setPvpActionsDisabled(disabled) {
+  document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=disabled);
+  const switchBtn = document.getElementById('btn-pvp-switch');
+  if (switchBtn) switchBtn.disabled = disabled;
+}
+
+function updatePvpSwitchButton() {
+  const switchBtn = document.getElementById('btn-pvp-switch');
+  if (!switchBtn) return;
+  const aliveOthers = pvpTeam.filter((p, i) => i !== pvpActiveIndex && p.current_hp > 0);
+  switchBtn.disabled = aliveOthers.length === 0;
+  switchBtn.style.opacity = aliveOthers.length === 0 ? '0.4' : '1';
+}
+
+document.getElementById('btn-pvp-switch').addEventListener('click', () => {
+  if (!pvpRoomId || pvpTeam.length <= 1) return;
+  const grid = document.getElementById('pvp-switch-grid');
+  grid.innerHTML = '';
+  pvpTeam.forEach((pet, idx) => {
+    const isActive = idx === pvpActiveIndex;
+    const isFainted = pet.current_hp <= 0;
+    const card = document.createElement('div');
+    card.style.cssText = `display:flex; align-items:center; gap:12px; padding:12px; border-radius:10px; cursor:${isActive||isFainted?'not-allowed':'pointer'}; border:1px solid ${isActive?'var(--neon-cyan)':isFainted?'rgba(255,0,0,0.3)':'var(--glass-border)'}; background:${isActive?'rgba(0,245,212,0.08)':isFainted?'rgba(255,0,0,0.05)':'rgba(255,255,255,0.03)'}; opacity:${isFainted?'0.5':'1'}; transition:all 0.2s;`;
+    const spriteDiv = document.createElement('div');
+    spriteDiv.style.cssText = 'width:48px; height:48px; flex-shrink:0;';
+    card.appendChild(spriteDiv);
+    setTimeout(() => renderPetSprite(spriteDiv, pet.pet_id, 48), 0);
+    const hpPct = Math.max(0, Math.min(100, pet.current_hp / pet.max_hp * 100));
+    const hpColor = hpPct <= 25 ? 'var(--hp-red)' : hpPct <= 50 ? 'var(--hp-yellow)' : 'var(--hp-green)';
+    const info = document.createElement('div');
+    info.style.cssText = 'flex:1;';
+    info.innerHTML = `
+      <div style="font-weight:bold;color:${isActive?'var(--neon-cyan)':'#fff'};font-size:14px;">${pet.nickname} <span style="font-size:12px;color:var(--text-secondary);">Lv.${pet.level}</span>${isActive?' <span style="color:var(--neon-cyan);font-size:11px;">（上场中）</span>':''}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <div style="flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${hpPct}%;background:${hpColor};border-radius:3px;transition:width 0.3s;"></div></div>
+        <span style="font-size:11px;color:var(--text-secondary);min-width:60px;text-align:right;">${Math.max(0,pet.current_hp)}/${pet.max_hp}</span>
+      </div>
+      ${isFainted?'<div style="font-size:11px;color:var(--hp-red);margin-top:2px;">已倒下</div>':''}
+    `;
+    card.appendChild(info);
+    if (!isActive && !isFainted) {
+      card.onmouseenter = () => { card.style.borderColor='var(--neon-cyan)'; card.style.background='rgba(0,245,212,0.06)'; };
+      card.onmouseleave = () => { card.style.borderColor='var(--glass-border)'; card.style.background='rgba(255,255,255,0.03)'; };
+      card.onclick = () => {
+        ws.send({type:'pvp_switch', roomId:pvpRoomId, petIndex:idx});
+        document.getElementById('modal-pvp-switch').classList.remove('active');
+        setPvpActionsDisabled(true);
+      };
+    }
+    grid.appendChild(card);
+  });
+  document.getElementById('modal-pvp-switch').classList.add('active');
+});
+
+document.getElementById('pvp-switch-close').addEventListener('click', () => {
+  document.getElementById('modal-pvp-switch').classList.remove('active');
+});
+
+ws.on('pvp_waiting', (msg)=>{ const log=document.getElementById('pvp-battle-log'); const p=document.createElement('p'); p.textContent=msg.message; p.style.color='var(--text-secondary)'; log.appendChild(p); log.scrollTop=log.scrollHeight; });
 
 // Ranked Matchmaking handlers
 document.getElementById('btn-ranked-match')?.addEventListener('click', () => {
@@ -1390,7 +1508,11 @@ ws.on('pvp_ranked_result', (msg) => {
 });
 
 ws.on('pvp_turn_result', async (msg) => {
-  document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=true);
+  setPvpActionsDisabled(true);
+  
+  // Update team data
+  if (msg.yourTeam) { pvpTeam = msg.yourTeam; }
+  if (msg.yourActiveIndex !== undefined) { pvpActiveIndex = msg.yourActiveIndex; }
   
   await playBattleAnimationSequence(msg.results, true);
   
@@ -1401,16 +1523,7 @@ ws.on('pvp_turn_result', async (msg) => {
       document.getElementById('pvp-player-name').textContent=msg.yourPet.nickname;
       document.getElementById('pvp-player-level').textContent=`Lv.${msg.yourPet.level}`;
       renderPetSprite(document.getElementById('pvp-player-sprite'),msg.yourPet.pet_id,140);
-      const grid=document.getElementById('pvp-skill-grid');
-      grid.innerHTML='';
-      (msg.yourPet.skills||[]).forEach(sid=>{
-        const sk = getSkillDef(sid);
-        const btn=document.createElement('button'); btn.className='skill-btn';
-        if(sk) btn.classList.add(`type-${sk.type}`);
-        btn.innerHTML=`<span class="skill-name">${getSkillName(sid)}</span><span class="skill-meta">${sk?sk.description:'使用'}</span>`;
-        btn.addEventListener('click',()=>{ ws.send({type:'pvp_action',roomId:pvpRoomId,skillId:sid}); grid.querySelectorAll('.skill-btn').forEach(b=>b.disabled=true); });
-        grid.appendChild(btn);
-      });
+      renderPvpSkillGrid(msg.yourPet);
       const p=document.createElement('p'); p.textContent=`你换上了 ${msg.yourPet.nickname}！`; p.style.color='#f59e0b'; log.appendChild(p);
     }
   }
@@ -1434,7 +1547,8 @@ ws.on('pvp_turn_result', async (msg) => {
       document.getElementById('btn-ranked-cancel').style.display = 'none';
     },3000);
   } else {
-    document.getElementById('pvp-skill-grid').querySelectorAll('.skill-btn').forEach(b=>b.disabled=false);
+    setPvpActionsDisabled(false);
+    updatePvpSwitchButton();
   }
 });
 
@@ -2006,6 +2120,8 @@ async function loadDailyQuests() {
     if (!list) return;
     list.innerHTML = '';
     let hasClaimable = false;
+    window._trackerData = window._trackerData || { story: null, dailies: [] };
+    window._trackerData.dailies = res.quests;
     res.quests.forEach(q => {
       const done = q.progress >= q.target;
       const claimed = !!q.reward_claimed;
@@ -2040,6 +2156,7 @@ async function loadDailyQuests() {
     // Red dot
     const dot = document.getElementById('quest-red-dot');
     if (dot) dot.style.display = hasClaimable ? 'block' : 'none';
+    if (window.renderQuestTracker) window.renderQuestTracker();
   } catch(e) { toast(e.message, 'error'); }
 }
 
@@ -2109,20 +2226,55 @@ async function loadStoryQuests() {
       list.appendChild(card);
     });
 
-    const tracker = document.getElementById('quest-tracker-container');
-    if (tracker) {
-      if (hasActiveStory) {
-        tracker.style.display = 'block';
-        document.getElementById('quest-tracker-title').textContent = activeQuestTitle;
-        document.getElementById('quest-tracker-desc').textContent = activeQuestDesc;
-        document.getElementById('quest-tracker-progress').textContent = activeQuestProgress;
-      } else {
-        tracker.style.display = 'none';
-      }
+    window._trackerData = window._trackerData || { story: null, dailies: [] };
+    if (hasActiveStory) {
+      window._trackerData.story = { title: activeQuestTitle, desc: activeQuestDesc, progress: activeQuestProgress };
+    } else {
+      window._trackerData.story = null;
     }
-
+    if (window.renderQuestTracker) window.renderQuestTracker();
   } catch(e) { console.error('Failed to load story quests:', e); }
 }
+
+window.renderQuestTracker = function() {
+  const container = document.getElementById('quest-tracker-container');
+  const listEl = document.getElementById('quest-tracker-list');
+  const filter = document.getElementById('quest-tracker-filter')?.value || 'all';
+  if (!container || !listEl) return;
+  
+  let html = '';
+  const data = window._trackerData || { story: null, dailies: [] };
+  
+  if ((filter === 'all' || filter === 'story') && data.story) {
+    html += `
+      <div class="quest-tracker-item">
+        <div style="font-weight:bold;color:var(--neon-blue);font-size:13px;margin-bottom:2px;">[主线] ${data.story.title}</div>
+        <div style="color:var(--text-secondary);font-size:12px;">${data.story.desc}</div>
+        <div style="color:var(--neon-cyan);font-size:12px;margin-top:2px;">${data.story.progress}</div>
+      </div>
+    `;
+  }
+  
+  if ((filter === 'all' || filter === 'daily') && data.dailies && data.dailies.length > 0) {
+    const activeDailies = data.dailies.filter(q => !q.reward_claimed).slice(0, 3);
+    activeDailies.forEach(q => {
+      const done = q.progress >= q.target;
+      html += `
+        <div class="quest-tracker-item">
+          <div style="font-weight:bold;color:var(--exp-blue);font-size:13px;margin-bottom:2px;">[日常] ${q.name}</div>
+          <div style="color:${done ? 'var(--hp-green)' : 'var(--text-secondary)'};font-size:12px;">进度: ${q.progress}/${q.target} ${done ? '(可领取)' : ''}</div>
+        </div>
+      `;
+    });
+  }
+  
+  if (html) {
+    container.style.display = 'block';
+    listEl.innerHTML = html;
+  } else {
+    container.style.display = 'none';
+  }
+};
 
 window.loadStoryQuests = loadStoryQuests;
 
@@ -3046,6 +3198,16 @@ document.getElementById('btn-save-base')?.addEventListener('click', async () => 
   } catch(e) { toast(e.message, 'error'); }
 });
 
+document.getElementById('btn-claim-base-exp')?.addEventListener('click', async () => {
+  try {
+    const res = await API.claimBaseExp();
+    toast(res.message, 'success');
+    if (res.expGain > 0) {
+      loadBasePets(); // Refresh levels
+    }
+  } catch(e) { toast(e.message, 'error'); }
+});
+
 // ===== QUEST TRACKER TOGGLE =====
 const questTrackerToggle = document.getElementById('quest-tracker-toggle');
 if (questTrackerToggle) {
@@ -3055,3 +3217,79 @@ if (questTrackerToggle) {
     questTrackerToggle.textContent = container.classList.contains('collapsed') ? '展开' : '收起';
   });
 }
+
+const questTrackerFilter = document.getElementById('quest-tracker-filter');
+if (questTrackerFilter) {
+  questTrackerFilter.addEventListener('change', () => {
+    if (window.renderQuestTracker) window.renderQuestTracker();
+  });
+}
+// ===== DAILY CHECK-IN =====
+document.getElementById('nav-checkin').addEventListener('click', () => {
+  apiCall('/api/player/checkin-status').then(res => {
+    document.getElementById('modal-checkin').classList.add('active');
+    
+    if (res.canCheckIn) {
+      document.getElementById('checkin-red-dot').style.display = 'inline-block';
+    } else {
+      document.getElementById('checkin-red-dot').style.display = 'none';
+    }
+    
+    const grid = document.getElementById('checkin-days-grid');
+    grid.innerHTML = '';
+    const rewards = [
+      { day: 1, text: '普通胶囊x5' },
+      { day: 2, text: '小型经验糖x3' },
+      { day: 3, text: '高级胶囊x3' },
+      { day: 4, text: '中型经验糖x2' },
+      { day: 5, text: '孵化加速器x1' },
+      { day: 6, text: '大师胶囊x1' },
+      { day: 7, text: '传说胶囊x1' }
+    ];
+    
+    for (let i = 1; i <= 7; i++) {
+      const isChecked = i <= (res.streak % 7) || (res.streak > 0 && res.streak % 7 === 0 && !res.canCheckIn);
+      const isToday = res.canCheckIn && i === (res.streak % 7) + 1;
+      
+      let borderCol = isChecked ? 'var(--neon-green)' : (isToday ? 'var(--neon-cyan)' : 'var(--border-color)');
+      let bgCol = isChecked ? 'rgba(0,255,100,0.1)' : (isToday ? 'rgba(0,255,255,0.1)' : 'rgba(255,255,255,0.05)');
+      
+      grid.innerHTML += `
+        <div style="border: 1px solid ${borderCol}; background: ${bgCol}; border-radius: 8px; padding: 10px; position: relative;">
+          <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 5px;">第${i}天</div>
+          <div style="font-size: 20px; margin-bottom: 5px;">🎁</div>
+          <div style="font-size: 11px; color: var(--text-secondary);">${rewards[i-1].text}</div>
+          ${isChecked ? '<div style="position:absolute; top:-5px; right:-5px; font-size: 16px;">✅</div>' : ''}
+        </div>
+      `;
+    }
+    
+    document.getElementById('checkin-status-text').textContent = `当前连续签到：${res.streak} 天 (总计: ${res.total}次)`;
+    
+    const btn = document.getElementById('btn-do-checkin');
+    if (res.canCheckIn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="btn-content">立即签到</span>';
+    } else {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="btn-content">今日已签到</span>';
+    }
+  });
+});
+
+document.getElementById('btn-close-checkin').addEventListener('click', () => {
+  document.getElementById('modal-checkin').classList.remove('active');
+});
+
+document.getElementById('btn-do-checkin').addEventListener('click', () => {
+  apiCall('/api/player/checkin', 'POST').then(res => {
+    if (res.success) {
+      showToast(res.message);
+      document.getElementById('modal-checkin').classList.remove('active');
+      document.getElementById('checkin-red-dot').style.display = 'none';
+      fetchHubData(); // update money etc.
+    } else {
+      showToast(res.error, true);
+    }
+  });
+});

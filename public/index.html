@@ -50,6 +50,9 @@
       <button class="hub-nav-btn" data-section="quests" id="nav-quests">
         <img src="/img/icons/nav_quests.svg" class="nav-svg-icon"><span>任务</span><span class="quest-red-dot" id="quest-red-dot" style="display:none"></span>
       </button>
+      <button class="hub-nav-btn" id="nav-checkin">
+        <span style="font-size: 16px;">📅</span><span>签到</span><span class="quest-red-dot" id="checkin-red-dot" style="display:none"></span>
+      </button>
       <button class="hub-nav-btn" data-section="bag" id="nav-bag">
         <img src="/img/icons/nav_bag.svg" class="nav-svg-icon"><span>背包</span>
       </button>
@@ -361,9 +364,13 @@
 
     <!-- Base section -->
     <section id="section-base" class="hub-section">
-      <h2 class="section-title"><img src="/img/icons/nav_base.svg" class="nav-svg-icon" style="width:24px;height:24px;">个人基地</h2>
-      <p class="section-subtitle">布置你的专属太空休息室</p>
-      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <div>
+          <h2 class="section-title" style="margin-bottom:5px;"><img src="/img/icons/nav_base.svg" class="nav-svg-icon" style="width:24px;height:24px;">个人基地</h2>
+          <p class="section-subtitle" style="margin:0;">布置你的专属太空休息室。放入基地的精灵每分钟可积累经验！</p>
+        </div>
+        <button class="btn btn-secondary" id="btn-claim-base-exp" style="border-radius:20px; font-weight:bold; color:var(--exp-blue); border-color:var(--exp-blue);">🍯 收集培育经验</button>
+      </div>
       <div style="display: flex; gap: 20px; height: 500px;">
         <!-- Base Sidebar -->
         <div id="base-sidebar" class="glass-card" style="width: 250px; display:flex; flex-direction:column; padding: 15px; transition: width 0.3s, opacity 0.3s; overflow:hidden;">
@@ -453,6 +460,7 @@
   <!-- ===== BATTLE SCREEN ===== -->
   <div id="screen-battle" class="screen">
     <div class="battle-scene">
+      <div id="battle-weather-indicator" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); font-size: 24px; font-weight:bold; text-shadow: 0 0 10px rgba(255,255,255,0.8); display:none; z-index:10;"></div>
       <!-- Enemy side -->
       <div class="battle-side enemy-side">
         <div class="battle-pet-info">
@@ -505,6 +513,7 @@
   <!-- ===== PVP BATTLE SCREEN ===== -->
   <div id="screen-pvp-battle" class="screen">
     <div class="battle-scene pvp-scene">
+      <div id="pvp-weather-indicator" style="position:absolute; top:50px; left:50%; transform:translateX(-50%); font-size: 24px; font-weight:bold; text-shadow: 0 0 10px rgba(255,255,255,0.8); display:none; z-index:10;"></div>
       <div class="pvp-banner">⚔️ PVP 对战 ⚔️</div>
       <div class="battle-side enemy-side">
         <div class="battle-pet-info">
@@ -533,7 +542,20 @@
       </div>
       <div class="battle-actions" id="pvp-battle-actions">
         <div class="skill-grid" id="pvp-skill-grid"></div>
+        <div class="action-buttons">
+          <button class="btn btn-capture" id="btn-pvp-switch">🔄 换宠</button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== PVP SWITCH PET MODAL ===== -->
+  <div id="modal-pvp-switch" class="modal">
+    <div class="modal-content glass-card" style="max-width: 450px;">
+      <button class="modal-close" id="pvp-switch-close">&times;</button>
+      <h3 style="color: var(--neon-cyan); text-align: center; margin-bottom: 5px;">🔄 换上精灵</h3>
+      <p style="color: var(--text-secondary); text-align: center; font-size: 13px; margin-bottom: 15px;">选择一只精灵替换上场（换宠后本回合不攻击）</p>
+      <div id="pvp-switch-grid" style="display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto;"></div>
     </div>
   </div>
 
@@ -686,13 +708,19 @@
 
   <!-- ===== QUEST TRACKER ===== -->
   <div id="quest-tracker-container" class="quest-tracker-container" style="display: none;">
-    <div class="quest-tracker-header">
-      <div class="quest-tracker-title" id="quest-tracker-title"></div>
+    <div class="quest-tracker-header" style="justify-content: space-between;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <span class="quest-tracker-title" id="quest-tracker-title">任务追踪</span>
+        <select id="quest-tracker-filter" style="background:transparent; border:none; color:var(--text-secondary); outline:none; font-size:12px; cursor:pointer;">
+          <option value="all">全部</option>
+          <option value="story">主线</option>
+          <option value="daily">日常</option>
+        </select>
+      </div>
       <button class="quest-tracker-toggle" id="quest-tracker-toggle">收起</button>
     </div>
-    <div class="quest-tracker-content" id="quest-tracker-content">
-      <div class="quest-tracker-item" id="quest-tracker-desc"></div>
-      <div class="quest-tracker-progress" id="quest-tracker-progress"></div>
+    <div class="quest-tracker-content" id="quest-tracker-content" style="max-height: 200px; overflow-y: auto;">
+      <div id="quest-tracker-list" style="display:flex; flex-direction:column; gap:8px;"></div>
     </div>
   </div>
 
@@ -716,6 +744,27 @@
       <div style="display: flex; gap: 10px;">
         <button class="btn btn-secondary" id="btn-story-decline" style="flex:1;">自由探索</button>
         <button class="btn btn-primary" id="btn-story-accept" style="flex:1;">开启剧情</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DAILY CHECK-IN MODAL ===== -->
+  <div id="modal-checkin" class="modal">
+    <div class="modal-content glass-card" style="max-width: 500px; text-align: center;">
+      <h2 style="color: var(--neon-cyan); margin-bottom: 5px;">📅 每日签到</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">连续签到可以获得更丰厚的奖励！</p>
+      
+      <div id="checkin-days-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
+        <!-- Days will be generated here -->
+      </div>
+      
+      <p id="checkin-status-text" style="margin-bottom: 15px; font-weight: bold;"></p>
+      
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn btn-secondary" id="btn-close-checkin">关闭</button>
+        <button class="btn btn-primary cyber-btn" id="btn-do-checkin" style="width: 150px;">
+          <span class="btn-content">立即签到</span>
+        </button>
       </div>
     </div>
   </div>

@@ -591,7 +591,7 @@ async function startSceneBattle(spawnId) {
     currentBattleId = data.battleId;
     window._battleSceneReturn = { mapId: currentMapId, sceneIndex: currentSceneIndex };
     showScreen('battle');
-    setupBattle(data.playerPet, data.wildPet);
+    setupBattle(data.playerPet, data.wildPet, data.weather);
     if (data.wildPet.isBoss) {
       const log = document.getElementById('battle-log');
       log.innerHTML = `<p style="color:#ffd700;font-weight:bold">👑 Boss ${data.wildPet.bossName || data.wildPet.petDef?.name} 出现了！不可捕捉！</p>`;

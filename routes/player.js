@@ -729,8 +729,86 @@ function createPlayerRouter(db) {
     res.json({ quests: enriched, today: getToday() });
   });
 
+  // ===== DAILY CHECK-IN SYSTEM =====
+  const CHECKIN_REWARDS = [
+    { day: 1, money: 500, items: { 'capsule_normal': 5 } },
+    { day: 2, money: 800, items: { 'candy_s': 3 } },
+    { day: 3, money: 1200, items: { 'capsule_great': 3 } },
+    { day: 4, money: 1500, items: { 'candy_m': 2 } },
+    { day: 5, money: 2000, items: { 'hatch_speed': 1 } },
+    { day: 6, money: 2500, items: { 'capsule_master': 1 } },
+    { day: 7, money: 5000, items: { 'candy_xl': 1, 'capsule_legend': 1 } }
+  ];
 
+  router.get('/checkin-status', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT checkin_streak, last_checkin, total_checkins FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
 
+    const today = getToday();
+    const canCheckIn = player.last_checkin !== today;
+    
+    // Check if streak is broken (didn't check in yesterday)
+    let currentStreak = player.checkin_streak || 0;
+    if (canCheckIn && player.last_checkin) {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      if (player.last_checkin !== yesterday) {
+        currentStreak = 0;
+      }
+    }
+
+    res.json({
+      canCheckIn,
+      streak: currentStreak,
+      total: player.total_checkins || 0,
+      todayReward: CHECKIN_REWARDS[currentStreak % 7]
+    });
+  });
+
+  router.post('/checkin', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT id, money, checkin_streak, last_checkin, total_checkins FROM players WHERE user_id = ?').get(req.userId);
+    if (!player) return res.status(404).json({ error: '玩家不存在' });
+
+    const today = getToday();
+    if (player.last_checkin === today) {
+      return res.status(400).json({ error: '今天已经签到过了！' });
+    }
+
+    let streak = player.checkin_streak || 0;
+    if (player.last_checkin) {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      if (player.last_checkin !== yesterday) {
+        streak = 0; // Streak broken
+      }
+    }
+
+    const reward = CHECKIN_REWARDS[streak % 7];
+    streak++;
+
+    // Apply rewards
+    db.prepare('UPDATE players SET money = money + ?, checkin_streak = ?, last_checkin = ?, total_checkins = total_checkins + 1 WHERE id = ?')
+      .run(reward.money, streak, today, player.id);
+
+    const itemsMsg = [];
+    if (reward.items) {
+      for (const [itemId, qty] of Object.entries(reward.items)) {
+        const existing = db.prepare('SELECT id FROM player_items WHERE player_id = ? AND item_id = ?').get(player.id, itemId);
+        if (existing) {
+          db.prepare('UPDATE player_items SET quantity = quantity + ? WHERE id = ?').run(qty, existing.id);
+        } else {
+          db.prepare('INSERT INTO player_items (player_id, item_id, quantity) VALUES (?, ?, ?)').run(player.id, itemId, qty);
+        }
+        
+        const itemDef = itemsData.capsules.find(i=>i.id===itemId) || itemsData.candies.find(i=>i.id===itemId) || (itemsData.boosters||[]).find(i=>i.id===itemId) || itemsData.others.find(i=>i.id===itemId) || {name: itemId};
+        itemsMsg.push(`${itemDef.name}x${qty}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `签到成功！连续签到 ${streak} 天。获得 ${reward.money}金币${itemsMsg.length > 0 ? '，' + itemsMsg.join('、') : ''}！`,
+      streak
+    });
+  });
   router.post('/claim-quest-reward', authMiddleware, (req, res) => {
     const { questDbId } = req.body;
     const player = db.prepare('SELECT * FROM players WHERE user_id = ?').get(req.userId);
@@ -1172,12 +1250,65 @@ function createPlayerRouter(db) {
 
   router.post('/base/pets/toggle', authMiddleware, (req, res) => {
     const { petId, inBase } = req.body;
-    const player = db.prepare('SELECT id FROM players WHERE user_id = ?').get(req.userId);
+    const player = db.prepare('SELECT id, last_base_exp_calc FROM players WHERE user_id = ?').get(req.userId);
     const pet = db.prepare('SELECT id FROM player_pets WHERE id = ? AND player_id = ?').get(petId, player.id);
     if (!pet) return res.status(404).json({ error: '宠物不存在' });
     
     db.prepare('UPDATE player_pets SET in_base = ? WHERE id = ?').run(inBase ? 1 : 0, pet.id);
+    
+    if (inBase && (!player.last_base_exp_calc || player.last_base_exp_calc === 0)) {
+        db.prepare('UPDATE players SET last_base_exp_calc = ? WHERE id = ?').run(Math.floor(Date.now() / 1000), player.id);
+    }
+    
     res.json({ success: true, message: inBase ? '放入基地成功' : '收回精灵成功' });
+  });
+
+  router.post('/base/claim-exp', authMiddleware, (req, res) => {
+    const player = db.prepare('SELECT id, last_base_exp_calc FROM players WHERE user_id = ?').get(req.userId);
+    const pets = db.prepare('SELECT id, level FROM player_pets WHERE player_id = ? AND in_base = 1').all(player.id);
+    
+    if (pets.length === 0) return res.json({ success: false, error: '基地中没有精灵，无法领取经验。' });
+
+    const now = Math.floor(Date.now() / 1000);
+    const lastCalc = player.last_base_exp_calc || now;
+    let elapsed = now - lastCalc;
+    
+    if (elapsed < 0) elapsed = 0;
+    
+    const baseItems = db.prepare('SELECT item_id FROM player_base_items WHERE player_id = ?').all(player.id);
+    let expMultiplier = 1.0;
+    const itemsData = require('../data/items.json');
+    baseItems.forEach(bi => {
+      const def = itemsData.furniture.find(f => f.id === bi.item_id);
+      if (def) {
+        if (def.id === 'base_bed') expMultiplier += 0.2;
+        if (def.id === 'base_desk') expMultiplier += 0.1;
+        if (def.id === 'base_plant') expMultiplier += 0.1;
+        if (def.id === 'base_lamp') expMultiplier += 0.05;
+      }
+    });
+    
+    // Base exp: 120 exp per minute (2 exp per second)
+    const expGain = Math.floor((elapsed / 60) * (120 * expMultiplier));
+    
+    if (expGain <= 0) return res.json({ success: false, error: '累积时间太短，暂无经验产出。' });
+    
+    const { addExp } = require('../game/pet-manager');
+    let totalLevels = 0;
+    let totalExpGiven = 0;
+    
+    db.transaction(() => {
+      for (const pet of pets) {
+        if (pet.level < 100) {
+          const result = addExp(db, pet.id, expGain);
+          totalExpGiven += expGain;
+          if (result && result.levelUps) totalLevels += result.levelUps.length;
+        }
+      }
+      db.prepare('UPDATE players SET last_base_exp_calc = ? WHERE id = ?').run(now, player.id);
+    })();
+    
+    res.json({ success: true, message: `成功领取了 ${expGain} 点经验！共发放给 ${pets.length} 只精灵，提升了 ${totalLevels} 个等级。`, expGain });
   });
 
   router.get('/gacha-pools', authMiddleware, (req, res) => {

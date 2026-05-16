@@ -1,6 +1,41 @@
 const petsData = require('../data/pets.json');
 const skillsData = require('../data/skills.json');
 
+// Build a quick lookup: skillId -> pp
+const SKILL_PP_MAP = {};
+skillsData.skills.forEach(s => { SKILL_PP_MAP[s.id] = s.pp || 99; });
+
+// ===== ABILITY SYSTEM =====
+const ABILITY_DEFS = {
+  '猛火':     { type: 'low_hp_boost', boostType: 'fire', mult: 1.5, threshold: 1/3 },
+  '急流':     { type: 'low_hp_boost', boostType: 'water', mult: 1.5, threshold: 1/3 },
+  '茂盛':     { type: 'low_hp_boost', boostType: 'grass', mult: 1.5, threshold: 1/3 },
+  '蓄电':     { type: 'type_absorb', absorbType: 'electric', healFrac: 0.25 },
+  '储水':     { type: 'type_absorb', absorbType: 'water', healFrac: 0.25 },
+  '烈焰身躯': { type: 'contact_status', status: 'burn', chance: 0.3, turns: 2, damage: 10 },
+  '静电':     { type: 'contact_status', status: 'paralyze', chance: 0.3, turns: 2, speedMult: 0.5 },
+  '圣光守护': { type: 'type_resist', resistType: 'dark', mult: 0.5 },
+  '光辉体':   { type: 'end_turn_heal', healFrac: 1/16 },
+  '暗影潜行': { type: 'crit_boost', critMult: 2.0 },
+  '压迫感':   { type: 'on_entry', effect: 'atk_down', mult: 0.9 },
+  '适应力':   { type: 'stab_boost', stabMult: 2.0 },
+  '叶子防御': { type: 'status_immune' },
+  '根性':     { type: 'guts', atkMult: 1.5 }
+};
+
+function getAbility(pet) {
+  if (pet._ability) return pet._ability;
+  const petDef = petsData.pets.find(p => p.id === pet.pet_id);
+  const abilityName = pet.ability || (petDef && petDef.ability) || null;
+  pet._ability = abilityName;
+  return abilityName;
+}
+
+function getAbilityDef(pet) {
+  const name = getAbility(pet);
+  return name ? (ABILITY_DEFS[name] || null) : null;
+}
+
 const typeChart = petsData.typeChart;
 
 function getTypeMultiplier(attackType, defenseType) {
@@ -12,36 +47,67 @@ function getTypeMultiplier(attackType, defenseType) {
   return 1.0;
 }
 
-function calculateDamage(attacker, defender, skill) {
+function calculateDamage(attacker, defender, skill, weather = null) {
   if (skill.category === 'status') return 0;
 
   const isPhysical = skill.category === 'physical';
-  const atkStat = isPhysical ? (attacker.attack || 0) : (attacker.sp_attack || 0);
+  let atkStat = isPhysical ? (attacker.attack || 0) : (attacker.sp_attack || 0);
   const defStat = isPhysical ? (defender.defense || 0) : (defender.sp_defense || 0);
+
+  // Ability: 根性 (Guts) - 1.5x attack when statused
+  const atkAbility = getAbilityDef(attacker);
+  if (atkAbility && atkAbility.type === 'guts' && attacker.statusEffects && attacker.statusEffects.length > 0 && isPhysical) {
+    atkStat = Math.floor(atkStat * atkAbility.atkMult);
+  }
 
   const levelFactor = (2 * attacker.level / 5 + 2);
   let damage = Math.floor((levelFactor * skill.power * atkStat / Math.max(1, defStat)) / 50 + 2);
 
+  // STAB (Same Type Attack Bonus)
   const attackerDef = petsData.pets.find(p => p.id === attacker.pet_id);
   if (attackerDef && attackerDef.type === skill.type) {
-    damage = Math.floor(damage * 1.5);
+    const stabMult = (atkAbility && atkAbility.type === 'stab_boost') ? atkAbility.stabMult : 1.5;
+    damage = Math.floor(damage * stabMult);
   }
 
   const defenderDef = petsData.pets.find(p => p.id === defender.pet_id);
   const typeMultiplier = defenderDef ? getTypeMultiplier(skill.type, defenderDef.type) : 1.0;
   damage = Math.floor(damage * typeMultiplier);
 
+  // Ability: low_hp_boost (猛火/急流/茂盛)
+  if (atkAbility && atkAbility.type === 'low_hp_boost' && skill.type === atkAbility.boostType) {
+    if (attacker.current_hp / attacker.max_hp <= atkAbility.threshold) {
+      damage = Math.floor(damage * atkAbility.mult);
+    }
+  }
+
+  // Ability: type_resist (圣光守护)
+  const defAbility = getAbilityDef(defender);
+  if (defAbility && defAbility.type === 'type_resist' && skill.type === defAbility.resistType) {
+    damage = Math.floor(damage * defAbility.mult);
+  }
+
   // Execute: bonus damage when defender HP is below threshold
   if (skill.execute && defender.current_hp / defender.max_hp < skill.execute.hpThreshold) {
     damage = Math.floor(damage * skill.execute.damageMult);
   }
 
+  // Weather: type damage modifier
+  if (weather === 'sun') {
+    if (skill.type === 'fire') damage = Math.floor(damage * 1.5);
+    if (skill.type === 'water') damage = Math.floor(damage * 0.5);
+  } else if (weather === 'rain') {
+    if (skill.type === 'water') damage = Math.floor(damage * 1.5);
+    if (skill.type === 'fire') damage = Math.floor(damage * 0.5);
+  }
+
   const randomFactor = (85 + Math.floor(Math.random() * 16)) / 100;
   damage = Math.floor(damage * randomFactor);
 
-  // Critical hit (base 6.25%, modified by critUp)
+  // Critical hit (base 6.25%, modified by critUp and ability)
   let critRate = 0.0625;
   if (attacker._critRateMult) critRate *= attacker._critRateMult;
+  if (atkAbility && atkAbility.type === 'crit_boost') critRate *= atkAbility.critMult;
   let critical = false;
   if (Math.random() < critRate) {
     damage = Math.floor(damage * 1.5);
@@ -99,8 +165,19 @@ function canAct(pet) {
 
 // Decrement status effect turns and remove expired ones
 function tickStatusEffects(pet) {
-  if (!pet.statusEffects) return [];
+  if (!pet.statusEffects) pet.statusEffects = [];
   const messages = [];
+
+  // Ability: end_turn_heal (光辉体)
+  const ability = getAbilityDef(pet);
+  if (ability && ability.type === 'end_turn_heal' && pet.current_hp > 0 && pet.current_hp < pet.max_hp) {
+    const healAmt = Math.floor(pet.max_hp * ability.healFrac);
+    if (healAmt > 0) {
+      pet.current_hp = Math.min(pet.max_hp, pet.current_hp + healAmt);
+      messages.push(`${pet.nickname}的特性「${getAbility(pet)}」恢复了${healAmt}点HP！`);
+    }
+  }
+
   const toRemove = [];
 
   pet.statusEffects.forEach((effect, i) => {
@@ -162,14 +239,52 @@ function getOriginalStat(pet, stat) {
   return pet._origStats[stat] !== undefined ? pet._origStats[stat] : pet._origStats[legacyKey];
 }
 
-function executePveTurn(playerPet, enemyPet, playerSkillId) {
+function initPpMap(pet) {
+  if (!pet._ppMap) {
+    const skills = typeof pet.skills === 'string' ? JSON.parse(pet.skills) : (pet.skills || []);
+    pet._ppMap = {};
+    skills.forEach(sid => {
+      pet._ppMap[sid] = SKILL_PP_MAP[sid] || 99;
+    });
+  }
+}
+
+function getAvailableSkillId(pet, requestedSkillId) {
+  initPpMap(pet);
+  // Check if requested skill has PP left
+  if (pet._ppMap[requestedSkillId] !== undefined && pet._ppMap[requestedSkillId] > 0) {
+    return requestedSkillId;
+  }
+  // Find any skill with PP remaining
+  const skills = typeof pet.skills === 'string' ? JSON.parse(pet.skills) : (pet.skills || []);
+  for (const sid of skills) {
+    if (pet._ppMap[sid] && pet._ppMap[sid] > 0) return sid;
+  }
+  // All PP exhausted -> use Struggle (id 61)
+  return 61;
+}
+
+function deductPp(pet, skillId) {
+  initPpMap(pet);
+  if (skillId === 61) return; // Struggle has unlimited PP
+  if (pet._ppMap[skillId] !== undefined) {
+    pet._ppMap[skillId] = Math.max(0, pet._ppMap[skillId] - 1);
+  }
+}
+
+function executePveTurn(playerPet, enemyPet, playerSkillId, weather = null) {
   // Validate that pet knows the skill
   const knownSkills = Array.isArray(playerPet.skills) ? playerPet.skills : JSON.parse(playerPet.skills || '[]');
-  if (!knownSkills.includes(playerSkillId)) {
+  if (!knownSkills.includes(playerSkillId) && playerSkillId !== 61) {
     return { battleEnd: false, error: '非法操作：精灵未学会该技能！' };
   }
 
-  const skill = skillsData.skills.find(s => s.id === playerSkillId);
+  // PP check: if requested skill has no PP, find alternative or use Struggle
+  initPpMap(playerPet);
+  initPpMap(enemyPet);
+  const actualPlayerSkillId = getAvailableSkillId(playerPet, playerSkillId);
+
+  const skill = skillsData.skills.find(s => s.id === actualPlayerSkillId);
   if (!skill) return { battleEnd: false, error: '技能不存在' };
 
   const results = [];
@@ -202,7 +317,8 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   // Determine turn order (respect priority flag)
   let playerFirst;
   const playerSkill = skill;
-  const enemySkill = chooseEnemySkill(enemyPet);
+  const enemySkillId = getAvailableSkillId(enemyPet, chooseEnemySkill(enemyPet).id);
+  const enemySkill = skillsData.skills.find(s => s.id === enemySkillId) || chooseEnemySkill(enemyPet);
 
   if (playerSkill.priority && !enemySkill.priority) {
     playerFirst = true;
@@ -222,7 +338,9 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   if (!act1.canAct) {
     results.push({ isPlayerAttacking: isPlayer1, skillName: null, message: act1.reason, skipped: true });
   } else {
-    const result1 = executeAttack(attacker1, defender1, skill1, isPlayer1);
+    // Deduct PP
+    deductPp(attacker1, isPlayer1 ? actualPlayerSkillId : enemySkillId);
+    const result1 = executeAttack(attacker1, defender1, skill1, isPlayer1, weather);
     results.push(result1);
   }
 
@@ -241,7 +359,9 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
   if (!act2.canAct) {
     results.push({ isPlayerAttacking: isPlayer2, skillName: null, message: act2.reason, skipped: true });
   } else {
-    const result2 = executeAttack(attacker2, defender2, skill2, isPlayer2);
+    // Deduct PP
+    deductPp(attacker2, isPlayer2 ? actualPlayerSkillId : enemySkillId);
+    const result2 = executeAttack(attacker2, defender2, skill2, isPlayer2, weather);
     results.push(result2);
   }
 
@@ -252,13 +372,47 @@ function executePveTurn(playerPet, enemyPet, playerSkillId) {
     if (msg) results.push({ isPlayerAttacking: null, skillName: null, message: msg, statusEffect: true });
   });
 
+  // Apply weather end turn damage
+  if (weather === 'sandstorm' || weather === 'hail') {
+    const immuneTypes = weather === 'sandstorm' ? ['ground', 'rock', 'steel', 'earth'] : ['ice'];
+    const weatherName = weather === 'sandstorm' ? '沙暴' : '冰雹';
+    [playerPet, enemyPet].forEach(p => {
+      const pDef = petsData.pets.find(pd => pd.id === p.pet_id);
+      if (pDef && !immuneTypes.includes(pDef.type) && p.current_hp > 0) {
+        // Some abilities might grant immunity to weather damage (like 光辉体, optional)
+        const wDmg = Math.max(1, Math.floor(p.max_hp * 0.0625));
+        p.current_hp = Math.max(0, p.current_hp - wDmg);
+        results.push({
+          isPlayerAttacking: null, skillName: null, statusEffect: true,
+          message: `由于${weatherName}天气的影响，${p.nickname}受到了${wDmg}点伤害！`
+        });
+      }
+    });
+  }
+
   const battleEnd = playerPet.current_hp <= 0 || enemyPet.current_hp <= 0;
   const playerWin = battleEnd ? enemyPet.current_hp <= 0 : null;
 
-  return { results, playerPet, enemyPet, battleEnd, playerWin };
+  return { results, playerPet, enemyPet, battleEnd, playerWin, ppUsed: actualPlayerSkillId !== playerSkillId ? actualPlayerSkillId : null, playerPpMap: playerPet._ppMap };
 }
 
-function executeAttack(attacker, defender, skill, isPlayerAttacking) {
+function executeAttack(attacker, defender, skill, isPlayerAttacking, weather = null) {
+  // Ability: type_absorb (蓄电/储水) - nullify attack and heal
+  const defAbility = getAbilityDef(defender);
+  if (defAbility && defAbility.type === 'type_absorb' && skill.type === defAbility.absorbType && skill.category !== 'status') {
+    const healAmt = Math.floor(defender.max_hp * defAbility.healFrac);
+    defender.current_hp = Math.min(defender.max_hp, defender.current_hp + healAmt);
+    const abilityName = getAbility(defender);
+    return {
+      isPlayerAttacking,
+      skillName: skill.name,
+      damage: 0,
+      heal: healAmt,
+      message: `${!isPlayerAttacking ? '我方' : '对方'}的${defender.nickname}的特性「${abilityName}」吸收了攻击，恢复了${healAmt}点HP！`,
+      absorbed: true
+    };
+  }
+
   // Accuracy check
   if (Math.random() * 100 > (skill.accuracy ?? 100)) {
     return {
@@ -333,7 +487,7 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   }
 
   // === DAMAGE ATTACK ===
-  const { damage, critical, typeMultiplier } = calculateDamage(attacker, defender, skill);
+  const { damage, critical, typeMultiplier } = calculateDamage(attacker, defender, skill, weather);
 
   // Apply shield absorption
   let actualDamage = damage;
@@ -405,7 +559,31 @@ function executeAttack(attacker, defender, skill, isPlayerAttacking) {
   applyDebuff(defender, skill);
 
   // Apply status effects from attack skill to defender
-  applyStatusEffect(defender, skill);
+  // Ability: status_immune (叶子防御) - immune to status effects
+  const defAbility2 = getAbilityDef(defender);
+  if (defAbility2 && defAbility2.type === 'status_immune') {
+    // Skip status application
+  } else {
+    applyStatusEffect(defender, skill);
+  }
+
+  // Ability: contact_status (烈焰身躯/静电) - physical contact may inflict status on attacker
+  if (skill.category === 'physical' && actualDamage > 0 && defender.current_hp > 0) {
+    const defContact = getAbilityDef(defender);
+    if (defContact && defContact.type === 'contact_status' && Math.random() < defContact.chance) {
+      if (!attacker.statusEffects) attacker.statusEffects = [];
+      const hasStatus = attacker.statusEffects.some(e => e.type === defContact.status);
+      if (!hasStatus) {
+        const statusEffect = { type: defContact.status, turns: defContact.turns };
+        if (defContact.damage) statusEffect.damage = defContact.damage;
+        if (defContact.speedMult) statusEffect.speedMult = defContact.speedMult;
+        attacker.statusEffects.push(statusEffect);
+        const abilityName = getAbility(defender);
+        const statusNames = { burn: '炙烧', paralyze: '麻痹' };
+        message += ` ${defender.nickname}的特性「${abilityName}」使${attacker.nickname}${statusNames[defContact.status] || '异常'}了！`;
+      }
+    }
+  }
 
   return {
     isPlayerAttacking,
@@ -525,5 +703,8 @@ module.exports = {
   executeAttack,
   processTurnStartStatus,
   canAct,
-  tickStatusEffects
+  tickStatusEffects,
+  initPpMap,
+  getAvailableSkillId,
+  deductPp
 };

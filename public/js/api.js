@@ -85,7 +85,8 @@ const API = {
   getBase() { return this.request('GET', '/player/base'); },
   saveBase(items) { return this.request('POST', '/player/base/save', { items }); },
   getBasePets() { return this.request('GET', '/player/base/pets'); },
-  toggleBasePet(petId, inBase) { return this.request('POST', '/player/base/pets/toggle', { petId, inBase }); }
+  toggleBasePet(petId, inBase) { return this.request('POST', '/player/base/pets/toggle', { petId, inBase }); },
+  claimBaseExp() { return this.request('POST', '/player/base/claim-exp'); }
 };
 window.API = API;
 
