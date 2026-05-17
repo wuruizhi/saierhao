@@ -11,7 +11,13 @@ const API = {
     if (this.token) opts.headers['Authorization'] = `Bearer ${this.token}`;
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(`/api${url}`, opts);
-    const data = await res.json();
+    let data = {};
+    try {
+      data = await res.json();
+    } catch(err) {
+      if (!res.ok) throw new Error(`服务器连接失败或返回异常 (${res.status})`);
+      throw new Error('服务器返回了无效的数据格式');
+    }
     if (!res.ok) throw new Error(data.error || '请求失败');
     return data;
   },

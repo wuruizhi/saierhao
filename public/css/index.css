@@ -1352,16 +1352,16 @@ input:checked + .toggle-slider:before {
 /* Item-specific placements replaced by unified image placements */
 
 /* HEAD ITEMS */
-.player-part-head .part-icon { font-size: 64px; transform: translate(0px, -24px); }
+.player-part-head .part-icon { font-size: 44px; transform: translate(0px, -26px); }
 
 /* BODY ITEMS */
-.player-part-body .part-icon { font-size: 56px; transform: translate(0px, 14px); }
+.player-part-body .part-icon { font-size: 40px; transform: translate(0px, 8px); }
 
 /* BACK ITEMS */
-.player-part-back .part-icon { font-size: 80px; transform: translate(0px, 0px); z-index: 1; }
+.player-part-back .part-icon { font-size: 56px; transform: translate(0px, 0px); z-index: 1; }
 
 /* ACCESSORY ITEMS */
-.player-part-accessory .part-icon { font-size: 48px; transform: translate(0px, -8px); z-index: 13; }
+.player-part-accessory .part-icon { font-size: 32px; transform: translate(0px, -4px); z-index: 13; }
 
 /* ===== ACHIEVEMENT SYSTEM ===== */
 .achievement-header {
