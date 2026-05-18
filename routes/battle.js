@@ -171,7 +171,8 @@ function createBattleRouter(db, sceneManager) {
       return res.status(400).json({ error: '战斗不存在' });
     }
     const numericSkillId = Number(skillId);
-    const activeSkills = Array.isArray(battle.activePet.skills) ? battle.activePet.skills : JSON.parse(battle.activePet.skills || '[]');
+    const rawSkills = Array.isArray(battle.activePet.skills) ? battle.activePet.skills : JSON.parse(battle.activePet.skills || '[]');
+    const activeSkills = rawSkills.map(Number);
     if (!Number.isInteger(numericSkillId) || !activeSkills.includes(numericSkillId)) {
       return res.status(400).json({ error: '该精灵未装备此技能' });
     }

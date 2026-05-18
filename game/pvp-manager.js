@@ -307,7 +307,8 @@ class PvpManager {
 
     const numericSkillId = Number(skillId);
     const activePet = player.team[player.activeIndex];
-    const activeSkills = Array.isArray(activePet.skills) ? activePet.skills : JSON.parse(activePet.skills || '[]');
+    const rawSkills = Array.isArray(activePet.skills) ? activePet.skills : JSON.parse(activePet.skills || '[]');
+    const activeSkills = rawSkills.map(Number);
     if (!Number.isInteger(numericSkillId) || !activeSkills.includes(numericSkillId)) {
       this.sendTo(userId, { type: 'pvp_error', message: '该精灵未装备此技能' });
       return;
