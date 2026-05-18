@@ -53,7 +53,9 @@ function createBattleRouter(db, sceneManager) {
 
   // Start battle with a specific spawn in a scene
   router.post('/explore', authMiddleware, (req, res) => {
-    const { mapId, sceneIndex = 0, spawnId } = req.body;
+    let { mapId, sceneIndex = 0, spawnId } = req.body;
+    mapId = parseInt(mapId);
+    sceneIndex = parseInt(sceneIndex);
     let map = null;
     for (const g of (mapsData.galaxies || [])) {
       map = g.planets.find(m => m.id === mapId);
