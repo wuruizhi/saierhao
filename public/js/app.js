@@ -2228,7 +2228,10 @@ async function loadStoryQuests() {
 
     window._trackerData = window._trackerData || { story: null, dailies: [] };
     if (hasActiveStory) {
-      window._trackerData.story = { title: activeQuestTitle, desc: activeQuestDesc, progress: activeQuestProgress };
+      // Find the active quest's planet ID to use for navigation
+      const activeQuest = res.quests.find(q => q.status !== 'completed');
+      const activePlanetId = activeQuest ? activeQuest.planet_id : null;
+      window._trackerData.story = { title: activeQuestTitle, desc: activeQuestDesc, progress: activeQuestProgress, planetId: activePlanetId };
     } else {
       window._trackerData.story = null;
     }
@@ -2247,7 +2250,7 @@ window.renderQuestTracker = function() {
   
   if ((filter === 'all' || filter === 'story') && data.story) {
     html += `
-      <div class="quest-tracker-item">
+      <div class="quest-tracker-item" ${data.story.planetId ? `style="cursor:pointer" onclick="enterScene('${data.story.planetId}', 0)"` : ''}>
         <div style="font-weight:bold;color:var(--neon-blue);font-size:13px;margin-bottom:2px;">[主线] ${data.story.title}</div>
         <div style="color:var(--text-secondary);font-size:12px;">${data.story.desc}</div>
         <div style="color:var(--neon-cyan);font-size:12px;margin-top:2px;">${data.story.progress}</div>
